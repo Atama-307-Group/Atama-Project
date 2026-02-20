@@ -1,43 +1,28 @@
 package com.atama.model;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
-public class FillBlankFlashcard implements Flashcard {
-    private int id;
+@Entity
+@DiscriminatorValue("FILL_BLANK")
+@Getter
+@Setter
+@NoArgsConstructor
+public class FillBlankFlashcard extends Flashcard {
+
     private String textWithBlanks;
+
+    @ElementCollection
+    @CollectionTable(name = "fill_blank_correct_answers", joinColumns = @JoinColumn(name = "flashcard_id"))
+    @Column(name = "answer")
     private List<String> correctAnswers;
 
-    public FillBlankFlashcard() {}
-
-    public FillBlankFlashcard(int id, String textWithBlanks, List<String> correctAnswers) {
-        this.id = id;
+    public FillBlankFlashcard(String textWithBlanks, List<String> correctAnswers) {
         this.textWithBlanks = textWithBlanks;
-        this.correctAnswers = correctAnswers;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTextWithBlanks() {
-        return textWithBlanks;
-    }
-
-    public void setTextWithBlanks(String textWithBlanks) {
-        this.textWithBlanks = textWithBlanks;
-    }
-
-    public List<String> getCorrectAnswers() {
-        return correctAnswers;
-    }
-
-    public void setCorrectAnswers(List<String> correctAnswers) {
         this.correctAnswers = correctAnswers;
     }
 }
