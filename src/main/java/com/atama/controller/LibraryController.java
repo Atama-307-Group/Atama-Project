@@ -1,0 +1,27 @@
+package com.atama.controller;
+
+import com.atama.model.Library;
+import com.atama.service.LibraryService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/libraries")
+@RequiredArgsConstructor
+public class LibraryController {
+
+    private final LibraryService libraryService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Library> getLibraryById(@PathVariable UUID id) {
+        return ResponseEntity.ok(libraryService.getLibraryById(id));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Library> getLibraryByUserId(@PathVariable UUID userId) {
+        return ResponseEntity.ok(libraryService.getLibraryByUserId(userId));
+    }
+}
