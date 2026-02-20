@@ -1,41 +1,23 @@
 package com.atama.model;
 
-public class NormalFlashcard implements Flashcard {
-    private int id;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@DiscriminatorValue("NORMAL")
+@Getter
+@Setter
+@NoArgsConstructor
+public class NormalFlashcard extends Flashcard {
+
     private String term;
     private String definition;
 
-    public NormalFlashcard() {}
-
-    public NormalFlashcard(int id, String term, String definition) {
-        this.id = id;
+    public NormalFlashcard(String term, String definition) {
         this.term = term;
         this.definition = definition;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTerm() {
-        return term;
-    }
-
-    public void setTerm(String term) {
-        this.term = term;
-    }
-
-    public String getDefinition() {
-        return definition;
-    }
-
-    public void setDefinition(String definition) {
-            this.definition = definition;
     }
 }

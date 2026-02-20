@@ -1,24 +1,34 @@
 package com.atama.model;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.Instant;
 import java.util.UUID;
 
-public interface LibraryItem {
-    UUID id();
-    UUID ownerId();     // ID of the user of the library
-    String title();
-    LibraryItemType type();
-    Instant createdAt();
-    Instant updatedAt();
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type")
+@Getter
+@Setter
+public abstract class LibraryItem {
 
-    UUID getId();
-    String getTitle();
-    void open(); // Logic for how the item is viewed
-}
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-enum LibraryItemType {
-    FLASHCARD_SET,
-    PRACTICE_TEST,
-    STUDY_GUIDE,
-    DOCUMENT
+    @Column(nullable = false)
+    private UUID ownerId;
+
+    @Column(nullable = false)
+    private String title;
+
+    @CreationTimestamp
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    private Instant updatedAt;
 }

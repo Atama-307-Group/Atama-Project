@@ -1,52 +1,32 @@
 package com.atama.model;
 
-import java.time.Instant;
-import java.util.UUID;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class FlashcardSet implements LibraryItem {
-//TODO
-    @Override
-    public UUID id() {
-        return null;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@DiscriminatorValue("FLASHCARD_SET")
+@Getter
+@Setter
+@NoArgsConstructor
+public class FlashcardSet extends LibraryItem {
+
+    private String description;
+
+    @OneToMany(mappedBy = "flashcardSet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Flashcard> flashcards = new ArrayList<>();
+
+    public void addFlashcard(Flashcard flashcard) {
+        flashcards.add(flashcard);
+        flashcard.setFlashcardSet(this);
     }
 
-    @Override
-    public UUID ownerId() {
-        return null;
-    }
-
-    @Override
-    public String title() {
-        return "";
-    }
-
-    @Override
-    public LibraryItemType type() {
-        return null;
-    }
-
-    @Override
-    public Instant createdAt() {
-        return null;
-    }
-
-    @Override
-    public Instant updatedAt() {
-        return null;
-    }
-
-    @Override
-    public UUID getId() {
-        return null;
-    }
-
-    @Override
-    public String getTitle() {
-        return "";
-    }
-
-    @Override
-    public void open() {
-
+    public void removeFlashcard(Flashcard flashcard) {
+        flashcards.remove(flashcard);
+        flashcard.setFlashcardSet(null);
     }
 }

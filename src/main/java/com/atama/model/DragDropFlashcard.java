@@ -1,39 +1,34 @@
 package com.atama.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
-public class DragDropFlashcard implements Flashcard {
-    private int id;
-    @Setter
-    @Getter
+@Entity
+@DiscriminatorValue("DRAG_DROP")
+@Getter
+@Setter
+@NoArgsConstructor
+public class DragDropFlashcard extends Flashcard {
+
     private String prompt;
-    @Setter
-    @Getter
+
+    @ElementCollection
+    @CollectionTable(name = "drag_drop_draggable_items", joinColumns = @JoinColumn(name = "flashcard_id"))
+    @Column(name = "item")
     private List<String> draggableItems;
-    @Setter
-    @Getter
+
+    @ElementCollection
+    @CollectionTable(name = "drag_drop_drop_targets", joinColumns = @JoinColumn(name = "flashcard_id"))
+    @Column(name = "target")
     private List<String> dropTargets;
 
-    public DragDropFlashcard() {}
-
-    public DragDropFlashcard(int id, String prompt, List<String> draggableItems, List<String> dropTargets) {
-        this.id = id;
+    public DragDropFlashcard(String prompt, List<String> draggableItems, List<String> dropTargets) {
         this.prompt = prompt;
         this.draggableItems = draggableItems;
         this.dropTargets = dropTargets;
     }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(int id) {
-        this.id = id;
-    }
-
 }
