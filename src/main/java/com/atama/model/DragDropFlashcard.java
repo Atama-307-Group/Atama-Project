@@ -1,9 +1,20 @@
+package com.atama.model;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 public class DragDropFlashcard implements Flashcard {
     private int id;
+    @Setter
+    @Getter
     private String prompt;
+    @Setter
+    @Getter
     private List<String> draggableItems;
+    @Setter
+    @Getter
     private List<String> dropTargets;
 
     public DragDropFlashcard() {}
@@ -25,27 +36,4 @@ public class DragDropFlashcard implements Flashcard {
         this.id = id;
     }
 
-    public String getPrompt() {
-        return prompt;
-    }
-
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
-    }
-
-    public List<String> getDraggableItems() {
-        return draggableItems;
-    }
-
-    public void setDraggableItems(List<String> draggableItems) {
-        this.draggableItems = draggableItems;
-    }
-
-    public List<String> getDropTargets() {
-        return dropTargets;
-    }
-
-    public void setDropTargets(List<String> dropTargets) {
-        this.dropTargets = dropTargets;
-    }
 }
