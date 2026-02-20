@@ -16,8 +16,7 @@ import java.util.UUID;
 public class Folder {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private int id;
 
     @Column(nullable = false)
     private String name;
@@ -40,5 +39,10 @@ public class Folder {
 
     public void addItem(LibraryItem item) {
         items.add(item);
+    }
+
+    public Folder(int randomID, String name) {
+        this.id = randomID;
+        this.name = name;
     }
 }
