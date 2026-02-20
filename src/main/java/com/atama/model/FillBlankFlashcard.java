@@ -1,3 +1,5 @@
+package com.atama.model;
+
 import java.util.List;
 
 public class FillBlankFlashcard implements Flashcard {

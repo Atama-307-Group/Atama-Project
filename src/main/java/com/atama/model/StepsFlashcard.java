@@ -1,8 +1,17 @@
+package com.atama.model;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 public class StepsFlashcard implements Flashcard {
     private int id;
+    @Setter
+    @Getter
     private String title;
+    @Setter
+    @Getter
     private List<String> steps;
 
     public StepsFlashcard() {}
@@ -23,19 +32,4 @@ public class StepsFlashcard implements Flashcard {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<String> getSteps() {
-        return steps;
-    }
-
-    public void setSteps(List<String> steps) {
-        this.steps = steps;
-    }
 }

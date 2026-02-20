@@ -1,3 +1,5 @@
+package com.atama.model;
+
 public class NormalFlashcard implements Flashcard {
     private int id;
     private String term;

@@ -1,3 +1,5 @@
+package com.atama.model;
+
 public interface Flashcard {
     int getId();
     void setId(int id);
