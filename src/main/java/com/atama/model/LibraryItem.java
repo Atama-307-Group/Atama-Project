@@ -20,8 +20,13 @@ public abstract class LibraryItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID ownerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "library_id", nullable = false)
+    private Library library;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "folder_id") // nullable => loose
+    private Folder folder;
 
     @Column(nullable = false)
     private String title;

@@ -26,9 +26,8 @@ public class Library {
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Folder> folders = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "library_id")
-    private List<LibraryItem> looseItems = new ArrayList<>();
+    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LibraryItem> items = new ArrayList<>();
 
     public Library(User user) {
         this.user = user;
@@ -39,7 +38,9 @@ public class Library {
         folder.setLibrary(this);
     }
 
-    public void addItemToLibrary(LibraryItem item) {
-        looseItems.add(item);
+    public void addItem(LibraryItem item) {
+        items.add(item);
+        item.setLibrary(this);
+        item.setFolder(null); // ensure loose item by default
     }
 }
