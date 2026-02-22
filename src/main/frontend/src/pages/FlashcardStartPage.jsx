@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FlashcardStartPage = ({ onStart }) => {
+const FlashcardStartPage = ({ onStart, onSignup }) => {
   return (
     <div
       style={{
@@ -15,6 +15,20 @@ const FlashcardStartPage = ({ onStart }) => {
 
       {/* Buttons side by side */}
       <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+        <button
+          onClick={onSignup}
+          style={{
+            padding: '10px 20px',
+            fontSize: '18px',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            backgroundColor: '#3e8ed0',
+            color: 'white',
+            border: 'none',
+          }}
+        >
+          Sign Up
+        </button>
         <button
           onClick={onStart}
           style={{
