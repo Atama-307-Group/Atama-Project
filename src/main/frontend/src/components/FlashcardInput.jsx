@@ -100,7 +100,7 @@ const FlashcardInput = ({ index, card, onChange, onRemove, canRemove }) => {
               onChange={(e) => updateField('prompt', e.target.value)}
               className="flashcard-input-field"
             />
-            <ListEditor
+            <ListEditor // not happy with this, but idk how to fix it
               label="Draggable Items"
               items={card.draggableItems || []}
               placeholder="Item"
