@@ -16,7 +16,7 @@ public class LibraryItemService {
     private final LibraryItemRepository libraryItemRepository;
 
     @Transactional
-    public void removeItemFromFolder(UUID userId, UUID itemId) {
+    public void removeItemFromFolder(Long userId, Long itemId) {
         LibraryItem item = libraryItemRepository
                 .findByIdAndLibrary_User_Id(itemId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("LibraryItem", "id", itemId));

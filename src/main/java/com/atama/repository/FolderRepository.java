@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface FolderRepository extends JpaRepository<Folder, UUID> {
-    List<Folder> findByLibraryId(UUID libraryId);
+public interface FolderRepository extends JpaRepository<Folder, Long> {
+    List<Folder> findByLibraryId(Long libraryId);
 }

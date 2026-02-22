@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface FlashcardRepository extends JpaRepository<Flashcard, Long> {
-    List<Flashcard> findByFlashcardSetId(UUID flashcardSetId);
+    List<Flashcard> findByFlashcardSetId(Long flashcardSetId);
 }

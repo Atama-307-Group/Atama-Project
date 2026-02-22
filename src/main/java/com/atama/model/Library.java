@@ -16,8 +16,8 @@ import java.util.UUID;
 public class Library {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
@@ -28,6 +28,9 @@ public class Library {
 
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LibraryItem> items = new ArrayList<>();
+
+    @Column(nullable = false)
+    private boolean isPrivate = true;
 
     public Library(User user) {
         this.user = user;

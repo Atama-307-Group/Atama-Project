@@ -17,8 +17,8 @@ import java.util.UUID;
 public abstract class LibraryItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "library_id", nullable = false)
@@ -36,4 +36,10 @@ public abstract class LibraryItem {
 
     @UpdateTimestamp
     private Instant updatedAt;
+
+    @Column
+    private Instant lastAccessed;
+
+    @Column(nullable = false)
+    private boolean starred = false;
 }

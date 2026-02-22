@@ -18,8 +18,8 @@ import java.util.UUID;
 public class Folder {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -36,6 +36,9 @@ public class Folder {
 
     @CreationTimestamp
     private Instant createdAt;
+
+    @Column(nullable = false)
+    private boolean starred = false;
 
     public Folder(String name) {
         this.name = name;
