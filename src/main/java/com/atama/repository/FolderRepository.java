@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface FolderRepository extends JpaRepository<Folder, Long> {
-    List<Folder> findByLibraryId(Long libraryId);
+    // List<Folder> findByLibraryId(Long libraryId);
 }

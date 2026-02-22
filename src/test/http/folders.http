@@ -1,0 +1,8 @@
+### Create a folder
+POST http://localhost:8080/folders
+Content-Type: application/json
+
+{
+  "name": "My 2nd folder",
+  "libraryId": 1
+}
