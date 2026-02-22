@@ -1,5 +1,5 @@
 import React from 'react';
-import './Flashcard.css'; // We'll create this for the flip animation
+import './Flashcard.css';
 
 const Flashcard = ({ question, answer, flipped, onFlip }) => {
   return (

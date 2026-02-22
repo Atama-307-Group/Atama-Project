@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FlashcardStartPage = ({ onStart }) => {
+const FlashcardStartPage = ({ onStart, onCreate }) => {
   return (
     <div
       style={{
@@ -16,7 +16,18 @@ const FlashcardStartPage = ({ onStart }) => {
       {/* Buttons side by side */}
       <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
         <button
-          onClick={onStart}
+          onClick={onCreate}
+          style={{
+            padding: '10px 20px',
+            fontSize: '18px',
+            borderRadius: '5px',
+            cursor: 'pointer',
+          }}
+        >
+          Create New Set
+        </button>
+        <button
+          onClick={onStart} // TODO: should probably change url when navigating pages
           style={{
             padding: '10px 20px',
             fontSize: '18px',
@@ -50,17 +61,6 @@ const FlashcardStartPage = ({ onStart }) => {
           Practice Test
         </button>
 
-        <button
-          onClick={() => alert('Other cool feature soon...')}
-          style={{
-            padding: '10px 20px',
-            fontSize: '18px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
-        >
-          Other cool feature
-        </button>
       </div>
     </div>
   );
