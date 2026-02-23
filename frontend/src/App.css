@@ -1,0 +1,364 @@
+:root {
+  /* Your palette */
+  --deep: #1E352F;
+  --mint: #DDFFD9;
+  --sage: #77BFA3;
+  --pine: #335145;
+
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color: var(--deep);
+  background: var(--mint);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-y: auto;   /* ✅ window scroll = scrollbar on FAR RIGHT */
+  overflow-x: hidden;
+}
+
+.appShell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 320px 1fr; /* right side dominates */
+  overflow: visible; /* ✅ prevents inner accidental scrollbars */
+}
+
+/* Left rail (controls only) */
+.rail {
+  background: var(--deep);
+  color: var(--mint);
+  border-right: 1px solid rgba(221, 255, 217, 0.18);
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  height: 100vh;
+  position: sticky; /* stays in place */
+  top: 0;
+  overflow: hidden; /* ✅ no scrollbar here */
+  align-self: start;  /* ✅ important for sticky inside grid */
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(221, 255, 217, 0.08);
+}
+
+.brandMark { font-size: 26px; }
+.brandTitle { font-weight: 900; letter-spacing: 0.2px; }
+.brandSub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+.panel {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(221, 255, 217, 0.08);
+  border: 1px solid rgba(221, 255, 217, 0.14);
+  display: grid;
+  gap: 10px;
+}
+
+.panelTitle {
+  font-weight: 800;
+  font-size: 13px;
+  opacity: 0.95;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  outline: none;
+  border: 1px solid rgba(221, 255, 217, 0.22);
+  background: rgba(221, 255, 217, 0.10);
+  color: var(--mint);
+}
+
+.input::placeholder { color: rgba(221, 255, 217, 0.7); }
+
+.input:focus {
+  border-color: rgba(119, 191, 163, 0.9);
+  background: rgba(221, 255, 217, 0.14);
+}
+
+.createRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.btn {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(221, 255, 217, 0.22);
+  background: rgba(221, 255, 217, 0.10);
+  color: var(--mint);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.btn:hover {
+  border-color: rgba(119, 191, 163, 0.95);
+  background: rgba(119, 191, 163, 0.18);
+}
+
+.btn.ghost {
+  background: transparent;
+}
+
+.error {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 180, 180, 0.55);
+  background: rgba(255, 180, 180, 0.12);
+  color: #ffe3e3;
+  font-size: 12px;
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 1.35;
+  opacity: 0.9;
+  padding: 0 4px;
+}
+
+/* Right side library area */
+.library {
+  background: var(--mint);
+  color: var(--deep);
+  width: 100%;
+  padding: 24px;
+  height: auto;
+  overflow: visible;
+  outline: 3px solid red;
+}
+
+.libraryHeader {
+  background: #ffffffb8;
+  border: 1px solid rgba(51, 81, 69, 0.14);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(6px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.libraryTitle {
+  font-weight: 950;
+  font-size: 22px;
+  letter-spacing: 0.2px;
+}
+
+.librarySub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--pine);
+}
+
+.libraryBody {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.folderGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  align-content: start;
+  outline: 3px solid blue;
+}
+
+.folderCard {
+  border-radius: 18px;
+  border: 1px solid rgba(51, 81, 69, 0.16);
+  background: #ffffff;
+  cursor: pointer;
+  text-align: left;
+  padding: 14px 14px;
+  box-shadow: 0 10px 22px rgba(30, 53, 47, 0.08);
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  color: var(--deep);
+}
+
+.folderCard:hover {
+  transform: translateY(-1px);
+  border-color: rgba(119, 191, 163, 0.8);
+  box-shadow: 0 14px 26px rgba(30, 53, 47, 0.12);
+}
+
+.folderCard.active {
+  border-color: rgba(119, 191, 163, 1);
+  box-shadow: 0 16px 30px rgba(30, 53, 47, 0.16);
+  background: linear-gradient(180deg, #ffffff, rgba(221, 255, 217, 0.55));
+}
+
+.folderName {
+  font-weight: 900;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.folderMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--pine);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.star {
+  color: var(--sage);
+  font-size: 14px;
+}
+
+.mutedStar {
+  opacity: 0.6;
+}
+
+.details {
+  border-radius: 18px;
+  border: 1px solid rgba(51, 81, 69, 0.16);
+  background: #ffffffb8;
+  padding: 14px 14px;
+  backdrop-filter: blur(6px);
+}
+
+.detailsTitle {
+  font-weight: 950;
+  margin-bottom: 10px;
+}
+
+.detailsBody {
+  color: var(--deep);
+  font-size: 13px;
+}
+
+.mutedText {
+  color: var(--pine);
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px 10px;
+}
+
+.k {
+  color: var(--pine);
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.v {
+  font-weight: 800;
+}
+
+.emptyState {
+  color: var(--pine);
+  font-weight: 800;
+  padding: 18px;
+}
+
+/* Buttons */
+.btn.primary {
+  background: var(--sage);
+  border: 1px solid var(--sage);
+  color: var(--deep);
+}
+
+.btn.primary:hover {
+  background: #6ab59a;
+}
+
+.btn.ghost {
+  background: transparent;
+}
+
+/* =========================
+   Modal Popup
+   ========================= */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 53, 47, 0.65); /* deep overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  width: min(420px, calc(100vw - 32px));
+  background: #fff;
+  color: var(--deep);
+  border-radius: 20px;
+  padding: 22px;
+  border: 1px solid rgba(51, 81, 69, 0.18);
+  box-shadow: 0 22px 55px rgba(30, 53, 47, 0.35);
+  animation: modalPop 140ms ease-out;
+}
+
+@keyframes modalPop {
+  from {
+    transform: translateY(6px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modalTitle {
+  font-weight: 950;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.modalForm {
+  display: grid;
+  gap: 14px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(51, 81, 69, 0.22);
+  outline: none;
+  font-size: 14px;
+  background: var(--mint);
+  color: var(--deep);
+}
+
+.modalInput:focus {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 4px rgba(119, 191, 163, 0.22);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Optional: disable button styling (Create disabled when empty) */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
