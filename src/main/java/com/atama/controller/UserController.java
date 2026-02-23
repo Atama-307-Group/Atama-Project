@@ -1,5 +1,6 @@
 package com.atama.controller;
 
+import com.atama.dto.request.UserRegistrationRequest;
 import com.atama.model.User;
 import com.atama.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,11 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<User> registerUser(@RequestBody UserRegistrationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(request));
+    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
