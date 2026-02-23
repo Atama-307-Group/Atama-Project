@@ -18,10 +18,12 @@ public class FolderService {
 
     private final FolderRepository folderRepository;
     private final LibraryRepository libraryRepository;
+    private final LibraryItemRepository libraryItemRepository;
 
-    public FolderService(FolderRepository folderRepository, LibraryRepository libraryRepository) {
+    public FolderService(FolderRepository folderRepository, LibraryRepository libraryRepository, LibraryItemRepository libraryItemRepository) {
         this.folderRepository = folderRepository;
         this.libraryRepository = libraryRepository;
+        this.libraryItemRepository = libraryItemRepository;
     }
 
     public Folder createFolder(CreateFolderRequest request) {
@@ -43,10 +45,8 @@ public class FolderService {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new IllegalArgumentException("Folder not found: " + folderId));
 
-        // TODO figure out wtf
-        // Unassign items so FK doesn't block delete (and we don't delete content)
         List<LibraryItem> items = libraryItemRepository.findAllByFolder_Id(folderId);
-        for (LibraryItem item : items) {
+        for (LibraryItem item : items) {    // Remove all LibraryItems in the Folder
             item.setFolder(null);
         }
         libraryItemRepository.saveAll(items);
