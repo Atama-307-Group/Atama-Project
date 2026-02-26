@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFolder, getFolders, renameFolder, deleteFolder as deleteFolderAPI } from "./api";
+import { createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred } from "./api";
 import "./app.css";
 
 export default function App() {
@@ -59,8 +59,12 @@ export default function App() {
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return folders;
-        return folders.filter((f) => (f.name ?? "").toLowerCase().includes(q));
+        const list = folders.filter((f) => f.name.toLowerCase().includes(q));
+
+        return [...list].sort((a, b) => {
+            if (a.starred !== b.starred) return a.starred ? -1 : 1;
+            return a.name.localeCompare(b.name);
+        });
     }, [folders, query]);
 
     const selected = useMemo(
@@ -114,11 +118,25 @@ export default function App() {
     }, [showModal, renameId, confirmDeleteId]);
 
     // ── Star toggle ───────────────────────────────────────────────────────────
-    function toggleStar(e, id) {
-        e.stopPropagation();
-        setFolders((prev) =>
-            prev.map((f) => (f.id === id ? { ...f, starred: !f.starred } : f))
+    async function onToggleStar(folderId) {
+        // optimistic update
+        const prev = folders;
+        setFolders((curr) =>
+            curr.map((f) => (f.id === folderId ? { ...f, starred: !f.starred } : f))
         );
+
+        try {
+            const folder = folders.find((f) => f.id === folderId);
+            const updated = await setFolderStarred(folderId, !folder.starred);
+
+            // reconcile with server response
+            setFolders((curr) =>
+                curr.map((f) => (f.id === folderId ? updated : f))
+            );
+        } catch (e) {
+            setError(e.message ?? "Failed to update star");
+            setFolders(prev); // rollback
+        }
     }
 
     // ── Delete ────────────────────────────────────────────────────────────────
@@ -133,7 +151,7 @@ export default function App() {
         setConfirmDeleteId(null); // close modal immediately
 
         try {
-            await deleteFolderAPI(id);
+            await deleteFolder(id);
             setFolders((prev) => prev.filter((f) => f.id !== id));
             if (selectedFolderId === id) setSelectedFolderId(null);
         } catch (err) {
@@ -239,7 +257,10 @@ export default function App() {
                                             <button
                                                 type="button"
                                                 className={`iconBtn starBtn ${f.starred ? "starred" : ""}`}
-                                                onClick={(e) => toggleStar(e, f.id)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // don’t select folder if you click star
+                                                    onToggleStar(f.id);
+                                                }}
                                                 title={f.starred ? "Unstar" : "Star"}
                                                 aria-label={f.starred ? "Unstar folder" : "Star folder"}
                                             >

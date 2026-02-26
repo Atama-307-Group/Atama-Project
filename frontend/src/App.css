@@ -123,6 +123,7 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 
 .libraryBody { width: 100%; margin-top: 24px; }
 
+/* TODO fix folders so that they automatically fill up the page */
 .folderGrid {
   width: 100%;
   display: grid;
