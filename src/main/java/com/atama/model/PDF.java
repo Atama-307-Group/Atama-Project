@@ -1,4 +1,5 @@
 package com.atama.model;
 
-public class PDF {
+public class PDF extends LibraryItem {
+
 }

@@ -41,16 +41,50 @@ public class FolderService {
     }
 
     @Transactional
+    public Folder renameFolder(Long folderId, String newName) {
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Folder name cannot be empty");
+        }
+
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found"));
+
+        folder.setName(newName.trim());
+
+        return folderRepository.save(folder);
+    }
+
+    @Transactional
     public void deleteFolder(Long folderId) {
         Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(() -> new IllegalArgumentException("Folder not found: " + folderId));
+                .orElseThrow(() -> new RuntimeException("Folder not found"));
 
-        List<LibraryItem> items = libraryItemRepository.findAllByFolder_Id(folderId);
-        for (LibraryItem item : items) {    // Remove all LibraryItems in the Folder
-            item.setFolder(null);
-        }
-        libraryItemRepository.saveAll(items);
+        // 1) Detach all items from this folder
+        libraryItemRepository.clearFolderForItems(folderId);
 
+        // 2) Delete the folder
         folderRepository.delete(folder);
+    }
+
+    @Transactional
+    public Folder setFolderStarred(Long folderId, boolean starred) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found"));
+
+        folder.setStarred(starred);
+        return folder; // managed entity, saved on tx commit
+    }
+
+    @Transactional
+    public Folder toggleFolderStarred(Long folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found"));
+
+        folder.setStarred(!folder.isStarred());
+        return folder;
+    }
+
+    public List<Folder> getAllFolders() {
+        return folderRepository.findAll();
     }
 }

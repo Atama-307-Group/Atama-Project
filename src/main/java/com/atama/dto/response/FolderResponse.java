@@ -1,9 +1,14 @@
 package com.atama.dto.response;
 
+import java.time.Instant;
+import java.util.List;
+
 public record FolderResponse(
         Long id,
         String name,
-        java.time.Instant createdAt,
-        java.time.Instant lastAccessed,
+        boolean starred,
+        Instant createdAt,
+        Instant lastAccessed,
+        List<com.atama.model.LibraryItem> itemIds,
         Long libraryId
 ) {}

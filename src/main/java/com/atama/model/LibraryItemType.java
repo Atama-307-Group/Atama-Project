@@ -1,4 +1,7 @@
 package com.atama.model;
 
-public class LibraryItemType {
+public enum LibraryItemType {
+    FLASHCARD_SET,
+    PDF,
+    PRACTICE_TEST
 }

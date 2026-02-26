@@ -1,4 +1,5 @@
 package com.atama.dto.request;
 
-public class RenameFolderRequest {
-}
+public record RenameFolderRequest(
+        String newName
+) {}

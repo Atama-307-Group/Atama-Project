@@ -7,7 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
-import java.util.UUID;
+
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -42,4 +42,8 @@ public abstract class LibraryItem {
 
     @Column(nullable = false)
     private boolean starred = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LibraryItemType item_type;
 }

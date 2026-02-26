@@ -1,4 +1,3 @@
 package com.atama.dto.request;
 
-public class SetFolderStarredRequest {
-}
+public record SetFolderStarredRequest(boolean starred) {}
