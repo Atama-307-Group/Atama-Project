@@ -3,7 +3,6 @@ package com.atama.service;
 import com.atama.dto.request.CreateFolderRequest;
 import com.atama.model.Folder;
 import com.atama.model.Library;
-import com.atama.model.LibraryItem;
 import com.atama.repository.FolderRepository;
 import com.atama.repository.LibraryRepository;
 import com.atama.repository.LibraryItemRepository;

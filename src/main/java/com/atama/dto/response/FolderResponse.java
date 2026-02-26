@@ -9,6 +9,6 @@ public record FolderResponse(
         boolean starred,
         Instant createdAt,
         Instant lastAccessed,
-        List<com.atama.model.LibraryItem> itemIds,
+        List<com.atama.model.LibraryItem> items,
         Long libraryId
 ) {}

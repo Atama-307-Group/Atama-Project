@@ -5,6 +5,7 @@ import com.atama.dto.request.RenameFolderRequest;
 import com.atama.dto.request.SetFolderStarredRequest;
 import com.atama.dto.response.FolderResponse;
 import com.atama.model.Folder;
+import com.atama.model.LibraryItem;
 import com.atama.service.FolderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,15 +23,17 @@ public class FolderController {
         this.folderService = folderService;
     }
 
-    private static FolderResponse toResponse(Folder saved) {
+    private static FolderResponse toResponse(Folder f) {
+        List<LibraryItem> items = f.getItems() == null ? List.of() : f.getItems();
+
         return new FolderResponse(
-                saved.getId(),
-                saved.getName(),
-                saved.isStarred(),
-                saved.getCreatedAt(),
-                saved.getLastAccessed(),
-                saved.getItems(),
-                saved.getLibrary().getId()
+                f.getId(),
+                f.getName(),
+                f.isStarred(),
+                f.getCreatedAt(),
+                f.getLastAccessed(),
+                items,
+                f.getLibrary().getId()
         );
     }
 
@@ -47,33 +50,35 @@ public class FolderController {
     }
 
     @PatchMapping("/{id}/rename")
-    public ResponseEntity<Folder> renameFolder(
+    public ResponseEntity<FolderResponse> renameFolder(
             @PathVariable Long id,
             @RequestBody RenameFolderRequest request
     ) {
         Folder renamed = folderService.renameFolder(id, request.newName());
-        return ResponseEntity.ok(renamed);
+        return ResponseEntity.ok(toResponse(renamed));
     }
 
-    // Set explicitly (star or unstar)
     @PatchMapping("/{id}/starred")
-    public ResponseEntity<Folder> setStarred(
+    public ResponseEntity<FolderResponse> setStarred(
             @PathVariable Long id,
             @RequestBody SetFolderStarredRequest request
     ) {
         Folder updated = folderService.setFolderStarred(id, request.starred());
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(toResponse(updated));
     }
 
-    // Optional: toggle endpoint (no body)
     @PostMapping("/{id}/starred/toggle")
-    public ResponseEntity<Folder> toggleStarred(@PathVariable Long id) {
+    public ResponseEntity<FolderResponse> toggleStarred(@PathVariable Long id) {
         Folder updated = folderService.toggleFolderStarred(id);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(toResponse(updated));
     }
 
     @GetMapping
-    public ResponseEntity<List<Folder>> getAllFolders() {
-        return ResponseEntity.ok(folderService.getAllFolders());
+    public ResponseEntity<List<FolderResponse>> getAllFolders() {
+        return ResponseEntity.ok(
+                folderService.getAllFolders().stream()
+                        .map(FolderController::toResponse)
+                        .toList()
+        );
     }
 }
