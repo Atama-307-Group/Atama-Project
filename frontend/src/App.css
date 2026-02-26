@@ -277,3 +277,17 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 }
 
 .modalActions { display: flex; justify-content: flex-end; gap: 10px; }
+
+.modalBody {
+  font-size: 14px;
+  color: var(--pine);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.btn.danger {
+  background: #c0392b;
+  border-color: #c0392b;
+  color: #fff;
+}
+.btn.danger:hover { background: #a93226; }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFolder, getFolders, renameFolder } from "./api";
+import { createFolder, getFolders, renameFolder, deleteFolder as deleteFolderAPI } from "./api";
 import "./app.css";
 
 export default function App() {
@@ -13,6 +13,8 @@ export default function App() {
     // Modal state
     const [showModal, setShowModal] = useState(false);
     const [modalName, setModalName] = useState("");
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
 
     // Overflow menu state: holds the id of the card whose menu is open
     const [openMenuId, setOpenMenuId] = useState(null);
@@ -81,18 +83,20 @@ export default function App() {
     async function onCreateFromModal(e) {
         e.preventDefault();
         const name = modalName.trim();
-        if (!name) return;
+        if (!name || submitting) return;
+
         setError("");
+        setSubmitting(true);
         try {
             const created = await createFolder({ name, libraryId: 1 });
             setFolders((prev) => [created, ...prev]);
             setSelectedFolderId(created.id);
-            closeModal(); // TODO Crashing out bc why isn't it closing
-
+            closeModal();
         } catch (err) {
             setError(err.message ?? "Failed to create folder");
+        } finally {
+            setSubmitting(false);
         }
-
     }
 
     // Close modals with Escape
@@ -101,13 +105,13 @@ export default function App() {
             if (ev.key === "Escape") {
                 if (showModal) closeModal();
                 if (renameId !== null) closeRenameModal();
+                if (confirmDeleteId !== null) setConfirmDeleteId(null);
                 setOpenMenuId(null);
             }
         }
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [showModal, renameId]);
+    }, [showModal, renameId, confirmDeleteId]);
 
     // ── Star toggle ───────────────────────────────────────────────────────────
     function toggleStar(e, id) {
@@ -118,10 +122,23 @@ export default function App() {
     }
 
     // ── Delete ────────────────────────────────────────────────────────────────
-    function deleteFolder(id) {
-        setFolders((prev) => prev.filter((f) => f.id !== id));
-        if (selectedFolderId === id) setSelectedFolderId(null);
+
+    function openDeleteConfirm(id) {
         setOpenMenuId(null);
+        setConfirmDeleteId(id);
+    }
+
+    async function confirmDelete() {
+        const id = confirmDeleteId;
+        setConfirmDeleteId(null); // close modal immediately
+
+        try {
+            await deleteFolderAPI(id);
+            setFolders((prev) => prev.filter((f) => f.id !== id));
+            if (selectedFolderId === id) setSelectedFolderId(null);
+        } catch (err) {
+            setError(err.message ?? "Failed to delete folder");
+        }
     }
 
     // ── Rename modal ──────────────────────────────────────────────────────────
@@ -262,7 +279,7 @@ export default function App() {
                                                             className="menuItem danger"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                deleteFolder(f.id);
+                                                                openDeleteConfirm(f.id);
                                                             }}
                                                         >
                                                             🗑️ Delete
@@ -305,8 +322,8 @@ export default function App() {
                                 <button className="btn cancelBtn" type="button" onClick={closeModal}>
                                     Cancel
                                 </button>
-                                <button className="btn primary" type="submit" disabled={!modalName.trim()}>
-                                    Create
+                                <button className="btn primary" type="submit" disabled={!modalName.trim() || submitting}>
+                                    {submitting ? "Creating…" : "Create"}
                                 </button>
                             </div>
                         </form>
@@ -345,6 +362,32 @@ export default function App() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {confirmDeleteId !== null && (
+                <div className="modalOverlay" onClick={() => setConfirmDeleteId(null)}>
+                    <div
+                        className="modal"
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="deleteModalTitle"
+                    >
+                        <div className="modalTitle" id="deleteModalTitle">Delete folder?</div>
+                        <p className="modalBody">
+                            Are you sure you want to delete this folder?
+                            The items inside will <strong>NOT</strong> be deleted.
+                        </p>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" type="button" onClick={() => setConfirmDeleteId(null)}>
+                                No, don't delete
+                            </button>
+                            <button className="btn danger" type="button" onClick={confirmDelete}>
+                                Yes, delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
