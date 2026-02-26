@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { createFolder, getFolders } from "./api";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createFolder, getFolders, renameFolder } from "./api";
 import "./app.css";
 
 export default function App() {
@@ -10,9 +10,18 @@ export default function App() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // ✅ NEW: modal state
+    // Modal state
     const [showModal, setShowModal] = useState(false);
     const [modalName, setModalName] = useState("");
+
+    // Overflow menu state: holds the id of the card whose menu is open
+    const [openMenuId, setOpenMenuId] = useState(null);
+
+    // Rename modal state
+    const [renameId, setRenameId] = useState(null);
+    const [renameName, setRenameName] = useState("");
+
+    const menuRef = useRef(null);
 
     async function loadFolders() {
         setError("");
@@ -22,8 +31,8 @@ export default function App() {
             const list = Array.isArray(data) ? data : [];
             setFolders(list);
             if (list.length && selectedFolderId == null) setSelectedFolderId(list[0].id);
-        } catch (e) {
-            setError(e.message ?? "Something went wrong");
+        } catch (err) {
+            setError(err.message ?? "Something went wrong");
         } finally {
             setLoading(false);
         }
@@ -33,6 +42,18 @@ export default function App() {
         loadFolders();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Close overflow menu when clicking outside
+    useEffect(() => {
+        if (!openMenuId) return;
+        function onPointerDown(e) {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpenMenuId(null);
+            }
+        }
+        window.addEventListener("pointerdown", onPointerDown);
+        return () => window.removeEventListener("pointerdown", onPointerDown);
+    }, [openMenuId]);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -45,7 +66,7 @@ export default function App() {
         [folders, selectedFolderId]
     );
 
-    // ✅ NEW: open/close modal helpers
+    // ── Create modal ──────────────────────────────────────────────────────────
     function openCreateFolderModal() {
         setError("");
         setModalName("");
@@ -57,39 +78,86 @@ export default function App() {
         setModalName("");
     }
 
-    // ✅ NEW: create from modal
     async function onCreateFromModal(e) {
         e.preventDefault();
         const name = modalName.trim();
         if (!name) return;
-
         setError("");
         try {
             const created = await createFolder({ name, libraryId: 1 });
             setFolders((prev) => [created, ...prev]);
             setSelectedFolderId(created.id);
-            closeModal();
-        } catch (e) {
-            setError(e.message ?? "Failed to create folder");
+            closeModal(); // TODO Crashing out bc why isn't it closing
+
+        } catch (err) {
+            setError(err.message ?? "Failed to create folder");
         }
+
     }
 
-    // ✅ NEW: close with Escape
+    // Close modals with Escape
     useEffect(() => {
-        if (!showModal) return;
-
         function onKeyDown(ev) {
-            if (ev.key === "Escape") closeModal();
+            if (ev.key === "Escape") {
+                if (showModal) closeModal();
+                if (renameId !== null) closeRenameModal();
+                setOpenMenuId(null);
+            }
         }
-
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [showModal]);
+    }, [showModal, renameId]);
+
+    // ── Star toggle ───────────────────────────────────────────────────────────
+    function toggleStar(e, id) {
+        e.stopPropagation();
+        setFolders((prev) =>
+            prev.map((f) => (f.id === id ? { ...f, starred: !f.starred } : f))
+        );
+    }
+
+    // ── Delete ────────────────────────────────────────────────────────────────
+    function deleteFolder(id) {
+        setFolders((prev) => prev.filter((f) => f.id !== id));
+        if (selectedFolderId === id) setSelectedFolderId(null);
+        setOpenMenuId(null);
+    }
+
+    // ── Rename modal ──────────────────────────────────────────────────────────
+    function openRenameModal(folder) {
+        setOpenMenuId(null);
+        setRenameId(folder.id);
+        setRenameName(folder.name ?? "");
+    }
+
+    function closeRenameModal() {
+        setRenameId(null);
+        setRenameName("");
+    }
+
+    async function onRenameSubmit(e) {
+        e.preventDefault();
+        const name = renameName.trim();
+        if (!name) return;
+
+        setError("");
+        try {
+            const updated = await renameFolder(renameId, name);
+
+            //setFolders((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+            setFolders((prev) =>
+                prev.map((f) => (f.id === renameId ? { ...f, name } : f))
+            );
+            closeRenameModal();
+        } catch (err) {
+            setError(err.message ?? "Failed to rename folder");
+        }
+    }
 
     return (
         <div className="appShell">
-            {/* Left rail: controls only (not the folders list) */}
+            {/* Left rail */}
             <aside className="rail">
                 <div className="brand">
                     <div className="brandMark">📚</div>
@@ -99,14 +167,15 @@ export default function App() {
                     </div>
                 </div>
 
-
                 <button className="btn primary" onClick={openCreateFolderModal} type="button">
                     Create Folder
                 </button>
 
                 <div className="panel">
                     <div className="panelTitle">Find</div>
+                    <label htmlFor="folder-search" className="srOnly">Search folders</label>
                     <input
+                        id="folder-search"
                         className="input"
                         placeholder="Search folders…"
                         value={query}
@@ -114,12 +183,12 @@ export default function App() {
                     />
                 </div>
 
-
                 {error ? <div className="error">{error}</div> : null}
             </aside>
 
-            {/* Right: the Library takes up the majority */}
+            {/* Right: library */}
             <main className="library">
+                {/* FIX 3: sticky header now has backdrop + subtle border-bottom for scroll context */}
                 <header className="libraryHeader">
                     <div>
                         <div className="libraryTitle">Folders</div>
@@ -138,9 +207,8 @@ export default function App() {
                     ) : (
                         <div className="folderGrid">
                             {filtered.map((f) => (
-                                <button
+                                <div
                                     key={f.id}
-                                    type="button"
                                     className={`folderCard ${f.id === selectedFolderId ? "active" : ""}`}
                                     onClick={() => setSelectedFolderId(f.id)}
                                     title={`Folder #${f.id}`}
@@ -148,24 +216,80 @@ export default function App() {
                                     <div className="folderName">{f.name}</div>
                                     <div className="folderMeta">
                                         <span>#{f.id}</span>
-                                        {f.starred ? (
-                                            <span className="star">★</span>
-                                        ) : (
-                                            <span className="star mutedStar">☆</span>
-                                        )}
+
+                                        <div className="folderActions">
+                                            {/* FIX 2: actionable star toggle */}
+                                            <button
+                                                type="button"
+                                                className={`iconBtn starBtn ${f.starred ? "starred" : ""}`}
+                                                onClick={(e) => toggleStar(e, f.id)}
+                                                title={f.starred ? "Unstar" : "Star"}
+                                                aria-label={f.starred ? "Unstar folder" : "Star folder"}
+                                            >
+                                                {f.starred ? "★" : "☆"}
+                                            </button>
+
+                                            {/* FIX 1: ⋯ overflow menu */}
+                                            <div className="menuWrap" ref={openMenuId === f.id ? menuRef : null}>
+                                                <button
+                                                    type="button"
+                                                    className="iconBtn menuTrigger"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenMenuId(openMenuId === f.id ? null : f.id);
+                                                    }}
+                                                    aria-label="Folder options"
+                                                    aria-haspopup="true"
+                                                    aria-expanded={openMenuId === f.id}
+                                                >
+                                                    ⋯
+                                                </button>
+
+                                                {openMenuId === f.id && (
+                                                    <div className="dropdownMenu" role="menu">
+                                                        <button
+                                                            role="menuitem"
+                                                            className="menuItem"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openRenameModal(f);
+                                                            }}
+                                                        >
+                                                            ✏️ Rename
+                                                        </button>
+                                                        <button
+                                                            role="menuitem"
+                                                            className="menuItem danger"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                deleteFolder(f.id);
+                                                            }}
+                                                        >
+                                                            🗑️ Delete
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                </button>
+                                </div>
                             ))}
                         </div>
                     )}
                 </section>
             </main>
 
-            {/* ✅ MODAL (injected) */}
+            {/* Create folder modal */}
             {showModal && (
                 <div className="modalOverlay" onClick={closeModal}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modalTitle">Create folder</div>
+                    <div
+                        className="modal"
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="createModalTitle"
+                    >
+                        <div className="modalTitle" id="createModalTitle">Create folder</div>
 
                         <form onSubmit={onCreateFromModal} className="modalForm">
                             <input
@@ -176,12 +300,48 @@ export default function App() {
                                 autoFocus
                             />
 
+                            {/* FIX 4: cancel gets a visible border, not invisible ghost */}
                             <div className="modalActions">
-                                <button className="btn ghost" type="button" onClick={closeModal}>
+                                <button className="btn cancelBtn" type="button" onClick={closeModal}>
                                     Cancel
                                 </button>
                                 <button className="btn primary" type="submit" disabled={!modalName.trim()}>
                                     Create
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Rename folder modal */}
+            {renameId !== null && (
+                <div className="modalOverlay" onClick={closeRenameModal}>
+                    <div
+                        className="modal"
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="renameModalTitle"
+                    >
+                        <div className="modalTitle" id="renameModalTitle">Rename folder</div>
+
+                        <form onSubmit={onRenameSubmit} className="modalForm">
+                            <input
+                                className="modalInput"
+                                placeholder="New name…"
+                                value={renameName}
+                                onChange={(e) => setRenameName(e.target.value)}
+                                autoFocus
+                                onFocus={(e) => e.target.select()}
+                            />
+
+                            <div className="modalActions">
+                                <button className="btn cancelBtn" type="button" onClick={closeRenameModal}>
+                                    Cancel
+                                </button>
+                                <button className="btn primary" type="submit" disabled={!renameName.trim()}>
+                                    Rename
                                 </button>
                             </div>
                         </form>
