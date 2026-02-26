@@ -16,12 +16,18 @@ public class LibraryController {
     private final LibraryService libraryService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Library> getLibraryById(@PathVariable UUID id) {
+    public ResponseEntity<Library> getLibraryById(@PathVariable Long id) {
         return ResponseEntity.ok(libraryService.getLibraryById(id));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Library> getLibraryByUserId(@PathVariable UUID userId) {
+    public ResponseEntity<Library> getLibraryByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(libraryService.getLibraryByUserId(userId));
+    }
+
+    @PatchMapping("/privacy")
+    public void updatePrivacy(@RequestParam boolean isPrivate) {
+        //UUID userId = getCurrentUserId(); // however you're extracting it
+        //libraryService.setLibraryPrivacy(userId, isPrivate);
     }
 }

@@ -25,23 +25,23 @@ public class FlashcardSetService {
     }
 
     @Transactional(readOnly = true)
-    public FlashcardSet getFlashcardSetById(UUID id) {
+    public FlashcardSet getFlashcardSetById(Long id) {
         return flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
     }
 
     @Transactional(readOnly = true)
-    public List<FlashcardSet> getFlashcardSetsByOwner(UUID ownerId) {
+    public List<FlashcardSet> getFlashcardSetsByOwner(Long ownerId) {
         return flashcardSetRepository.findByOwnerId(ownerId);
     }
 
-    public FlashcardSet addFlashcard(UUID flashcardSetId, Flashcard flashcard) {
+    public FlashcardSet addFlashcard(Long flashcardSetId, Flashcard flashcard) {
         FlashcardSet set = getFlashcardSetById(flashcardSetId);
         set.addFlashcard(flashcard);
         return flashcardSetRepository.save(set);
     }
 
-    public void deleteFlashcardSet(UUID id) {
+    public void deleteFlashcardSet(Long id) {
         if (!flashcardSetRepository.existsById(id)) {
             throw new ResourceNotFoundException("FlashcardSet", "id", id);
         }
@@ -49,7 +49,7 @@ public class FlashcardSetService {
     }
 
     @Transactional(readOnly = true)
-    public List<Flashcard> getFlashcardsBySetId(UUID flashcardSetId) {
+    public List<Flashcard> getFlashcardsBySetId(Long flashcardSetId) {
         return flashcardRepository.findByFlashcardSetId(flashcardSetId);
     }
 }

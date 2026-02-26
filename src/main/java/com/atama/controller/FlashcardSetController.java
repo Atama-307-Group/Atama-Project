@@ -24,27 +24,27 @@ public class FlashcardSetController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FlashcardSet> getFlashcardSetById(@PathVariable UUID id) {
+    public ResponseEntity<FlashcardSet> getFlashcardSetById(@PathVariable Long id) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
     }
 
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<FlashcardSet>> getFlashcardSetsByOwner(@PathVariable UUID ownerId) {
+    public ResponseEntity<List<FlashcardSet>> getFlashcardSetsByOwner(@PathVariable Long ownerId) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(ownerId));
     }
 
     @GetMapping("/{id}/flashcards")
-    public ResponseEntity<List<Flashcard>> getFlashcardsBySetId(@PathVariable UUID id) {
+    public ResponseEntity<List<Flashcard>> getFlashcardsBySetId(@PathVariable Long id) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardsBySetId(id));
     }
 
     @PostMapping("/{id}/flashcards")
-    public ResponseEntity<FlashcardSet> addFlashcard(@PathVariable UUID id, @RequestBody Flashcard flashcard) {
+    public ResponseEntity<FlashcardSet> addFlashcard(@PathVariable Long id, @RequestBody Flashcard flashcard) {
         return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.addFlashcard(id, flashcard));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFlashcardSet(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteFlashcardSet(@PathVariable Long id) {
         flashcardSetService.deleteFlashcardSet(id);
         return ResponseEntity.noContent().build();
     }
