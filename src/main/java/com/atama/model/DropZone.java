@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DropZone {
-
+    private Long id;
     /** X position on the image (percentage, 0–100) */
     private double x;
 

@@ -1,5 +1,8 @@
 package com.atama.controller;
 
+import com.atama.dto.request.FlashcardSetRequestDTO;
+import com.atama.dto.response.FlashcardSetResponseDTO;
+import com.atama.mapper.FlashcardSetMapper;
 import com.atama.model.Flashcard;
 import com.atama.model.FlashcardSet;
 import com.atama.service.FlashcardSetService;
@@ -18,6 +21,14 @@ public class FlashcardSetController {
 
     private final FlashcardSetService flashcardSetService;
 
+    /*@PostMapping
+    public ResponseEntity<FlashcardSetResponseDTO> createFlashcardSet(
+            @RequestBody @Valid FlashcardSetRequestDTO request) {
+
+        FlashcardSet saved = flashcardSetService.createFlashcardSet(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(FlashcardSetMapper.toResponseDTO(saved)); // hope this is correct
+    }*/
     @PostMapping
     public ResponseEntity<FlashcardSet> createFlashcardSet(@RequestBody FlashcardSet flashcardSet) {
         return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.createFlashcardSet(flashcardSet));

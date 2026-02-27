@@ -40,8 +40,9 @@ const CreateFlashcardSetPage = ({ onCancel, onSave }) => {
         case 'DRAG_DROP':
           return (
             card.prompt?.trim() &&
-            card.draggableItems?.some((i) => i.trim()) &&
-            card.dropTargets?.some((t) => t.trim())
+            card.imageUrl &&
+            card.dropZones?.some((z) => z.correctLabel?.trim()) &&
+            card.draggableLabels?.some((l) => l.trim())
           );
         case 'STEPS':
           return card.title?.trim() && card.steps?.some((s) => s.trim());
@@ -61,11 +62,11 @@ const CreateFlashcardSetPage = ({ onCancel, onSave }) => {
       if (cleaned.correctAnswers) {
         cleaned.correctAnswers = cleaned.correctAnswers.filter((a) => a.trim());
       }
-      if (cleaned.draggableItems) {
-        cleaned.draggableItems = cleaned.draggableItems.filter((i) => i.trim());
+      if (cleaned.draggableLabels) {
+        cleaned.draggableLabels = cleaned.draggableLabels.filter((l) => l.trim());
       }
-      if (cleaned.dropTargets) {
-        cleaned.dropTargets = cleaned.dropTargets.filter((t) => t.trim());
+      if (cleaned.dropZones) {
+        cleaned.dropZones = cleaned.dropZones.filter((z) => z.correctLabel?.trim());
       }
       if (cleaned.steps) {
         cleaned.steps = cleaned.steps.filter((s) => s.trim());

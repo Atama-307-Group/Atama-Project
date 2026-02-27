@@ -1,4 +1,5 @@
 import React from 'react';
+import DragDropEditor from './DragDropEditor';
 import './FlashcardInput.css';
 
 const CARD_TYPES = [
@@ -37,7 +38,7 @@ const FlashcardInput = ({ index, card, onChange, onRemove, canRemove }) => {
         onChange(index, { ...base, textWithBlanks: '', correctAnswers: [''] });
         break;
       case 'DRAG_DROP':
-        onChange(index, { ...base, prompt: '', draggableItems: [''], dropTargets: [''] });
+        onChange(index, { ...base, prompt: '', imageUrl: '', dropZones: [], draggableLabels: [''] });
         break;
       case 'STEPS':
         onChange(index, { ...base, title: '', steps: [''] });
@@ -92,31 +93,10 @@ const FlashcardInput = ({ index, card, onChange, onRemove, canRemove }) => {
 
       case 'DRAG_DROP':
         return (
-          <>
-            <input
-              type="text"
-              placeholder="Prompt"
-              value={card.prompt || ''}
-              onChange={(e) => updateField('prompt', e.target.value)}
-              className="flashcard-input-field"
-            />
-            <ListEditor // not happy with this, but idk how to fix it
-              label="Draggable Items"
-              items={card.draggableItems || []}
-              placeholder="Item"
-              onChange={(i, val) => updateListItem('draggableItems', i, val)}
-              onAdd={() => addListItem('draggableItems')} // specifies what to change for each type
-              onRemove={(i) => removeListItem('draggableItems', i)}
-            />
-            <ListEditor
-              label="Drop Targets"
-              items={card.dropTargets || []}
-              placeholder="Target"
-              onChange={(i, val) => updateListItem('dropTargets', i, val)}
-              onAdd={() => addListItem('dropTargets')}
-              onRemove={(i) => removeListItem('dropTargets', i)}
-            />
-          </>
+          <DragDropEditor
+            card={card}
+            onChange={(updatedCard) => onChange(index, updatedCard)}
+          />
         );
 
       case 'STEPS':

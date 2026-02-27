@@ -14,7 +14,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class FlashcardSet extends LibraryItem {
-
     private String description;
 
     @OneToMany(mappedBy = "flashcardSet", cascade = CascadeType.ALL, orphanRemoval = true)
