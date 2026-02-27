@@ -1,25 +1,42 @@
 import React, { useState } from 'react';
 import StartPage from './pages/FlashcardStartPage';
+import PreLearnPage from './pages/PreLearnPage';
 import StudyPage from './pages/StudyPage';
 
+const sampleFlashcards = [
+  { term: 'React', definition: 'A JavaScript library for building UIs.', favorite: false },
+  { term: 'JSX', definition: 'A syntax extension for JavaScript that looks like HTML.', favorite: false },
+  { term: 'Component', definition: 'Reusable piece of UI in React.', favorite: false },
+];
+
 function App() {
-  const [started, setStarted] = useState(false); // Have they clicked "Learn"?
-  const [studyMode, setStudyMode] = useState(null); // "term" or "definition"
+  const [phase, setPhase] = useState('start'); // 'start' | 'prelearn' | 'study'
+  const [studyMode, setStudyMode] = useState('term');
+  const [cards, setCards] = useState([]);
+
+  const handlePreLearnStart = (mode, filteredCards) => {
+    setStudyMode(mode);
+    setCards(filteredCards);
+    setPhase('study');
+  };
 
   return (
     <div>
-      {!started && <StartPage onStart={() => setStarted(true)} />}
-      {started && !studyMode && (
-        <div style={{ textAlign: 'center', marginTop: '100px' }}>
-          <h2>Choose what appears on the front of the flashcards:</h2>
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '20px' }}>
-            <button onClick={() => setStudyMode('term')}>Term on Front</button>
-            <button onClick={() => setStudyMode('definition')}>Definition on Front</button>
-          </div>
-        </div>
+      {phase === 'start' && (
+        <StartPage onStart={() => setPhase('prelearn')} />
       )}
-      {started && studyMode && (
-        <StudyPage onBack={() => { setStarted(false); setStudyMode(null); }} studyMode={studyMode} />
+      {phase === 'prelearn' && (
+        <PreLearnPage
+          flashcards={sampleFlashcards}
+          onStart={handlePreLearnStart}
+        />
+      )}
+      {phase === 'study' && (
+        <StudyPage
+          onBack={() => setPhase('start')}
+          studyMode={studyMode}
+          initialFlashcards={cards}
+        />
       )}
     </div>
   );

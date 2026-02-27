@@ -1,0 +1,30 @@
+/* Full page container centered vertically + horizontally */
+.study-page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical center */
+  align-items: center;     /* horizontal center */
+  text-align: center;
+}
+
+/* Buttons below the card */
+.study-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.study-buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Card counter */
+.card-counter {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #555;
+}
