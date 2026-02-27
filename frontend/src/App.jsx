@@ -310,15 +310,15 @@ export default function App() {
                     </div>
                 </div>
 
-                <button
-                    className="btn settings"
-                    type="button"
-                    onClick={openPrivacy}
-                    aria-haspopup="dialog"
-                    aria-expanded={showPrivacyModal}
-                >
-                    Privacy Settings
-                </button>
+                {/*<button TODO Probably remove later */}
+                {/*    className="btn settings"*/}
+                {/*    type="button"*/}
+                {/*    onClick={openPrivacy}*/}
+                {/*    aria-haspopup="dialog"*/}
+                {/*    aria-expanded={showPrivacyModal}*/}
+                {/*>*/}
+                {/*    Privacy Settings*/}
+                {/*</button>*/}
 
                 <button className="btn primary" onClick={openCreateFolderModal} type="button">
                     Create Folder

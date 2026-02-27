@@ -22,6 +22,7 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   grid-template-columns: 320px 1fr;
   height: 100vh;
   overflow: hidden;
+  width: 100vw;
 }
 
 /* Rail */
@@ -102,6 +103,8 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   width: 100%; padding: 24px;
   height: 100vh;
   overflow-y: auto;
+  flex: 1;
+  min-width: 0;
 }
 
 /* FIX 3: sticky header gets a scroll-aware shadow via box-shadow */
@@ -129,17 +132,15 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 
 .libraryTitle { font-weight: 950; font-size: 22px; letter-spacing: 0.2px; }
 .librarySub   { margin-top: 4px; font-size: 12px; color: var(--pine); }
+.libraryBody { width: 100%; margin-top: 24px; padding: 16px; box-sizing: border-box;}
 
-.libraryBody { width: 100%; margin-top: 24px; }
-
-/* TODO fix folders so that they automatically fill up the page */
 .folderGrid {
-  width: 100%;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 18px;
-  align-content: start;
-  align-items: stretch;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 200px));
+  grid-auto-rows: 120px;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
 }
 
 @media (max-width: 900px) {
@@ -150,7 +151,6 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   .folderGrid { grid-template-columns: 1fr; }
 }
 
-/* FIX 1: folder card is now a div (menu inside) instead of a button */
 .folderCard {
   border-radius: 18px;
   border: 1px solid rgba(51,81,69,0.16);
@@ -177,7 +177,6 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 
 .folderName {
   font-weight: 900; font-size: 16px; margin-bottom: 10px;
-  /* prevent text from running under the action buttons */
   padding-right: 4px;
 }
 
@@ -191,7 +190,7 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   display: flex; align-items: center; gap: 4px;
 }
 
-/* FIX 2: icon button base — used for star & menu trigger */
+/* icon button base — used for star & menu trigger */
 .iconBtn {
   background: none; border: none;
   cursor: pointer; padding: 4px 6px;
@@ -202,12 +201,13 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 }
 .iconBtn:hover { background: rgba(51,81,69,0.10); }
 
-/* FIX 2: star is now actionable with a real toggle */
-.starBtn { color: var(--sage); opacity: 0.55; }
+/* star is now actionable with a real toggle */
+.starBtn { color: var(--sage); opacity: 0; transition: opacity 100ms ease;}
 .starBtn.starred { opacity: 1; color: #e8a020; }
+.folderCard:hover .starBtn,
 .starBtn:hover { opacity: 1; }
 
-/* FIX 1: ⋯ menu trigger — hidden until card is hovered */
+/* ⋯ menu trigger — hidden until card is hovered */
 .menuTrigger {
   opacity: 0;
   transition: opacity 100ms ease;
@@ -216,7 +216,7 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 .folderCard:hover .menuTrigger,
 .menuTrigger:focus { opacity: 1; }
 
-/* FIX 1: dropdown menu */
+/* dropdown menu */
 .menuWrap { position: relative; }
 
 .dropdownMenu {
