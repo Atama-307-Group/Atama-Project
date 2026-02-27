@@ -57,6 +57,19 @@ export default function App() {
         return () => window.removeEventListener("pointerdown", onPointerDown);
     }, [openMenuId]);
 
+    // Header disappearing when scrolling
+    useEffect(() => {
+        const libraryEl = document.querySelector('.library');
+        if (!libraryEl) return;
+        const handleScroll = () => {
+            const header = document.querySelector('.libraryHeader');
+            if (header) header.classList.toggle('scrolled', libraryEl.scrollTop > 50);
+        };
+        libraryEl.addEventListener('scroll', handleScroll);
+        return () => libraryEl.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Sorting
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         const list = folders.filter((f) => f.name.toLowerCase().includes(q));
@@ -140,7 +153,6 @@ export default function App() {
     }
 
     // ── Delete ────────────────────────────────────────────────────────────────
-
     function openDeleteConfirm(id) {
         setOpenMenuId(null);
         setConfirmDeleteId(id);

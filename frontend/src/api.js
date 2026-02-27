@@ -63,12 +63,3 @@ export function setFolderStarred(folderId, starred) {
         body: JSON.stringify({ starred }),
     });
 }
-
-// optional toggle
-export async function toggleFolderStarred(folderId) {
-    const res = await fetch(`${BASE}/folders/${folderId}/starred/toggle`, {
-        method: "POST",
-    });
-    if (!res.ok) throw new Error(`Failed to toggle starred (${res.status})`);
-    return res.json();
-}
