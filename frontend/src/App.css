@@ -74,13 +74,14 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   border: 1px solid rgba(221,255,217,0.22);
   background: rgba(221,255,217,0.10);
   color: var(--mint); cursor: pointer;
-  font-weight: 800; font-size: 14px;
+  font-weight: 800; font-size: 16px;
 }
 .btn:hover {
   border-color: rgba(119,191,163,0.95);
   background: rgba(119,191,163,0.18);
 }
 .btn.primary { background: var(--sage); border-color: var(--sage); color: var(--deep); }
+.btn.settings { background: #1E352F; border-color: var(--sage); color: var(--mint)}
 .btn.primary:hover { background: #6ab59a; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -114,11 +115,16 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   position: sticky; top: 12px; z-index: 5;
   box-shadow: 0 4px 20px rgba(30,53,47,0.10);
   transition: box-shadow 200ms ease, transform 300ms ease, opacity 300ms ease;
+  overflow: visible;
 }
 .libraryHeader.scrolled {
-  transform: translateY(-120%);
+  transform: translateY(-100%);
   opacity: 0;
   pointer-events: none; /* prevents clicks on hidden header */
+}
+
+.sortWrap {
+  position: relative;
 }
 
 .libraryTitle { font-weight: 950; font-size: 22px; letter-spacing: 0.2px; }
@@ -215,14 +221,17 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 
 .dropdownMenu {
   position: absolute;
-  right: 0; bottom: calc(100% + 4px);
+  right: 0;
+  top: calc(100% + 6px);  /* down from button */
+  bottom: auto;           /* IMPORTANT: remove bottom constraint */
+
   background: #fff;
   border: 1px solid rgba(51,81,69,0.18);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(30,53,47,0.18);
-  min-width: 140px;
+  min-width: 180px;
   overflow: hidden;
-  z-index: 20;
+  z-index: 9999;          /* make it outrank header effects */
   animation: menuPop 100ms ease-out;
 }
 

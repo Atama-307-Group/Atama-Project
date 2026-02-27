@@ -10,6 +10,18 @@ export default function App() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // Sorting
+    const [sortBy, setSortBy] = useState("alpha-asc");
+    const [showSortMenu, setShowSortMenu] = useState(false);
+    const sortMenuRef = useRef(null);
+    const SORT_LABELS = {
+        "alpha-asc": "Alphabetical (A → Z)",
+        "alpha-desc": "Alphabetical (Z → A)",
+        "created-desc": "Creation date (Newest)",
+        "created-asc": "Creation date (Oldest)",
+        "accessed-desc": "Last accessed",
+    };
+
     // Modal state
     const [showModal, setShowModal] = useState(false);
     const [modalName, setModalName] = useState("");
@@ -22,6 +34,17 @@ export default function App() {
     // Rename modal state
     const [renameId, setRenameId] = useState(null);
     const [renameName, setRenameName] = useState("");
+
+    // Privacy modal state
+    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+
+    function openPrivacy() {
+        setShowPrivacyModal(true);
+    }
+
+    function closePrivacy() {
+        setShowPrivacyModal(false);
+    }
 
     const menuRef = useRef(null);
 
@@ -42,7 +65,6 @@ export default function App() {
 
     useEffect(() => {
         loadFolders();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Close overflow menu when clicking outside
@@ -60,11 +82,33 @@ export default function App() {
     // Header disappearing when scrolling
     useEffect(() => {
         const libraryEl = document.querySelector('.library');
-        if (!libraryEl) return;
-        const handleScroll = () => {
-            const header = document.querySelector('.libraryHeader');
-            if (header) header.classList.toggle('scrolled', libraryEl.scrollTop > 50);
-        };
+        const header = document.querySelector('.libraryHeader');
+        if (!libraryEl || !header) return;
+
+        let lastScrollTop = 0;
+
+        function handleScroll() {
+            const current = libraryEl.scrollTop;
+
+            // Always show header at very top
+            if (current <= 10) {
+                header.classList.remove('scrolled');
+                lastScrollTop = current;
+                return;
+            }
+
+            // If scrolling down → hide
+            if (current > lastScrollTop) {
+                header.classList.add('scrolled');
+            }
+            // If scrolling up → show immediately
+            else {
+                header.classList.remove('scrolled');
+            }
+
+            lastScrollTop = current;
+        }
+
         libraryEl.addEventListener('scroll', handleScroll);
         return () => libraryEl.removeEventListener('scroll', handleScroll);
     }, []);
@@ -74,11 +118,61 @@ export default function App() {
         const q = query.trim().toLowerCase();
         const list = folders.filter((f) => f.name.toLowerCase().includes(q));
 
+        function safeTime(x) {
+            const t = x ? new Date(x).getTime() : 0;
+            return Number.isFinite(t) ? t : 0;
+        }
+
+        function compareBySort(a, b) {
+            switch (sortBy) {
+                case "alpha-desc":
+                    return (b.name ?? "").localeCompare(a.name ?? "");
+
+                case "created-asc":
+                    return safeTime(a.createdAt) - safeTime(b.createdAt);
+
+                case "created-desc":
+                    return safeTime(b.createdAt) - safeTime(a.createdAt);
+
+                // last accessed (you only asked one way; I’m assuming "most recent first")
+                case "accessed-desc":
+                    // If lastAccessed is null, treat as very old so it sinks.
+                    return safeTime(b.lastAccessed) - safeTime(a.lastAccessed);
+
+                case "alpha-asc":
+                default:
+                    return (a.name ?? "").localeCompare(b.name ?? "");
+            }
+        }
+
         return [...list].sort((a, b) => {
+            // ⭐ Always keep starred at the top
             if (a.starred !== b.starred) return a.starred ? -1 : 1;
-            return a.name.localeCompare(b.name);
+
+            // Then sort within the starred group / unstarred group
+            const primary = compareBySort(a, b);
+            if (primary !== 0) return primary;
+
+            // Stable-ish tie breakers so order doesn’t jitter
+            const byName = (a.name ?? "").localeCompare(b.name ?? "");
+            if (byName !== 0) return byName;
+
+            return (a.id ?? 0) - (b.id ?? 0);
         });
-    }, [folders, query]);
+    }, [folders, query, sortBy]);
+
+    useEffect(() => {
+        if (!showSortMenu) return;
+
+        function handlePointerDown(e) {
+            if (sortMenuRef.current && !sortMenuRef.current.contains(e.target)) {
+                setShowSortMenu(false);
+            }
+        }
+
+        window.addEventListener("pointerdown", handlePointerDown);
+        return () => window.removeEventListener("pointerdown", handlePointerDown);
+    }, [showSortMenu]);
 
     const selected = useMemo(
         () => folders.find((f) => f.id === selectedFolderId) ?? null,
@@ -123,12 +217,14 @@ export default function App() {
                 if (showModal) closeModal();
                 if (renameId !== null) closeRenameModal();
                 if (confirmDeleteId !== null) setConfirmDeleteId(null);
+                if (showPrivacyModal) closePrivacy();
+                if (showSortMenu) setShowSortMenu(false);
                 setOpenMenuId(null);
             }
         }
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-    }, [showModal, renameId, confirmDeleteId]);
+    }, [showModal, renameId, confirmDeleteId, showPrivacyModal, showSortMenu]);
 
     // ── Star toggle ───────────────────────────────────────────────────────────
     async function onToggleStar(folderId) {
@@ -214,6 +310,16 @@ export default function App() {
                     </div>
                 </div>
 
+                <button
+                    className="btn settings"
+                    type="button"
+                    onClick={openPrivacy}
+                    aria-haspopup="dialog"
+                    aria-expanded={showPrivacyModal}
+                >
+                    Privacy Settings
+                </button>
+
                 <button className="btn primary" onClick={openCreateFolderModal} type="button">
                     Create Folder
                 </button>
@@ -235,7 +341,6 @@ export default function App() {
 
             {/* Right: library */}
             <main className="library">
-                {/* FIX 3: sticky header now has backdrop + subtle border-bottom for scroll context */}
                 <header className="libraryHeader">
                     <div>
                         <div className="libraryTitle">Folders</div>
@@ -243,6 +348,58 @@ export default function App() {
                             {loading ? "Loading…" : `${filtered.length} folder${filtered.length === 1 ? "" : "s"}`}
                             {selected ? ` · Selected: ${selected.name}` : ""}
                         </div>
+                    </div>
+
+                    <div className="sortWrap" ref={sortMenuRef}>
+                        <button
+                            type="button"
+                            className="iconBtn"
+                            onClick={() => setShowSortMenu((p) => !p)}
+                            aria-haspopup="true"
+                            aria-expanded={showSortMenu}
+                            title="Sort folders"
+                        >
+                            ⇅ Sort: {SORT_LABELS[sortBy]}
+                        </button>
+
+                        {showSortMenu && (
+                            <div className="dropdownMenu" role="menu">
+                                <button
+                                    className="menuItem"
+                                    onClick={() => { setSortBy("alpha-asc"); setShowSortMenu(false); }}
+                                >
+                                    Alphabetical (A → Z)
+                                </button>
+
+                                <button
+                                    className="menuItem"
+                                    onClick={() => { setSortBy("alpha-desc"); setShowSortMenu(false); }}
+                                >
+                                    Alphabetical (Z → A)
+                                </button>
+
+                                <button
+                                    className="menuItem"
+                                    onClick={() => { setSortBy("created-desc"); setShowSortMenu(false); }}
+                                >
+                                    Creation date (Newest)
+                                </button>
+
+                                <button
+                                    className="menuItem"
+                                    onClick={() => { setSortBy("created-asc"); setShowSortMenu(false); }}
+                                >
+                                    Creation date (Oldest)
+                                </button>
+
+                                <button
+                                    className="menuItem"
+                                    onClick={() => { setSortBy("accessed-desc"); setShowSortMenu(false); }}
+                                >
+                                    Last accessed
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </header>
 
@@ -364,6 +521,7 @@ export default function App() {
                 </div>
             )}
 
+
             {/* Rename folder modal */}
             {renameId !== null && (
                 <div className="modalOverlay" onClick={closeRenameModal}>
@@ -419,6 +577,51 @@ export default function App() {
                             </button>
                             <button className="btn danger" type="button" onClick={confirmDelete}>
                                 Yes, delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showPrivacyModal && (
+                <div className="modalOverlay" onClick={closePrivacy}>
+                    <div
+                        className="modal"
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="privacyModalTitle"
+                    >
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: 12,
+                            }}
+                        >
+                            <div className="modalTitle" id="privacyModalTitle">
+                                Privacy Settings
+                            </div>
+
+                            <button
+                                type="button"
+                                className="iconBtn"
+                                onClick={closePrivacy}
+                                aria-label="Close privacy settings"
+                                title="Close"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="modalBody" style={{ marginTop: 10 }}>
+                            {/* TODO: privacy settings content goes here */}
+                        </div>
+
+                        <div className="modalActions" style={{ marginTop: 14 }}>
+                            <button type="button" className="btn cancelBtn" onClick={closePrivacy}>
+                                Close
                             </button>
                         </div>
                     </div>
