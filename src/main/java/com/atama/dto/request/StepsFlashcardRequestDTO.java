@@ -7,8 +7,6 @@ import java.util.List;
 @Getter
 @Setter
 public class StepsFlashcardRequestDTO extends FlashcardRequestDTO {
-
     private String title;
-
     private List<String> steps;
 }

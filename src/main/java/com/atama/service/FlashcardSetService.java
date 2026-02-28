@@ -1,10 +1,10 @@
 package com.atama.service;
 
 import com.atama.exception.ResourceNotFoundException;
-import com.atama.model.Flashcard;
-import com.atama.model.FlashcardSet;
-import com.atama.repository.FlashcardRepository;
-import com.atama.repository.FlashcardSetRepository;
+import com.atama.model.*;
+import com.atama.repository.*;
+import com.atama.mapper.*;
+import com.atama.dto.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +19,12 @@ public class FlashcardSetService {
 
     private final FlashcardSetRepository flashcardSetRepository;
     private final FlashcardRepository flashcardRepository;
+    private final FlashcardSetMapper mapper;
 
-    public FlashcardSet createFlashcardSet(FlashcardSet flashcardSet) {
-        return flashcardSetRepository.save(flashcardSet);
+
+    public FlashcardSet createFlashcardSet(FlashcardSetRequestDTO dto) {
+        FlashcardSet entity = mapper.toEntity(dto);
+        return flashcardSetRepository.save(entity);
     }
 
     @Transactional(readOnly = true)

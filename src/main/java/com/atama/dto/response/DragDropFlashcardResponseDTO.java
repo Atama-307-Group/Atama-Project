@@ -1,6 +1,7 @@
 package com.atama.dto.response;
 
-import com.atama.dto.request.DropZoneDTO;
+import com.atama.model.DropZone;
+import com.atama.model.FlashcardType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,5 +14,7 @@ public class DragDropFlashcardResponseDTO extends FlashcardResponseDTO {
     private String prompt;
     private String imageUrl;
     private List<String> draggableLabels;
-    private List<DropZoneDTO> dropZones;
+    // TODO: should this be DropZone DTO? bc otherwise DTO does not get used
+    private List<DropZone> dropZones;
+    private FlashcardType type;
 }

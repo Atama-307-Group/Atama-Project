@@ -21,4 +21,9 @@ public class DropZone {
 
     /** The correct label that should be dragged here */
     private String correctLabel;
+
+    public double getX() {
+        return x;
+    }
+
 }

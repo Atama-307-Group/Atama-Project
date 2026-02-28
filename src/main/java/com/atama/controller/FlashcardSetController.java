@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,19 +21,20 @@ import java.util.UUID;
 public class FlashcardSetController {
 
     private final FlashcardSetService flashcardSetService;
+    private final FlashcardSetMapper mapper;
 
-    /*@PostMapping
+    @PostMapping
     public ResponseEntity<FlashcardSetResponseDTO> createFlashcardSet(
             @RequestBody @Valid FlashcardSetRequestDTO request) {
 
         FlashcardSet saved = flashcardSetService.createFlashcardSet(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(FlashcardSetMapper.toResponseDTO(saved)); // hope this is correct
-    }*/
-    @PostMapping
+                .body(mapper.toResponseDTO(saved)); // hope this is correct
+    }
+    /*@PostMapping
     public ResponseEntity<FlashcardSet> createFlashcardSet(@RequestBody FlashcardSet flashcardSet) {
         return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.createFlashcardSet(flashcardSet));
-    }
+    }*/
 
     @GetMapping("/{id}")
     public ResponseEntity<FlashcardSet> getFlashcardSetById(@PathVariable Long id) {
