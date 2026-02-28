@@ -1,5 +1,6 @@
 package com.atama.service;
 
+import com.atama.dto.response.FlashcardSetResponseDTO;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.*;
 import com.atama.repository.*;
@@ -20,11 +21,15 @@ public class FlashcardSetService {
     private final FlashcardSetRepository flashcardSetRepository;
     private final FlashcardRepository flashcardRepository;
     private final FlashcardSetMapper mapper;
+    private final LibraryItemService libraryItemService;
 
-
-    public FlashcardSet createFlashcardSet(FlashcardSetRequestDTO dto) {
+    // TODO: the services should return the DTO not the entity
+    public FlashcardSetResponseDTO createFlashcardSet(FlashcardSetRequestDTO dto) {
         FlashcardSet entity = mapper.toEntity(dto);
-        return flashcardSetRepository.save(entity);
+        // entity.setOwnerId(userId); should do something like this but id has to come from auth context
+        libraryItemService.initializeLibraryItem(entity, dto); // resolve library, folder, item_type
+        FlashcardSet saved = flashcardSetRepository.save(entity);
+        return mapper.toResponseDTO(saved);
     }
 
     @Transactional(readOnly = true)

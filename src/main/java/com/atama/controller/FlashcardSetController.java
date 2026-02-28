@@ -2,18 +2,17 @@ package com.atama.controller;
 
 import com.atama.dto.request.FlashcardSetRequestDTO;
 import com.atama.dto.response.FlashcardSetResponseDTO;
-import com.atama.mapper.FlashcardSetMapper;
 import com.atama.model.Flashcard;
 import com.atama.model.FlashcardSet;
 import com.atama.service.FlashcardSetService;
 import lombok.RequiredArgsConstructor;
+//import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 //import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/flashcard-sets")
@@ -21,19 +20,30 @@ import java.util.UUID;
 public class FlashcardSetController {
 
     private final FlashcardSetService flashcardSetService;
-    private final FlashcardSetMapper mapper;
 
     @PostMapping
     public ResponseEntity<FlashcardSetResponseDTO> createFlashcardSet(
             @RequestBody FlashcardSetRequestDTO request) {
 
-        FlashcardSet saved = flashcardSetService.createFlashcardSet(request);
+        FlashcardSetResponseDTO saved = flashcardSetService.createFlashcardSet(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(mapper.toResponseDTO(saved)); // hope this is correct
+                .body(saved); // hope this is correct
     }
     /*@PostMapping
     public ResponseEntity<FlashcardSet> createFlashcardSet(@RequestBody FlashcardSet flashcardSet) {
         return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.createFlashcardSet(flashcardSet));
+    }*/
+    /*@PostMapping("/flashcard-sets")
+    public ResponseEntity<FlashcardSetResponseDTO> create(
+            @RequestBody FlashcardSetRequestDTO dto,
+            Authentication authentication
+    ) {
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = user.getId();
+
+        return ResponseEntity.ok(
+                flashcardSetService.createFlashcardSet(dto, userId)
+        );
     }*/
 
     @GetMapping("/{id}")
