@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
+//import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +25,7 @@ public class FlashcardSetController {
 
     @PostMapping
     public ResponseEntity<FlashcardSetResponseDTO> createFlashcardSet(
-            @RequestBody @Valid FlashcardSetRequestDTO request) {
+            @RequestBody FlashcardSetRequestDTO request) {
 
         FlashcardSet saved = flashcardSetService.createFlashcardSet(request);
         return ResponseEntity.status(HttpStatus.CREATED)
