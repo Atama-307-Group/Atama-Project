@@ -1,12 +1,16 @@
 .create-set-page {
   max-width: 700px;
   margin: 40px auto;
-  padding: 0 20px;
+  padding: 0 24px 60px;
   text-align: left;
 }
 
 .create-set-page h1 {
   text-align: center;
+  font-weight: 950;
+  font-size: 26px;
+  letter-spacing: 0.2px;
+  color: var(--deep);
   margin-bottom: 24px;
 }
 
@@ -14,41 +18,45 @@
   width: 100%;
   padding: 12px 14px;
   font-size: 1.1em;
-  border: 1px solid #555;
-  border-radius: 8px;
+  border: 1px solid rgba(51,81,69,0.22);
+  border-radius: 14px;
   margin-bottom: 12px;
-  background: transparent;
-  color: inherit;
+  background: #ffffff;
+  color: var(--deep);
   font-family: inherit;
   box-sizing: border-box;
+  outline: none;
 }
 
 .create-set-title:focus {
-  outline: none;
-  border-color: #646cff;
+  border-color: var(--sage);
+  box-shadow: 0 0 0 4px rgba(119,191,163,0.22);
 }
 
 .create-set-description {
   width: 100%;
   padding: 10px 14px;
   font-size: 1em;
-  border: 1px solid #555;
-  border-radius: 8px;
+  border: 1px solid rgba(51,81,69,0.22);
+  border-radius: 14px;
   margin-bottom: 24px;
-  background: transparent;
-  color: inherit;
+  background: #ffffff;
+  color: var(--deep);
   font-family: inherit;
   box-sizing: border-box;
   resize: vertical;
+  outline: none;
 }
 
 .create-set-description:focus {
-  outline: none;
-  border-color: #646cff;
+  border-color: var(--sage);
+  box-shadow: 0 0 0 4px rgba(119,191,163,0.22);
 }
 
 .create-set-cards {
   margin-bottom: 16px;
+  display: grid;
+  gap: 14px;
 }
 
 .create-set-add-btn {
@@ -56,33 +64,61 @@
   width: 100%;
   padding: 10px;
   font-size: 1em;
+  font-weight: 800;
   margin-bottom: 24px;
-  border: 2px dashed #555;
+  border: 2px dashed rgba(51,81,69,0.30);
   background: transparent;
-  color: inherit;
+  color: var(--pine);
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 14px;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
 }
 
 .create-set-add-btn:hover {
-  border-color: #646cff;
-  color: #646cff;
+  border-color: var(--sage);
+  color: var(--deep);
+  background: rgba(119,191,163,0.08);
 }
 
 .create-set-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   padding-bottom: 40px;
 }
 
+/* Cancel — matches .btn.cancelBtn from the reference */
+.create-set-actions button:first-child {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(51,81,69,0.35);
+  background: transparent;
+  color: var(--pine);
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.create-set-actions button:first-child:hover {
+  background: rgba(51,81,69,0.06);
+  border-color: rgba(51,81,69,0.55);
+}
+
+/* Save — matches .btn.primary from the reference */
 .create-set-save-btn {
-  background-color: #646cff;
-  color: #fff;
-  border: none;
-  padding: 10px 24px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--sage);
+  background: var(--sage);
+  color: var(--deep);
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+  transition: background 120ms ease;
 }
 
 .create-set-save-btn:hover {
-  background-color: #535bf2;
+  background: #6ab59a;
+  border-color: #6ab59a;
 }
