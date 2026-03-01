@@ -6,8 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NomalFlashcardResponseDTO extends FlashcardResponseDTO{
+public class NormalFlashcardResponseDTO extends FlashcardResponseDTO {
     private String term;
     private String definition;
-    private FlashcardType type;
+    //private FlashcardType type;
 }

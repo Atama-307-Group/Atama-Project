@@ -17,4 +17,16 @@ public class DropZoneDTO {
     public Long getId() {
         return id; //not sure if this is needed
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
 }

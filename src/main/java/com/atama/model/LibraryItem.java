@@ -20,8 +20,8 @@ public abstract class LibraryItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "library_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true) // same, should be false
+    @JoinColumn(name = "library_id", nullable = true) // TODO: change nullable to false
     private Library library;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,4 +46,5 @@ public abstract class LibraryItem {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LibraryItemType item_type;
+    // TODO: should library item have a owner id? put it here and not in flashcard set?
 }

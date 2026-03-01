@@ -1,6 +1,8 @@
 package com.atama.controller;
 
+import com.atama.dto.request.FlashcardRequestDTO;
 import com.atama.dto.request.FlashcardSetRequestDTO;
+import com.atama.dto.response.FlashcardResponseDTO;
 import com.atama.dto.response.FlashcardSetResponseDTO;
 import com.atama.model.Flashcard;
 import com.atama.model.FlashcardSet;
@@ -45,7 +47,26 @@ public class FlashcardSetController {
                 flashcardSetService.createFlashcardSet(dto, userId)
         );
     }*/
+    @GetMapping("/{id}")
+    public ResponseEntity<FlashcardSetResponseDTO> getFlashcardSetById(@PathVariable Long id) {
+        return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
+    }
 
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<FlashcardSetResponseDTO>> getFlashcardSetsByOwner(@PathVariable Long ownerId) {
+        return ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(ownerId));
+    }
+
+    @GetMapping("/{id}/flashcards")
+    public ResponseEntity<List<FlashcardResponseDTO>> getFlashcardsBySetId(@PathVariable Long id) {
+        return ResponseEntity.ok(flashcardSetService.getFlashcardsBySetId(id));
+    }
+
+    @PostMapping("/{id}/flashcards")
+    public ResponseEntity<FlashcardSetResponseDTO> addFlashcard(@PathVariable Long id, @RequestBody FlashcardRequestDTO flashcardDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.addFlashcard(id, flashcardDTO));
+    }
+    /*
     @GetMapping("/{id}")
     public ResponseEntity<FlashcardSet> getFlashcardSetById(@PathVariable Long id) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
@@ -70,5 +91,5 @@ public class FlashcardSetController {
     public ResponseEntity<Void> deleteFlashcardSet(@PathVariable Long id) {
         flashcardSetService.deleteFlashcardSet(id);
         return ResponseEntity.noContent().build();
-    }
+    }*/
 }

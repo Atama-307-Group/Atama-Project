@@ -8,10 +8,8 @@ function App() {
   const [studyMode, setStudyMode] = useState(null); // "term" or "definition"
   const [creating, setCreating] = useState(false);
 
-  const handleSaveNewSet = (setData) => {
-    console.log('New flashcard set:', setData);
-    // TODO: POST to /api/flashcard-sets once backend integration is done
-    alert('Flashcard set created! (fake rn lol)');
+  const handleSaveNewSet = (savedSet) => {
+    console.log('Saved flashcard set:', savedSet);
     setCreating(false); // back to start page
   };
 

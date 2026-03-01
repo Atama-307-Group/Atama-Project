@@ -1,5 +1,6 @@
 package com.atama.service;
 
+import com.atama.dto.response.FlashcardResponseDTO;
 import com.atama.dto.response.FlashcardSetResponseDTO;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.*;
@@ -21,6 +22,7 @@ public class FlashcardSetService {
     private final FlashcardSetRepository flashcardSetRepository;
     private final FlashcardRepository flashcardRepository;
     private final FlashcardSetMapper mapper;
+    private final FlashcardMapper flashcardMapper;
     private final LibraryItemService libraryItemService;
 
     // TODO: the services should return the DTO not the entity
@@ -33,6 +35,36 @@ public class FlashcardSetService {
     }
 
     @Transactional(readOnly = true)
+    public FlashcardSetResponseDTO getFlashcardSetById(Long id) {
+        FlashcardSet entity = flashcardSetRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
+        return mapper.toResponseDTO(entity);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FlashcardSetResponseDTO> getFlashcardSetsByOwner(Long ownerId) {
+        return flashcardSetRepository.findByOwnerId(ownerId)
+                .stream()
+                .map(mapper::toResponseDTO)
+                .toList();
+    }
+
+    public FlashcardSetResponseDTO addFlashcard(Long flashcardSetId, FlashcardRequestDTO flashcardDTO) {
+        FlashcardSet set = flashcardSetRepository.findById(flashcardSetId)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", flashcardSetId));
+        // map DTO to entity via flashcardMapper, not raw entity from request
+        set.addFlashcard(flashcardMapper.toEntity(flashcardDTO));
+        return mapper.toResponseDTO(flashcardSetRepository.save(set));
+    }
+
+    @Transactional(readOnly = true)
+    public List<FlashcardResponseDTO> getFlashcardsBySetId(Long flashcardSetId) {
+        return flashcardRepository.findByFlashcardSetId(flashcardSetId)
+                .stream()
+                .map(flashcardMapper::toResponseDTO)
+                .toList();
+    }
+    /*@Transactional(readOnly = true)
     public FlashcardSet getFlashcardSetById(Long id) {
         return flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
@@ -59,5 +91,5 @@ public class FlashcardSetService {
     @Transactional(readOnly = true)
     public List<Flashcard> getFlashcardsBySetId(Long flashcardSetId) {
         return flashcardRepository.findByFlashcardSetId(flashcardSetId);
-    }
+    }*/
 }

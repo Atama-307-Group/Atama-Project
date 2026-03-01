@@ -11,5 +11,5 @@ import java.util.List;
 public class StepsFlashcardResponseDTO extends FlashcardResponseDTO {
     private String title;
     private List<String> steps;
-    private FlashcardType type;
+    //private FlashcardType type;
 }

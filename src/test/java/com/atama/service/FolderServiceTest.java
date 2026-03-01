@@ -56,8 +56,10 @@ class FolderServiceTest {
         folder.setLibrary(library);
         folder = folderRepository.save(folder);
 
-//        Assertions.assertThrows(IllegalArgumentException.class, () ->
-//                folderService.renameFolder(folder.getId(), "")
+        Folder finalFolder = folder;
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                folderService.renameFolder(finalFolder.getId(), "")
+        );
 //        ); TODO might need?
     }
 }

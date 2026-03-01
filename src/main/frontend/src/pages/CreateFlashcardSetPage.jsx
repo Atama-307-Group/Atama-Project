@@ -22,7 +22,7 @@ const CreateFlashcardSetPage = ({ onCancel, onSave }) => {
     setCards(cards.filter((_, i) => i !== index));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
@@ -39,10 +39,10 @@ const CreateFlashcardSetPage = ({ onCancel, onSave }) => {
           return card.textWithBlanks?.trim() && card.correctAnswers?.some((a) => a.trim());
         case 'DRAG_DROP':
           return (
-            card.prompt?.trim() &&
-            card.imageUrl &&
-            card.dropZones?.some((z) => z.correctLabel?.trim()) &&
-            card.draggableLabels?.some((l) => l.trim())
+              card.prompt?.trim() &&
+              card.imageUrl &&
+              card.dropZones?.some((z) => z.correctLabel?.trim()) &&
+              card.draggableLabels?.some((l) => l.trim())
           );
         case 'STEPS':
           return card.title?.trim() && card.steps?.some((s) => s.trim());
@@ -58,7 +58,7 @@ const CreateFlashcardSetPage = ({ onCancel, onSave }) => {
 
     // Get rid of empty entries from list fields before sending
     const cleanedCards = validCards.map((card) => {
-      const cleaned = { ...card };
+      const cleaned = {...card};
       if (cleaned.correctAnswers) {
         cleaned.correctAnswers = cleaned.correctAnswers.filter((a) => a.trim());
       }
@@ -74,11 +74,33 @@ const CreateFlashcardSetPage = ({ onCancel, onSave }) => {
       return cleaned; // doesn't do anything for now
     });
 
-    onSave({
+    /*onSave({
       title: trimmedTitle,
       description: description.trim(),
       flashcards: cleanedCards,
-    });
+    });*/
+    try {
+      const response = await fetch('http://localhost:8080/api/flashcard-sets', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          title: trimmedTitle,
+          description: description.trim(),
+          flashcards: cleanedCards,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        console.error('Backend error:', err);
+        throw new Error(err.message || 'Failed to save');
+      }
+      const saved = await response.json();
+      onSave(saved); // pass the response DTO back up instead of the raw local data
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong saving your set.' + err.message);
+    }
   };
 
   return (

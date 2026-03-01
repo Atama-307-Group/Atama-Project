@@ -23,6 +23,14 @@ public class FlashcardMapper {
         throw new IllegalArgumentException("Unknown flashcard type");
     }
 
+    private NormalFlashcard toEntity(NormalFlashcardRequestDTO dto) {
+        NormalFlashcard card = new NormalFlashcard();
+        card.setTerm(dto.getTerm());
+        card.setDefinition(dto.getDefinition());
+        return card;
+    }
+
+
     private DragDropFlashcard toEntity(DragDropFlashcardRequestDTO dto) {
         DragDropFlashcard card = new DragDropFlashcard();
         card.setPrompt(dto.getPrompt());
@@ -57,18 +65,30 @@ public class FlashcardMapper {
         return z;
     }
 
+    private NormalFlashcardResponseDTO toResponseDTO(NormalFlashcard card) {
+        NormalFlashcardResponseDTO dto = new NormalFlashcardResponseDTO();
+        dto.setId(card.getId());
+        dto.setType(resolveType(card));
+        dto.setTerm(card.getTerm());
+        dto.setDefinition(card.getDefinition());
+        return dto;
+    }
+
     private DragDropFlashcardResponseDTO toResponseDTO(DragDropFlashcard card) {
         DragDropFlashcardResponseDTO dto = new DragDropFlashcardResponseDTO();
+        dto.setId(card.getId());
         dto.setType(resolveType(card));
         dto.setPrompt(card.getPrompt());
         dto.setImageUrl(card.getImageUrl());
         dto.setDraggableLabels(card.getDraggableLabels());
-        dto.setDropZones(card.getDropZones());
+        //dto.setDropZones(card.getDropZones());
+        dto.setDropZones(card.getDropZones().stream().map(this::toDropZoneDTO).toList());
         return dto;
     }
 
     private StepsFlashcardResponseDTO toResponseDTO(StepsFlashcard card) {
         StepsFlashcardResponseDTO dto = new StepsFlashcardResponseDTO();
+        dto.setId(card.getId());
         dto.setType(resolveType(card));
         dto.setTitle(card.getTitle());
         dto.setSteps(card.getSteps());
@@ -77,12 +97,21 @@ public class FlashcardMapper {
 
     private FillBlankFlashcardResponseDTO toResponseDTO(FillBlankFlashcard card) {
         FillBlankFlashcardResponseDTO dto = new FillBlankFlashcardResponseDTO();
+        dto.setId(card.getId());
         dto.setType(resolveType(card));
         dto.setTextWithBlanks(card.getTextWithBlanks());
         dto.setCorrectAnswers(card.getCorrectAnswers());
         return dto;
     }
-    // need to add for normal flashcard here? -> both toResponse and toEntity
+
+    private DropZoneDTO toDropZoneDTO(DropZone zone) {
+        DropZoneDTO dto = new DropZoneDTO();
+        dto.setId(zone.getId());
+        dto.setX(zone.getX());
+        dto.setY(zone.getY());
+        return dto;
+    }
+
     private FlashcardType resolveType(Flashcard card) {
         if (card instanceof DragDropFlashcard) return FlashcardType.DRAG_DROP;
         if (card instanceof StepsFlashcard) return FlashcardType.STEPS;

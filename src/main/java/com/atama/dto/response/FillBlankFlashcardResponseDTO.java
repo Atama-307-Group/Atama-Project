@@ -11,5 +11,5 @@ import java.util.List;
 public class FillBlankFlashcardResponseDTO extends FlashcardResponseDTO {
     private String textWithBlanks;
     private List<String> correctAnswers;
-    private FlashcardType type;
+    //private FlashcardType type;
 }
