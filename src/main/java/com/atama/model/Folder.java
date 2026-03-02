@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +18,8 @@ import java.util.UUID;
 public class Folder {
 
     @Id
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -25,24 +28,28 @@ public class Folder {
     @JoinColumn(name = "library_id")
     private Library library;
 
-    @ManyToMany
-    @JoinTable(
-            name = "folder_items",
-            joinColumns = @JoinColumn(name = "folder_id"),
-            inverseJoinColumns = @JoinColumn(name = "library_item_id")
-    )
-    private List<LibraryItem> items = new ArrayList<>();
+    @OneToMany(mappedBy = "folder")
+    private List<LibraryItem> items = new ArrayList<>();    // Items inside a folder
+
+    @Column
+    private Instant lastAccessed;
+
+    @CreationTimestamp
+    private Instant createdAt;
+
+    @Column(nullable = false)
+    private boolean starred = false;
 
     public Folder(String name) {
         this.name = name;
     }
 
-    public void addItem(LibraryItem item) {
-        items.add(item);
+    public void addItem(LibraryItem item) {     // Add an item to a folder
+        if (!items.contains(item)) items.add(item);
     }
 
-    public Folder(int randomID, String name) {
-        this.id = randomID;
-        this.name = name;
+    public void removeItem(LibraryItem item) {  // Remove an item from a folder
+        items.remove(item);
+        item.setFolder(null);
     }
 }

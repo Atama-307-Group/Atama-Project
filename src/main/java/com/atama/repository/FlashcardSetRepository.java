@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface FlashcardSetRepository extends JpaRepository<FlashcardSet, UUID> {
-    List<FlashcardSet> findByOwnerId(UUID ownerId);
+public interface FlashcardSetRepository extends JpaRepository<FlashcardSet, Long> {
+    List<FlashcardSet> findByOwnerId(long ownerId);
+
+    boolean existsById(Long id);
 }
