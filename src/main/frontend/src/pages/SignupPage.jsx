@@ -5,9 +5,15 @@ const SignupPage = ({ onBack, onLoginClick }) => {
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
     });
     const [status, setStatus] = useState({ loading: false, error: '', success: '' });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const passwordsMatch = formData.confirmPassword === '' || formData.password === formData.confirmPassword;
+    const passwordsTouched = formData.password !== '' && formData.confirmPassword !== '';
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,13 +21,18 @@ const SignupPage = ({ onBack, onLoginClick }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (formData.password !== formData.confirmPassword) {
+            setStatus({ loading: false, error: 'Passwords do not match.', success: '' });
+            return;
+        }
         setStatus({ loading: true, error: '', success: '' });
 
         try {
+            const { confirmPassword, ...submitData } = formData;
             const response = await fetch('/api/users/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(submitData)
             });
 
             if (!response.ok) {
@@ -30,7 +41,7 @@ const SignupPage = ({ onBack, onLoginClick }) => {
             }
 
             setStatus({ loading: false, error: '', success: 'Account created successfully! Please log in.' });
-            setFormData({ username: '', email: '', password: '' });
+            setFormData({ username: '', email: '', password: '', confirmPassword: '' });
         } catch (err) {
             setStatus({ loading: false, error: err.message || 'Failed to connect to server.', success: '' });
         }
@@ -74,17 +85,55 @@ const SignupPage = ({ onBack, onLoginClick }) => {
                         />
                     </div>
 
-                    <div className="input-group">
+                    <div className={`input-group ${passwordsTouched && !passwordsMatch ? 'input-error' : ''}`}>
                         <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            placeholder="••••••••"
-                        />
+                        <div className="password-wrapper">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                placeholder="••••••••"
+                            />
+                            <button
+                                type="button"
+                                className="toggle-eye"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                                aria-label="Toggle password visibility"
+                            >
+                                {showPassword ? '🙈' : '👁️'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={`input-group ${passwordsTouched && !passwordsMatch ? 'input-error' : ''}`}>
+                        <label htmlFor="confirmPassword">Confirm Password</label>
+                        <div className="password-wrapper">
+                            <input
+                                type={showConfirm ? 'text' : 'password'}
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required
+                                placeholder="••••••••"
+                            />
+                            <button
+                                type="button"
+                                className="toggle-eye"
+                                onClick={() => setShowConfirm(!showConfirm)}
+                                tabIndex={-1}
+                                aria-label="Toggle confirm password visibility"
+                            >
+                                {showConfirm ? '🙈' : '👁️'}
+                            </button>
+                        </div>
+                        {passwordsTouched && !passwordsMatch && (
+                            <span className="mismatch-hint">Passwords do not match</span>
+                        )}
                     </div>
 
                     <button
