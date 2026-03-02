@@ -51,6 +51,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User loginUser(String identifier, String password) {
+        // Try finding by username first, then by email
+        User user = userRepository.findByUsername(identifier)
+                .orElseGet(() -> userRepository.findByEmail(identifier)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid username/email or password.")));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid username/email or password.");
+        }
+
+        return user;
+    }
+
     public User createUser(User user) {
         return userRepository.save(user);
     }
