@@ -1,24 +1,41 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './Flashcard.css';
 
-const Flashcard = ({ question, answer, flipped, onFlip }) => {
-  const [favorite, setFavorite] = useState(false);
+const Flashcard = ({
+  flashcard,
+  question,
+  answer,
+  flipped,
+  onFlip,
+  onFavoriteUpdate
+}) => {
 
-  const handleFavoriteClick = (e) => {
-    e.stopPropagation(); // prevent flipping
-    setFavorite(!favorite);
+  const handleFavoriteClick = async (e) => {
+    e.stopPropagation();
+
+    const response = await fetch(
+      `/api/flashcard-sets/flashcards/${flashcard.id}/favorite`,
+      { method: "PUT" }
+    );
+
+    const updatedCard = await response.json();
+    onFavoriteUpdate(updatedCard);
   };
 
   return (
     <div className="flashcard-container">
-      {/* Star */}
+
       <div className="favorite-star" onClick={handleFavoriteClick}>
         <span className="tooltip-text">Favorite</span>
-        <span style={{ color: favorite ? 'gold' : '#ccc' }}>★</span>
+        <span style={{ color: flashcard.favorite ? 'gold' : '#ccc' }}>
+          ★
+        </span>
       </div>
 
-      {/* Flip wrapper */}
-      <div className={`flashcard-inner ${flipped ? 'flipped' : ''}`} onClick={onFlip}>
+      <div
+        className={`flashcard-inner ${flipped ? 'flipped' : ''}`}
+        onClick={onFlip}
+      >
         <div className="flashcard front">{question}</div>
         <div className="flashcard back">{answer}</div>
       </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Flashcard from '../components/Flashcard';
 
-const StudyPage = ({ onComplete, studyMode, initialFlashcards }) => {
+const StudyPage = ({ onComplete, studyMode, flashcards, onUpdateFlashcard }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
@@ -17,7 +17,7 @@ const StudyPage = ({ onComplete, studyMode, initialFlashcards }) => {
   };
 
   const nextCard = () => {
-    if (currentIndex < initialFlashcards.length - 1) {
+    if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setFlipped(false);
     }
@@ -30,7 +30,7 @@ const StudyPage = ({ onComplete, studyMode, initialFlashcards }) => {
     }
   };
 
-  const currentCard = initialFlashcards[currentIndex];
+  const currentCard = flashcards[currentIndex];
 
   const front =
     studyMode === 'term' ? currentCard.term : currentCard.definition;
@@ -43,10 +43,12 @@ const StudyPage = ({ onComplete, studyMode, initialFlashcards }) => {
       <h1>Study Session</h1>
 
       <Flashcard
-        question={front}
-        answer={back}
-        flipped={flipped}
-        onFlip={handleFlip}
+          flashcard={currentCard}
+          question={front}
+          answer={back}
+          flipped={flipped}
+          onFlip={handleFlip}
+          onFavoriteUpdate={onUpdateFlashcard}
       />
 
       <div className="study-buttons">
@@ -55,7 +57,7 @@ const StudyPage = ({ onComplete, studyMode, initialFlashcards }) => {
         </button>
         <button
           onClick={nextCard}
-          disabled={currentIndex === initialFlashcards.length - 1}
+          disabled={currentIndex === flashcards.length - 1}
         >
           Next
         </button>
@@ -65,7 +67,7 @@ const StudyPage = ({ onComplete, studyMode, initialFlashcards }) => {
       </div>
 
       <p>
-        Card {currentIndex + 1} / {initialFlashcards.length}
+        Card {currentIndex + 1} / {flashcards.length}
       </p>
     </div>
   );

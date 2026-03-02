@@ -52,4 +52,12 @@ public class FlashcardSetService {
     public List<Flashcard> getFlashcardsBySetId(UUID flashcardSetId) {
         return flashcardRepository.findByFlashcardSetId(flashcardSetId);
     }
+
+    public Flashcard toggleFavorite(UUID flashcardId) {
+        Flashcard flashcard = flashcardRepository.findById(flashcardId)
+                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+
+        flashcard.setFavorite(!flashcard.isFavorite());
+        return flashcardRepository.save(flashcard);
+    }
 }

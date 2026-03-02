@@ -18,4 +18,6 @@ public abstract class Flashcard {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "flashcard_set_id")
     private FlashcardSet flashcardSet;
+
+    private boolean favorite = false;
 }

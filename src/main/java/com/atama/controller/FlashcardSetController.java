@@ -48,4 +48,9 @@ public class FlashcardSetController {
         flashcardSetService.deleteFlashcardSet(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/flashcards/{flashcardId}/favorite")
+    public ResponseEntity<Flashcard> toggleFavorite(@PathVariable UUID flashcardId) {
+        return ResponseEntity.ok(flashcardSetService.toggleFavorite(flashcardId));
+    }
 }

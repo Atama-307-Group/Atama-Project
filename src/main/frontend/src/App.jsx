@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StartPage from './pages/FlashcardStartPage';
 import PreLearnPage from './pages/PreLearnPage';
 import StudyPage from './pages/StudyPage';
 import PostLearnPage from './pages/PostLearnPage';
-
-const sampleFlashcards = [
-  { term: 'React', definition: 'A JavaScript library for building UIs.', favorite: false },
-  { term: 'JSX', definition: 'A syntax extension for JavaScript that looks like HTML.', favorite: false },
-  { term: 'Component', definition: 'Reusable piece of UI in React.', favorite: false },
-];
 
 function App() {
   const [phase, setPhase] = useState('start');
   const [studyMode, setStudyMode] = useState('term');
   const [cards, setCards] = useState([]);
   const [studiedCount, setStudiedCount] = useState(0);
+
+  useEffect(() => {
+    fetch(`/api/flashcard-sets/${setId}/flashcards`)
+      .then(res => res.json())
+      .then(data => setCards(data));
+  }, []);
 
   const handlePreLearnStart = (mode, filteredCards) => {
     setStudyMode(mode);
@@ -35,7 +35,7 @@ function App() {
 
       {phase === 'prelearn' && (
         <PreLearnPage
-          flashcards={sampleFlashcards}
+          flashcards={cards}
           onStart={handlePreLearnStart}
         />
       )}
@@ -43,7 +43,14 @@ function App() {
       {phase === 'study' && (
         <StudyPage
           studyMode={studyMode}
-          initialFlashcards={cards}
+          flashcards={cards}
+          onUpdateFlashcard={(updatedCard) => {
+            setCards(prev =>
+              prev.map(card =>
+                card.id === updatedCard.id ? updatedCard : card
+              )
+            );
+          }}
           onComplete={handleStudyComplete}
         />
       )}
