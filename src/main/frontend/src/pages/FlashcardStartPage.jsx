@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './FlashcardStartPage.css';
 
-const FlashcardStartPage = ({ onStart, onSignup, onLoginClick, currentUser, onLogout }) => {
+const FlashcardStartPage = ({ onStart, onSignup, onLoginClick, currentUser, onLogout, onProfile }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -45,6 +45,9 @@ const FlashcardStartPage = ({ onStart, onSignup, onLoginClick, currentUser, onLo
                   </div>
                 </div>
                 <div className="dropdown-divider" />
+                <button className="dropdown-item" onClick={() => { setDropdownOpen(false); onProfile(); }}>
+                  Profile
+                </button>
                 <button className="dropdown-item logout-btn" onClick={onLogout}>
                   Log Out
                 </button>

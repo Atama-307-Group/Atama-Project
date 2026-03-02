@@ -3,12 +3,14 @@ import StartPage from './pages/FlashcardStartPage';
 import StudyPage from './pages/StudyPage';
 import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   const [started, setStarted] = useState(false);
   const [studyMode, setStudyMode] = useState(null);
   const [showSignup, setShowSignup] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('currentUser');
@@ -31,7 +33,12 @@ function App() {
 
   return (
     <div>
-      {showLogin ? (
+      {showProfile && currentUser ? (
+        <ProfilePage
+          currentUser={currentUser}
+          onBack={() => setShowProfile(false)}
+        />
+      ) : showLogin ? (
         <LoginPage
           onBack={() => setShowLogin(false)}
           onLoginSuccess={handleLoginSuccess}
@@ -51,6 +58,7 @@ function App() {
               onLoginClick={() => setShowLogin(true)}
               currentUser={currentUser}
               onLogout={handleLogout}
+              onProfile={() => setShowProfile(true)}
             />
           )}
           {started && !studyMode && (
