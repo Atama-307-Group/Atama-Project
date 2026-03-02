@@ -2,6 +2,7 @@ package com.atama.controller;
 
 import com.atama.dto.request.CreateFolderRequest;
 import com.atama.dto.request.RenameFolderRequest;
+import com.atama.dto.request.SetFolderPrivacyRequest;
 import com.atama.dto.request.SetFolderStarredRequest;
 import com.atama.dto.response.FolderItemsResponse;
 import com.atama.dto.response.FolderResponse;
@@ -9,10 +10,8 @@ import com.atama.model.Folder;
 import com.atama.model.LibraryItem;
 import com.atama.repository.FolderRepository;
 import com.atama.service.FolderService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -35,6 +34,7 @@ public class FolderController {
                 f.getId(),
                 f.getName(),
                 f.isStarred(),
+                f.isPublic(),
                 f.getCreatedAt(),
                 f.getLastAccessed(),
                 items,
@@ -98,5 +98,14 @@ public class FolderController {
         return ResponseEntity.ok(
                 new FolderItemsResponse(folder.getId(), folder.getName(), List.of())
         );
+    }
+
+    @PatchMapping("/{id}/privacy")
+    public ResponseEntity<FolderResponse> setPrivacy(
+            @PathVariable Long id,
+            @RequestBody SetFolderPrivacyRequest request
+    ) {
+        Folder updated = folderService.setFolderPrivacy(id, request.isPublic());
+        return ResponseEntity.ok(toResponse(updated));
     }
 }

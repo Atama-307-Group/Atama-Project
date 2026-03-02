@@ -27,24 +27,10 @@ public class Library {
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Folder> folders = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LibraryItem> items = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean isPrivate = true;
-
-    public Library(User user) {
-        this.user = user;
-    }
-
-    public void addFolder(Folder folder) {
-        folders.add(folder);
-        folder.setLibrary(this);
-    }
-
-    public void addItem(LibraryItem item) {
-        items.add(item);
-        item.setLibrary(this);
-        item.setFolder(null); // ensure loose item by default
-    }
 }

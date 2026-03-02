@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems } from "./api";
+import {createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy } from "./api";
 import "./app.css";
 
 export default function App() {
@@ -35,16 +35,9 @@ export default function App() {
     const [renameId, setRenameId] = useState(null);
     const [renameName, setRenameName] = useState("");
 
-    // Privacy modal state TODO might remove
-    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-
-    function openPrivacy() {
-        setShowPrivacyModal(true);
-    } // TODO
-
-    function closePrivacy() {
-        setShowPrivacyModal(false);
-    } // TODO
+    // Folder privacy
+    const [privacyId, setPrivacyId] = useState(null);
+    const [nextIsPublic, setNextIsPublic] = useState(false);
 
     // Folder items
     const [items, setItems] = useState([]);
@@ -159,6 +152,7 @@ export default function App() {
             return Number.isFinite(t) ? t : 0;
         }
 
+        // TODO fix
         function compareBySort(a, b) {
             switch (sortBy) {
                 case "alpha-desc":
@@ -170,7 +164,6 @@ export default function App() {
                 case "created-desc":
                     return safeTime(b.createdAt) - safeTime(a.createdAt);
 
-                // last accessed (you only asked one way; I’m assuming "most recent first")
                 case "accessed-desc":
                     // If lastAccessed is null, treat as very old so it sinks.
                     return safeTime(b.lastAccessed) - safeTime(a.lastAccessed);
@@ -253,14 +246,14 @@ export default function App() {
                 if (showModal) closeModal();
                 if (renameId !== null) closeRenameModal();
                 if (confirmDeleteId !== null) setConfirmDeleteId(null);
-                if (showPrivacyModal) closePrivacy();
+                if (privacyId !== null) setPrivacyId(null);
                 if (showSortMenu) setShowSortMenu(false);
                 setOpenMenuId(null);
             }
         }
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-    }, [showModal, renameId, confirmDeleteId, showPrivacyModal, showSortMenu]);
+    }, [showModal, renameId, confirmDeleteId, privacyId, showSortMenu]);
 
     // ── Star toggle ───────────────────────────────────────────────────────────
     async function onToggleStar(folderId) {
@@ -333,6 +326,30 @@ export default function App() {
             setError(err.message ?? "Failed to rename folder");
         }
     }
+    // ── Privacy modal ──────────────────────────────────────────────────────────
+    function openPrivacyModal(folder) {
+        setPrivacyId(folder.id);
+        setNextIsPublic(!folder.isPublic);
+        setOpenMenuId(null);
+    }
+
+    async function confirmPrivacyChange() {
+        if (privacyId == null) return;
+        const prevFolders = folders; // save for rollback
+        setPrivacyId(null);
+
+        try {
+            const updated = await setFolderPrivacy(privacyId, nextIsPublic);
+            setFolders((prev) =>
+                prev.map((f) => f.id === updated.id ? { ...f, isPublic: updated.isPublic } : f)
+            );
+        } catch (e) {
+            setError(e.message ?? "Failed to update privacy");
+            setFolders(prevFolders); // rollback
+        }
+    }
+
+    // ── Main ──────────────────────────────────────────────────────────
 
     return (
         <div className="appShell">
@@ -512,6 +529,18 @@ export default function App() {
                                                             >
                                                                 ✏ Rename
                                                             </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="menuItem"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    openPrivacyModal(f);
+                                                                }}
+                                                            >
+                                                                {f.isPublic ? "🔒 Make Private" : "🔓 Make Public"}
+                                                            </button>
+
                                                             <button
                                                                 role="menuitem"
                                                                 className="menuItem danger"
@@ -661,45 +690,42 @@ export default function App() {
                 </div>
             )}
 
-            {showPrivacyModal && (
-                <div className="modalOverlay" onClick={closePrivacy}>
-                    <div
-                        className="modal"
-                        onClick={(e) => e.stopPropagation()}
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="privacyModalTitle"
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                gap: 12,
-                            }}
-                        >
-                            <div className="modalTitle" id="privacyModalTitle">
-                                Privacy Settings
-                            </div>
+            {privacyId != null && (
+                <div className="modalOverlay" onClick={() => setPrivacyId(null)}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modalTitle">
+                            {nextIsPublic ? "Make folder public?" : "Make folder private?"}
 
+                        </div>
+
+                        <div className="modalBody">
+                            {nextIsPublic ? (
+                                <p>
+                                    ⚠️ If you set this folder to <b>public</b>, everything in the folder
+                                    will be <b>visible to other users</b>.
+                                </p>
+                            ) : (
+                                <p>
+                                ⚠️ If you set this folder to <b>private</b>, everything in the folder
+                                will be <b>hidden from other users</b>.
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="modalActions">
                             <button
                                 type="button"
-                                className="iconBtn"
-                                onClick={closePrivacy}
-                                aria-label="Close privacy settings"
-                                title="Close"
+                                className="btn"
+                                onClick={() => setPrivacyId(null)}
                             >
-                                ✕
+                                Cancel
                             </button>
-                        </div>
-
-                        <div className="modalBody" style={{ marginTop: 10 }}>
-                            {/* TODO: privacy settings content goes here */}
-                        </div>
-
-                        <div className="modalActions" style={{ marginTop: 14 }}>
-                            <button type="button" className="btn cancelBtn" onClick={closePrivacy}>
-                                Close
+                            <button
+                                type="button"
+                                className="btn primary"
+                                onClick={confirmPrivacyChange}
+                            >
+                                {nextIsPublic ? "Make public" : "Make private"}
                             </button>
                         </div>
                     </div>

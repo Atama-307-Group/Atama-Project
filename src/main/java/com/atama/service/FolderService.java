@@ -8,7 +8,9 @@ import com.atama.repository.FolderRepository;
 import com.atama.repository.LibraryRepository;
 import com.atama.repository.LibraryItemRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -109,5 +111,12 @@ public class FolderService {
         return new FolderItemsResponse(folder.getId(), folder.getName(), summaries);
     }
 
+    @Transactional
+    public Folder setFolderPrivacy(Long folderId, boolean isPublic) {
+        Folder f = folderRepository.findById(folderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        f.setPublic(isPublic);          // or f.setIsPublic(isPublic) depending on your model
+        return folderRepository.save(f); // safest, forces DB write
+    }
 }

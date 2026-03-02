@@ -1,5 +1,7 @@
 package com.atama.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +28,7 @@ public class Folder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_id")
+    @JsonIgnore
     private Library library;
 
     @OneToMany(mappedBy = "folder")
@@ -39,4 +42,8 @@ public class Folder {
 
     @Column(nullable = false)
     private boolean starred = false;
+
+    @JsonProperty("isPublic")
+    @Column(name = "is_public", nullable = false)
+    private boolean isPublic = true;        // Public by default
 }

@@ -69,3 +69,18 @@ export async function getFolderItems(folderId) {
     if (!res.ok) throw new Error("Failed to load folder items");
     return res.json();
 }
+
+export async function setFolderPrivacy(folderId, isPublic) {
+    // return request(`/folders/${folderId}/privacy`, {
+    //     method: "PATCH",
+    //     body: JSON.stringify({isPublic})
+    // })
+
+    const res = await fetch(`http://localhost:8080/folders/${folderId}/privacy`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic }),
+    });
+    if (!res.ok) throw new Error("Failed to update folder privacy");
+    return res.json();
+}
