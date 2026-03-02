@@ -1,6 +1,7 @@
 package com.atama.service;
 
 import com.atama.dto.request.CreateFolderRequest;
+import com.atama.dto.response.FolderItemsResponse;
 import com.atama.model.Folder;
 import com.atama.model.Library;
 import com.atama.repository.FolderRepository;
@@ -14,7 +15,6 @@ import java.util.List;
 
 @Service
 public class FolderService {
-
     private final FolderRepository folderRepository;
     private final LibraryRepository libraryRepository;
     private final LibraryItemRepository libraryItemRepository;
@@ -71,7 +71,7 @@ public class FolderService {
                 .orElseThrow(() -> new RuntimeException("Folder not found"));
 
         folder.setStarred(starred);
-        return folder; // managed entity, saved on tx commit
+        return folder;
     }
 
     @Transactional
@@ -83,7 +83,31 @@ public class FolderService {
         return folder;
     }
 
+    // Get all FOlders
     public List<Folder> getAllFolders() {
         return folderRepository.findAll();
     }
+
+    public FolderItemsResponse getFolderItems(Long folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new IllegalArgumentException("Folder not found"));
+
+        var items = libraryItemRepository.findAllByFolderId(folderId);
+
+        var summaries = items.stream()
+                .map(li -> new FolderItemsResponse.LibraryItemSummary(
+                        li.getId(),
+                        li.getTitle(),
+                        li.isStarred(),
+                        li.getCreatedAt(),
+                        li.getUpdatedAt(),
+                        li.getLastAccessed(),
+                        li.getItem_type()
+                ))
+                .toList();
+
+        return new FolderItemsResponse(folder.getId(), folder.getName(), summaries);
+    }
+
+
 }

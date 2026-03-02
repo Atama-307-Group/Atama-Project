@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred } from "./api";
+import {createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems } from "./api";
 import "./app.css";
 
 export default function App() {
@@ -35,16 +35,21 @@ export default function App() {
     const [renameId, setRenameId] = useState(null);
     const [renameName, setRenameName] = useState("");
 
-    // Privacy modal state
+    // Privacy modal state TODO might remove
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
     function openPrivacy() {
         setShowPrivacyModal(true);
-    }
+    } // TODO
 
     function closePrivacy() {
         setShowPrivacyModal(false);
-    }
+    } // TODO
+
+    // Folder items
+    const [items, setItems] = useState([]);
+    const [itemsLoading, setItemsLoading] = useState(false);
+    const [itemsError, setItemsError] = useState("");
 
     const menuRef = useRef(null);
 
@@ -55,7 +60,7 @@ export default function App() {
             const data = await getFolders();
             const list = Array.isArray(data) ? data : [];
             setFolders(list);
-            if (list.length && selectedFolderId == null) setSelectedFolderId(list[0].id);
+            // if (list.length && selectedFolderId == null) setSelectedFolderId(list[0].id);
         } catch (err) {
             setError(err.message ?? "Something went wrong");
         } finally {
@@ -63,6 +68,7 @@ export default function App() {
         }
     }
 
+    // Load the folders
     useEffect(() => {
         loadFolders();
     }, []);
@@ -112,6 +118,36 @@ export default function App() {
         libraryEl.addEventListener('scroll', handleScroll);
         return () => libraryEl.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Loading Folder items
+    useEffect(() => {
+        if (selectedFolderId == null) {
+            setItems([]);
+            setItemsError("");
+            setItemsLoading(false);
+            return;
+        }
+
+        let cancelled = false;
+
+        async function loadItems() {
+            setItemsError("");
+            setItemsLoading(true);
+            try {
+                const data = await getFolderItems(selectedFolderId);
+                if (!cancelled) setItems(Array.isArray(data) ? data : []);
+            } catch (e) {
+                if (!cancelled) setItemsError(e.message ?? "Failed to load folder contents");
+            } finally {
+                if (!cancelled) setItemsLoading(false);
+            }
+        }
+
+        loadItems();
+        return () => {
+            cancelled = true;
+        };
+    }, [selectedFolderId]);
 
     // Sorting
     const filtered = useMemo(() => {
@@ -321,16 +357,27 @@ export default function App() {
                 {/*</button>*/}
 
                 <button className="btn primary" onClick={openCreateFolderModal} type="button">
-                    Create Folder
+                    TODO New Flashcard Set
+                </button>
+
+                <button className="btn secondary" onClick={openCreateFolderModal} type="button">
+                    TODO New Upload
+                </button>
+
+                <button className="btn ghost"
+                        onClick={() => setShowModal(true)}
+                        disabled={selectedFolderId !== null}
+                        type="button">
+                    New Folder
                 </button>
 
                 <div className="panel">
-                    <div className="panelTitle">Find</div>
-                    <label htmlFor="folder-search" className="srOnly">Search folders</label>
+                    <div className="panelTitle">Search</div>
+                    <label htmlFor="folder-search" className="srOnly">Search personal library</label>
                     <input
                         id="folder-search"
                         className="input"
-                        placeholder="Search folders…"
+                        placeholder="Search personal library…"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
@@ -343,7 +390,7 @@ export default function App() {
             <main className="library">
                 <header className="libraryHeader">
                     <div>
-                        <div className="libraryTitle">Folders</div>
+                        <div className="libraryTitle">Your Library</div>
                         <div className="librarySub">
                             {loading ? "Loading…" : `${filtered.length} folder${filtered.length === 1 ? "" : "s"}`}
                             {selected ? ` · Selected: ${selected.name}` : ""}
@@ -404,83 +451,116 @@ export default function App() {
                 </header>
 
                 <section className="libraryBody">
-                    {loading ? (
-                        <div className="emptyState">Gathering folders…</div>
-                    ) : filtered.length === 0 ? (
-                        <div className="emptyState">No folders found.</div>
-                    ) : (
-                        <div className="folderGrid">
-                            {filtered.map((f) => (
-                                <div
-                                    key={f.id}
-                                    className={`folderCard ${f.id === selectedFolderId ? "active" : ""}`}
-                                    onClick={() => setSelectedFolderId(f.id)}
-                                    title={`Folder #${f.id}`}
-                                >
-                                    <div className="folderName">{f.name}</div>
-                                    <div className="folderMeta">
-                                        <span>#{f.id}</span>
+                    {selectedFolderId == null ? (
+                        loading ? (
+                            <div className="emptyState">Gathering folders…</div>
+                        ) : filtered.length === 0 ? (
+                            <div className="emptyState">No folders found.</div>
+                        ) : (
+                            <div className="folderGrid">
+                                {filtered.map((f) => (
+                                    <div
+                                        key={f.id}
+                                        className={`folderCard ${f.id === selectedFolderId ? "active" : ""}`}
+                                        onClick={() => setSelectedFolderId(f.id)}
+                                        title={`Folder #${f.id}`}
+                                    >
+                                        <div className="folderName">{f.name}</div>
+                                        <div className="folderMeta">
+                                            <span>#{f.id}</span>
 
-                                        <div className="folderActions">
-                                            {/* FIX 2: actionable star toggle */}
-                                            <button
-                                                type="button"
-                                                className={`iconBtn starBtn ${f.starred ? "starred" : ""}`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // don’t select folder if you click star
-                                                    onToggleStar(f.id);
-                                                }}
-                                                title={f.starred ? "Unstar" : "Star"}
-                                                aria-label={f.starred ? "Unstar folder" : "Star folder"}
-                                            >
-                                                {f.starred ? "★" : "☆"}
-                                            </button>
-
-                                            {/* FIX 1: ⋯ overflow menu */}
-                                            <div className="menuWrap" ref={openMenuId === f.id ? menuRef : null}>
+                                            <div className="folderActions">
+                                                {/* actionable star toggle */}
                                                 <button
                                                     type="button"
-                                                    className="iconBtn menuTrigger"
+                                                    className={`iconBtn starBtn ${f.starred ? "starred" : ""}`}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        setOpenMenuId(openMenuId === f.id ? null : f.id);
+                                                        onToggleStar(f.id);
                                                     }}
-                                                    aria-label="Folder options"
-                                                    aria-haspopup="true"
-                                                    aria-expanded={openMenuId === f.id}
+                                                    title={f.starred ? "Unstar" : "Star"}
+                                                    aria-label={f.starred ? "Unstar folder" : "Star folder"}
                                                 >
-                                                    ⋯
+                                                    {f.starred ? "★" : "☆"}
                                                 </button>
 
-                                                {openMenuId === f.id && (
-                                                    <div className="dropdownMenu" role="menu">
-                                                        <button
-                                                            role="menuitem"
-                                                            className="menuItem"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                openRenameModal(f);
-                                                            }}
-                                                        >
-                                                            ✏️ Rename
-                                                        </button>
-                                                        <button
-                                                            role="menuitem"
-                                                            className="menuItem danger"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                openDeleteConfirm(f.id);
-                                                            }}
-                                                        >
-                                                            🗑️ Delete
-                                                        </button>
-                                                    </div>
-                                                )}
+                                                {/* ⋯ overflow menu */}
+                                                <div className="menuWrap" ref={openMenuId === f.id ? menuRef : null}>
+                                                    <button
+                                                        type="button"
+                                                        className="iconBtn menuTrigger"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setOpenMenuId(openMenuId === f.id ? null : f.id);
+                                                        }}
+                                                        aria-label="Folder options"
+                                                        aria-haspopup="true"
+                                                        aria-expanded={openMenuId === f.id}
+                                                    >
+                                                        ⋯
+                                                    </button>
+
+                                                    {openMenuId === f.id && (
+                                                        <div className="dropdownMenu" role="menu">
+                                                            <button
+                                                                role="menuitem"
+                                                                className="menuItem"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    openRenameModal(f);
+                                                                }}
+                                                            >
+                                                                ✏ Rename
+                                                            </button>
+                                                            <button
+                                                                role="menuitem"
+                                                                className="menuItem danger"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    openDeleteConfirm(f.id);
+                                                                }}
+                                                            >
+                                                                🗑 Delete
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                        )
+                    ) : (
+                        /* ─────────────────────────────
+                           MODE 2: Folder selected → show folder contents
+                           ───────────────────────────── */
+                        <div className="folderContents">
+                            <button
+                                type="button"
+                                className="btn cancelBtn"
+                                onClick={() => setSelectedFolderId(null)}
+                                style={{ marginBottom: 12 }}
+                            >
+                                ← Back to folders
+                            </button>
+
+                            {itemsLoading ? (
+                                <div className="emptyState">Loading items…</div>
+                            ) : itemsError ? (
+                                <div className="error">{itemsError}</div>
+                            ) : items.length === 0 ? (
+                                <div className="emptyState">This folder is empty.</div>
+                            ) : (
+                                <div className="itemsList">
+                                    {items.map((it) => (
+                                        <div key={it.id} className="itemRow">
+                                            <div className="itemTitle">{it.title}</div>
+                                            <div className="itemMeta">{it.type}</div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            )}
                         </div>
                     )}
                 </section>
@@ -507,7 +587,6 @@ export default function App() {
                                 autoFocus
                             />
 
-                            {/* FIX 4: cancel gets a visible border, not invisible ghost */}
                             <div className="modalActions">
                                 <button className="btn cancelBtn" type="button" onClick={closeModal}>
                                     Cancel
@@ -520,7 +599,6 @@ export default function App() {
                     </div>
                 </div>
             )}
-
 
             {/* Rename folder modal */}
             {renameId !== null && (

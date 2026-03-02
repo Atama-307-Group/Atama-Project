@@ -14,4 +14,11 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, Long> 
     @Query("update LibraryItem li set li.folder = null where li.folder.id = :folderId")
     void clearFolderForItems(@Param("folderId") Long folderId);
 
+    @Query("""
+           select li
+           from LibraryItem li
+           where li.folder.id = :folderId
+           order by li.updatedAt desc
+           """)
+    List<LibraryItem> findAllByFolderId(@Param("folderId") Long folderId);
 }

@@ -1,5 +1,6 @@
 package com.atama.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public abstract class LibraryItem {
     private Library library;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "folder_id") // nullable => loose
     private Folder folder;
 

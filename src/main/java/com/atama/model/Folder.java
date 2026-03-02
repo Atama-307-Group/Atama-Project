@@ -39,17 +39,4 @@ public class Folder {
 
     @Column(nullable = false)
     private boolean starred = false;
-
-    public Folder(String name) {
-        this.name = name;
-    }
-
-    public void addItem(LibraryItem item) {     // Add an item to a folder
-        if (!items.contains(item)) items.add(item);
-    }
-
-    public void removeItem(LibraryItem item) {  // Remove an item from a folder
-        items.remove(item);
-        item.setFolder(null);
-    }
 }

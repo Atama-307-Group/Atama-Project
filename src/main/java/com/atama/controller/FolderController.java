@@ -3,14 +3,17 @@ package com.atama.controller;
 import com.atama.dto.request.CreateFolderRequest;
 import com.atama.dto.request.RenameFolderRequest;
 import com.atama.dto.request.SetFolderStarredRequest;
+import com.atama.dto.response.FolderItemsResponse;
 import com.atama.dto.response.FolderResponse;
 import com.atama.model.Folder;
 import com.atama.model.LibraryItem;
+import com.atama.repository.FolderRepository;
 import com.atama.service.FolderService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -18,9 +21,11 @@ import java.util.List;
 public class FolderController {
 
     private final FolderService folderService;
+    private final FolderRepository folderRepository;
 
-    public FolderController(FolderService folderService) {
+    public FolderController(FolderService folderService, FolderRepository folderRepository) {
         this.folderService = folderService;
+        this.folderRepository = folderRepository;
     }
 
     private static FolderResponse toResponse(Folder f) {
@@ -73,12 +78,25 @@ public class FolderController {
         return ResponseEntity.ok(toResponse(updated));
     }
 
+    // Get all Folders
     @GetMapping
     public ResponseEntity<List<FolderResponse>> getAllFolders() {
         return ResponseEntity.ok(
                 folderService.getAllFolders().stream()
                         .map(FolderController::toResponse)
                         .toList()
+        );
+    }
+
+    // Get all LibraryItems in a Folder
+    @GetMapping("/{id}/items")
+    public ResponseEntity<FolderItemsResponse> getFolderItems(@PathVariable Long id) {
+        Folder folder = folderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Folder not found: " + id));
+
+        // For now: always empty
+        return ResponseEntity.ok(
+                new FolderItemsResponse(folder.getId(), folder.getName(), List.of())
         );
     }
 }
