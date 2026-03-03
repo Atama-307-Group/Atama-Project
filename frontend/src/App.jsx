@@ -161,9 +161,10 @@ function App() {
             <Route
                 path="/create"
                 element={
-                    currentUser
+                    <CreateFlashcardSetPage />
+                    /*currentUser
                         ? <CreateFlashcardSetPage />
-                        : <Navigate to="/login" />
+                        : <Navigate to="/login" />*/
                 }
             />
 
@@ -176,7 +177,7 @@ function App() {
             {/* Folders Page */}
             <Route
                 path="/folders"
-                element={currentUser ? <FoldersPage /> : <Navigate to ="/login" />}
+                element={<FoldersPage />/*currentUser ? <FoldersPage /> : <Navigate to ="/login" />*/}
             />
 
             {/* Catch-all */}
