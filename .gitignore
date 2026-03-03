@@ -1,0 +1,2 @@
+# Never commit the line below - it is meant for local use to ignore the .agents directory
+.agents/
