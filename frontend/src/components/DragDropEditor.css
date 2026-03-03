@@ -1,0 +1,196 @@
+/* ---- Mode toggle ---- */
+.dd-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dd-mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.dd-mode-btn {
+  padding: 4px 14px;
+  font-size: 0.85em;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dd-mode-btn.active {
+  background: #646cff;
+  border-color: #646cff;
+  color: #fff;
+}
+
+/* ---- Image upload placeholder ---- */
+.dd-image-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #555;
+  border-radius: 8px;
+  padding: 32px;
+  cursor: pointer;
+  color: #888;
+  font-size: 0.95em;
+  transition: border-color 0.2s;
+}
+
+.dd-image-upload:hover {
+  border-color: #646cff;
+  color: #646cff;
+}
+
+/* ---- Canvas (image + zone markers) ---- */
+.dd-canvas-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dd-canvas {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.dd-canvas-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.dd-zone-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(100, 108, 255, 0.85);
+  color: #fff;
+  font-size: 0.75em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.dd-zone-marker--preview {
+  width: auto;
+  min-width: 26px;
+  height: auto;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  background: rgba(100, 108, 255, 0.9);
+}
+
+.dd-remove-image-btn {
+  align-self: flex-start;
+  padding: 4px 10px;
+  font-size: 0.8em;
+  background: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dd-remove-image-btn:hover {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+/* ---- Zone list ---- */
+.dd-zone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dd-zone-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dd-zone-index {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #646cff;
+  color: #fff;
+  font-size: 0.75em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dd-zone-coords {
+  font-size: 0.8em;
+  color: #888;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.dd-zone-row .flashcard-input-field {
+  flex: 1;
+}
+
+/* ---- Section labels & hints ---- */
+.dd-section-label {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+.dd-hint {
+  font-size: 0.8em;
+  color: #666;
+  margin: 0;
+}
+
+/* ---- Labels section (edit) ---- */
+.dd-labels-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---- Preview prompt ---- */
+.dd-preview-prompt {
+  font-size: 1.05em;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ---- Preview label chips ---- */
+.dd-preview-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.dd-label-chip {
+  padding: 6px 14px;
+  font-size: 0.9em;
+  border: 1px solid #646cff;
+  border-radius: 16px;
+  color: #646cff;
+  background: transparent;
+}
