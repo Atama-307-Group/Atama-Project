@@ -6,6 +6,9 @@ import PostLearnPage from './pages/PostLearnPage';
 import PreMatchPage from './pages/PreMatchPage';
 import MatchPage from './pages/MatchPage';
 import PostMatchPage from './pages/PostMatchPage';
+import PreTestPage from './pages/PreTestPage';
+import PracticeTestPage from './pages/PracticeTestPage';
+import PostTestPage from './pages/PostTestPage';
 
 const App = () => {
   const [page, setPage] = useState('start');
@@ -13,6 +16,9 @@ const App = () => {
   const [totalCards, setTotalCards] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [matchTime, setMatchTime] = useState(0);
+  const [testScore, setTestScore] = useState(0);
+  const [promptType, setPromptType] = useState('term');
+  const [numQuestions, setNumQuestions] = useState(0);
 
   const flashcards = [
     { term: 'React', definition: 'A JS library for building UI', favorite: true },
@@ -26,6 +32,7 @@ const App = () => {
         <FlashcardStartPage
           onLearn={() => setPage('prelearn')}
           onMatch={() => setPage('prematch')}
+          onPracticeTest={() => setPage('pretest')}
         />
       )}
 
@@ -88,6 +95,39 @@ const App = () => {
           onRestart={() => setPage('start')}
         />
       )}
+
+  {page === 'pretest' && (
+          <PreTestPage
+            flashcards={flashcards}
+            onStartTest={(type, selectedCards, count) => {
+              setPromptType(type);
+              setCardsToStudy(selectedCards);
+              setNumQuestions(count);
+              setPage('test');
+            }}
+          />
+        )}
+
+        {page === 'test' && (
+          <PracticeTestPage
+            promptType={promptType}
+            cards={cardsToStudy}
+            numQuestions={numQuestions}
+            onDone={(score, total) => {
+              setTestScore(score);
+              setTotalCards(total);
+              setPage('posttest');
+            }}
+          />
+        )}
+
+        {page === 'posttest' && (
+          <PostTestPage
+            correct={testScore}
+            total={totalCards}
+            onRestart={() => setPage('start')}
+          />
+        )}
     </div>
   );
 };
