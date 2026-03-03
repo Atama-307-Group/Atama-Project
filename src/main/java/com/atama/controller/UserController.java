@@ -2,6 +2,7 @@ package com.atama.controller;
 
 import com.atama.dto.request.UserRegistrationRequest;
 import com.atama.model.User;
+import com.atama.service.PasswordResetService;
 import com.atama.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> request) {
@@ -47,7 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
@@ -57,8 +59,77 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/delete-account")
+    public ResponseEntity<?> deleteAccount(@PathVariable UUID id, @RequestBody Map<String, String> request) {
+        String password = request.get("password");
+        try {
+            userService.deleteAccountWithPassword(id, password);
+            return ResponseEntity.ok(Map.of("message", "Account deleted successfully."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable UUID id, @RequestBody Map<String, String> request) {
+        String oldPassword = request.get("oldPassword");
+        String newPassword = request.get("newPassword");
+        try {
+            userService.changePassword(id, oldPassword, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password changed successfully."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/change-username")
+    public ResponseEntity<?> changeUsername(@PathVariable UUID id, @RequestBody Map<String, String> request) {
+        String newUsername = request.get("newUsername");
+        String password = request.get("password");
+        try {
+            User user = userService.changeUsername(id, newUsername, password);
+            return ResponseEntity.ok(Map.of(
+                    "id", user.getId().toString(),
+                    "username", user.getUsername(),
+                    "email", user.getEmail()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String identifier = request.get("identifier");
+        try {
+            String email = passwordResetService.generateResetCode(identifier);
+            // Mask the email for privacy
+            String masked = email.substring(0, 2) + "***@" + email.substring(email.indexOf("@") + 1);
+            return ResponseEntity.ok(Map.of(
+                    "message", "A reset code has been sent to " + masked));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String code = request.get("code");
+        String newPassword = request.get("newPassword");
+        try {
+            passwordResetService.resetPassword(code, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 }
