@@ -1,8 +1,10 @@
 .create-set-page {
   max-width: 700px;
-  margin: 40px auto;
-  padding: 0 24px 60px;
-  text-align: left;
+  margin: 0px auto;
+  text-align: center;
+  padding-top: 64px;
+  align-items: center;
+  align-self: flex-start;
 }
 
 .create-set-page h1 {
@@ -82,7 +84,7 @@
 
 .create-set-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
   padding-bottom: 40px;
 }

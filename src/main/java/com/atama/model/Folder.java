@@ -1,5 +1,7 @@
 package com.atama.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,7 @@ public class Folder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_id")
+    @JsonIgnore
     private Library library;
 
     @OneToMany(mappedBy = "folder")
@@ -36,21 +39,13 @@ public class Folder {
     private Instant lastAccessed;
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column(nullable = false)
     private boolean starred = false;
 
-    public Folder(String name) {
-        this.name = name;
-    }
-
-    public void addItem(LibraryItem item) {     // Add an item to a folder
-        if (!items.contains(item)) items.add(item);
-    }
-
-    public void removeItem(LibraryItem item) {  // Remove an item from a folder
-        items.remove(item);
-        item.setFolder(null);
-    }
+    @JsonProperty("isPublic")
+    @Column(name = "is_public", nullable = false)
+    private boolean isPublic = true;        // Public by default
 }
