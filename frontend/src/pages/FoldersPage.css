@@ -5,8 +5,9 @@
   --pine: #335145;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
   color: var(--deep);
-  background: var(--mint);
+  /*background: var(--mint);*/
 }
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body { margin: 0; overflow-y: auto; overflow-x: hidden; }
@@ -83,7 +84,6 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 .btn.primary:hover { background: #6ab59a; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* FIX 4: Cancel button has a visible border instead of being invisible */
 .btn.cancelBtn {
   background: transparent;
   border: 1px solid rgba(51,81,69,0.35);
@@ -96,12 +96,11 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 
 /* Library */
 .library {
-  background: var(--mint); color: var(--deep);
+  /*background: var(--mint); color: var(--deep);*/
   width: 100%; padding: 24px;
   height: auto; overflow: visible;
 }
 
-/* FIX 3: sticky header gets a scroll-aware shadow via box-shadow */
 .libraryHeader {
   background: rgba(255,255,255,0.85);
   border: 1px solid rgba(51,81,69,0.14);
@@ -123,7 +122,6 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 
 .libraryBody { width: 100%; margin-top: 24px; }
 
-/* TODO fix folders so that they automatically fill up the page */
 .folderGrid {
   width: 100%;
   display: grid;
@@ -140,7 +138,6 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   .folderGrid { grid-template-columns: 1fr; }
 }
 
-/* FIX 1: folder card is now a div (menu inside) instead of a button */
 .folderCard {
   border-radius: 18px;
   border: 1px solid rgba(51,81,69,0.16);
@@ -180,7 +177,6 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
   display: flex; align-items: center; gap: 4px;
 }
 
-/* FIX 2: icon button base — used for star & menu trigger */
 .iconBtn {
   background: none; border: none;
   cursor: pointer; padding: 4px 6px;
@@ -191,12 +187,10 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 }
 .iconBtn:hover { background: rgba(51,81,69,0.10); }
 
-/* FIX 2: star is now actionable with a real toggle */
 .starBtn { color: var(--sage); opacity: 0.55; }
 .starBtn.starred { opacity: 1; color: #e8a020; }
 .starBtn:hover { opacity: 1; }
 
-/* FIX 1: ⋯ menu trigger — hidden until card is hovered */
 .menuTrigger {
   opacity: 0;
   transition: opacity 100ms ease;
@@ -205,12 +199,12 @@ body { margin: 0; overflow-y: auto; overflow-x: hidden; }
 .folderCard:hover .menuTrigger,
 .menuTrigger:focus { opacity: 1; }
 
-/* FIX 1: dropdown menu */
 .menuWrap { position: relative; }
 
 .dropdownMenu {
   position: absolute;
-  right: 0; bottom: calc(100% + 4px);
+  right: 0;
+  top: calc(100% + 4px);
   background: #fff;
   border: 1px solid rgba(51,81,69,0.18);
   border-radius: 12px;

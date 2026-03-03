@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy} from "../api.js";
 import {useNavigate} from "react-router-dom";
-import "./PersonalLibrary.css";
+import "./FoldersPage.css";
 
 const FoldersPage = () => {
     const navigate = useNavigate(); // TODO use
@@ -369,8 +369,8 @@ const FoldersPage = () => {
                     </div>
                 </div>
 
-                <button className="btn primary" onClick={openCreateFolderModal} type="button">
-                    TODO New Flashcard Set
+                <button className="btn primary" onClick={() => navigate('/create')} type="button">
+                    New Flashcard Set
                 </button>
 
                 <button className="btn secondary" onClick={openCreateFolderModal} type="button">
