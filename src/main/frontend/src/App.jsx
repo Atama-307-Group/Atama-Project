@@ -12,6 +12,7 @@ const App = () => {
   const [cardsToStudy, setCardsToStudy] = useState([]);
   const [totalCards, setTotalCards] = useState(0);
   const [attempts, setAttempts] = useState(0);
+  const [matchTime, setMatchTime] = useState(0);
 
   const flashcards = [
     { term: 'React', definition: 'A JS library for building UI', favorite: true },
@@ -72,8 +73,9 @@ const App = () => {
       {page === 'match' && (
         <MatchPage
           flashcards={cardsToStudy}
-          onDone={(attemptsCount) => {
+          onDone={(attemptsCount, time) => {
             setAttempts(attemptsCount);
+            setMatchTime(time);
             setPage('postmatch');
           }}
         />
@@ -82,6 +84,7 @@ const App = () => {
       {page === 'postmatch' && (
         <PostMatchPage
           attempts={attempts}
+          time={matchTime}
           onRestart={() => setPage('start')}
         />
       )}
