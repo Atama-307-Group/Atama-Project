@@ -60,6 +60,5 @@ class FolderServiceTest {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 folderService.renameFolder(finalFolder.getId(), "")
         );
-//        ); TODO might need?
     }
 }

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.atama.service.FolderServiceTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 35.22 s -- in com.atama.service.FolderServiceTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.57 s -- in com.atama.service.FolderServiceTest

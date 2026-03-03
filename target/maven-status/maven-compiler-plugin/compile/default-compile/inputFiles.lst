@@ -18,6 +18,7 @@ C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\request\pa
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\request\RenameFolderRequest.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\request\SetFolderStarredRequest.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\request\StepsFlashcardRequestDTO.java
+C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\request\UserRegistrationRequest.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\response\DragDropFlashcardResponseDTO.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\response\FillBlankFlashcardResponseDTO.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\dto\response\FlashcardResponseDTO.java
@@ -47,12 +48,14 @@ C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\model\NormalFl
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\model\PDF.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\model\ReviewTag.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\model\StepsFlashcard.java
+C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\model\University.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\model\User.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\repository\FlashcardRepository.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\repository\FlashcardSetRepository.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\repository\FolderRepository.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\repository\LibraryItemRepository.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\repository\LibraryRepository.java
+C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\repository\UniversityRepository.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\repository\UserRepository.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\service\FlashcardSetService.java
 C:\Users\pawan\IdeaProjects\Atama-Project\src\main\java\com\atama\service\FolderService.java

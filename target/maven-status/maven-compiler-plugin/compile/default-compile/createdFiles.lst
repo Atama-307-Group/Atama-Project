@@ -1,3 +1,4 @@
+com\atama\dto\request\UserRegistrationRequest.class
 com\atama\controller\FlashcardSetController.class
 com\atama\mapper\FlashcardMapper.class
 com\atama\model\Flashcard.class
@@ -53,11 +54,13 @@ com\atama\model\LibrarySortType.class
 com\atama\dto\request\DropZoneDTO.class
 com\atama\repository\FlashcardSetRepository.class
 com\atama\dto\request\FlashcardSetRequestDTO.class
+com\atama\model\University.class
 com\atama\repository\FolderRepository.class
 com\atama\mapper\FlashcardSetMapper.class
 com\atama\service\FolderService.class
 com\atama\model\StepsFlashcard.class
 com\atama\dto\request\FlashcardRequestDTO.class
+com\atama\repository\UniversityRepository.class
 com\atama\repository\UserRepository.class
 com\atama\dto\response\FlashcardResponseDTO.class
 com\atama\dto\response\StepsFlashcardResponseDTO.class
