@@ -68,7 +68,7 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
 
       {/* Main content */}
       <div className="start-content">
-        <h1>Flashcard Set Title</h1>
+        <h1>Study with Atama</h1>
           <div className="action-buttons">
               <button className="action-btn" onClick={() => navigate('/create')}>
                   Create New Set

@@ -1,0 +1,270 @@
+/* ===== Page Layout ===== */
+
+.goalPage {
+    min-height: 100vh;
+    padding: 0 10px 40px 20px;
+    background: linear-gradient(180deg, #e8f7f2 0%, #f4fbf9 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    height: 100vh;
+}
+
+.goalPage h1 {
+    margin-bottom: 24px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2d2a;
+}
+
+/* ===== Card ===== */
+
+.card {
+    width: 100%;
+    max-width: 520px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(6px);
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    align-self: center;
+}
+
+/* ===== Form Elements ===== */
+
+.card label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2f3e3b;
+}
+
+.card input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #d4e3df;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.card input:focus {
+    outline: none;
+    border-color: #79c7b7;
+    box-shadow: 0 0 0 3px rgba(121, 199, 183, 0.25);
+}
+
+/* ===== Progress ===== */
+
+.progressRow {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #33423f;
+}
+
+.bar {
+    height: 14px;
+    border-radius: 999px;
+    background: #e2efeb;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.fill {
+    height: 100%;
+    background: linear-gradient(90deg, #79c7b7, #4eb89f);
+    transition: width 0.3s ease;
+    border-radius: 999px;
+}
+
+/* ===== Buttons ===== */
+
+.actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.actions button:first-child {
+    background: #4eb89f;
+    color: white;
+}
+
+.actions button:first-child:hover {
+    background: #3da98f;
+}
+
+.actions button:last-child {
+    background: #eef3f2;
+    color: #33423f;
+}
+
+.actions button:last-child:hover {
+    background: #e1e8e6;
+}
+
+/* ===== Sections ===== */
+
+.section {
+    margin-bottom: 18px;
+}
+
+.sectionTitle {
+    font-weight: 700;
+    color: #2f3e3b;
+    margin-bottom: 10px;
+}
+
+.hint {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+
+.summary {
+    margin-top: 10px;
+    color: #33423f;
+}
+
+.summaryWarn {
+    color: #8a2f2f;
+    font-weight: 600;
+}
+
+/* ===== Day Picker ===== */
+
+.dayRow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.dayBtn {
+    padding: 10px 0;
+    border-radius: 12px;
+    border: 1px solid #d4e3df;
+    background: rgba(255, 255, 255, 0.8);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.05s ease, background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+}
+
+.dayBtn:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+.dayBtn:active {
+    transform: scale(0.98);
+}
+
+.dayBtn.active {
+    background: rgba(78, 184, 159, 0.15);
+    border-color: rgba(78, 184, 159, 0.65);
+}
+
+/* ===== Field Row ===== */
+
+.fieldRow {
+    display: grid;
+    grid-template-columns: auto 180px; /* label width auto, dropdown fixed */
+    align-items: center;
+    gap: 16px;
+    justify-content: center; /* centers the whole row inside the card */
+}
+
+.fieldLabel {
+    font-weight: 700;
+    color: #2f3e3b;
+    text-align: right;
+}
+
+/* reuse your existing card input look for select */
+.goalSelect {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #d4e3df;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.goalSelect:focus {
+    outline: none;
+    border-color: #79c7b7;
+    box-shadow: 0 0 0 3px rgba(121, 199, 183, 0.25);
+}
+
+/* Disable look for day buttons/select when not editing */
+.dayBtn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.goalSelect:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Bottom action row */
+.bottomActions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: right;
+    gap: 12px;
+}
+
+.goalBtnPrimary,
+.goalBtnSecondary {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.goalBtnPrimary {
+    background: #4eb89f;
+    color: white;
+    border: none;
+}
+
+.goalBtnPrimary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.goalBtnSecondary {
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.stack {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Optional: slightly different title style inside cards */
+.sectionTitleSmall {
+    font-weight: 700;
+    color: #2f3e3b;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}

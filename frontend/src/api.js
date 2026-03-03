@@ -50,8 +50,8 @@ async function request(path, options = {}) {
     return text || null;
 }
 
-export function renameFolder(id, newName) {
-    return request(`/folders/${id}/rename`, {
+export function renameFolder(folderId, newName) {
+    return request(`/folders/${folderId}/rename`, {
         method: "PATCH",
         body: JSON.stringify({ newName }),
     });
@@ -64,11 +64,23 @@ export function setFolderStarred(folderId, starred) {
     });
 }
 
-// optional toggle
-export async function toggleFolderStarred(folderId) {
-    const res = await fetch(`${BASE}/folders/${folderId}/starred/toggle`, {
-        method: "POST",
+export async function getFolderItems(folderId) {
+    const res = await fetch(`http://localhost:8080/folders/${folderId}/items`);
+    if (!res.ok) throw new Error("Failed to load folder items");
+    return res.json();
+}
+
+export async function setFolderPrivacy(folderId, isPublic) {
+    // return request(`/folders/${folderId}/privacy`, {
+    //     method: "PATCH",
+    //     body: JSON.stringify({isPublic})
+    // })
+
+    const res = await fetch(`http://localhost:8080/folders/${folderId}/privacy`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic }),
     });
-    if (!res.ok) throw new Error(`Failed to toggle starred (${res.status})`);
+    if (!res.ok) throw new Error("Failed to update folder privacy");
     return res.json();
 }
