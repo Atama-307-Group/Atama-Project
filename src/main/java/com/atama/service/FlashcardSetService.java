@@ -53,7 +53,12 @@ public class FlashcardSetService {
         return flashcardRepository.findByFlashcardSetId(flashcardSetId);
     }
 
-    public Flashcard toggleFavorite(UUID flashcardId) {
+    @Transactional(readOnly = true)
+    public List<Flashcard> getFavoriteFlashcardsBySetId(UUID flashcardSetId) {
+        return flashcardRepository.findByFlashcardSetIdAndFavoriteTrue(flashcardSetId);
+    }
+
+    public Flashcard toggleFavorite(Long flashcardId) {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
                 .orElseThrow(() -> new RuntimeException("Flashcard not found"));
 

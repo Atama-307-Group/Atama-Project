@@ -1,74 +1,90 @@
 import React, { useState } from 'react';
-import Flashcard from '../components/Flashcard';
+import './StudyPage.css';
 
-const StudyPage = ({ onComplete, studyMode, flashcards, onUpdateFlashcard }) => {
+const StudyPage = ({ studyMode, flashcards, onDone }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [flippedCards, setFlippedCards] = useState(new Set());
+  const [cards, setCards] = useState(flashcards);
 
-  // Track studied cards
-  const [studiedCards, setStudiedCards] = useState(new Set());
+  if (!cards || cards.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <h2>No cards to study</h2>
+        <button onClick={() => onDone(0)}>Done</button>
+      </div>
+    );
+  }
+
+  const currentCard = cards[currentIndex];
 
   const handleFlip = () => {
-    if (!flipped) {
-      // Only count first flip
-      setStudiedCards(prev => new Set(prev).add(currentIndex));
-    }
-    setFlipped(!flipped);
-  };
-
-  const nextCard = () => {
-    if (currentIndex < flashcards.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setFlipped(false);
+    setIsFlipped(!isFlipped);
+    if (!isFlipped) {
+      const newFlipped = new Set(flippedCards);
+      newFlipped.add(currentIndex);
+      setFlippedCards(newFlipped);
     }
   };
 
-  const prevCard = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setFlipped(false);
-    }
+  const handleNext = () => {
+    setIsFlipped(false);
+    setCurrentIndex((prev) => (prev + 1) % cards.length);
   };
 
-  const currentCard = flashcards[currentIndex];
+  const handlePrev = () => {
+    setIsFlipped(false);
+    setCurrentIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
+  };
 
-  const front =
-    studyMode === 'term' ? currentCard.term : currentCard.definition;
-
-  const back =
-    studyMode === 'term' ? currentCard.definition : currentCard.term;
+  const toggleFavorite = () => {
+    const updated = [...cards];
+    updated[currentIndex].favorite = !updated[currentIndex].favorite;
+    setCards(updated);
+  };
 
   return (
-    <div className="study-page-container">
-      <h1>Study Session</h1>
+    <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
+      <h2>Study Mode: {studyMode === 'term' ? 'Term on Front' : 'Definition on Front'}</h2>
 
-      <Flashcard
-          flashcard={currentCard}
-          question={front}
-          answer={back}
-          flipped={flipped}
-          onFlip={handleFlip}
-          onFavoriteUpdate={onUpdateFlashcard}
-      />
+      {/* Flippable card */}
+      <div className="card-container" onClick={handleFlip}>
+        <div className={`card ${isFlipped ? 'flipped' : ''}`}>
+          <div className="front">
+            {studyMode === 'term' ? currentCard.term : currentCard.definition}
+          </div>
+          <div className="back">
+            {studyMode === 'term' ? currentCard.definition : currentCard.term}
+          </div>
+        </div>
+      </div>
 
-      <div className="study-buttons">
-        <button onClick={prevCard} disabled={currentIndex === 0}>
-          Previous
-        </button>
-        <button
-          onClick={nextCard}
-          disabled={currentIndex === flashcards.length - 1}
-        >
-          Next
-        </button>
-        <button onClick={() => onComplete(studiedCards.size)}>
-          Done
+      <div style={{ marginBottom: '20px' }}>
+        <button onClick={handlePrev} style={{ marginRight: '10px' }}>Previous</button>
+        <button onClick={handleNext}>Next</button>
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <button onClick={toggleFavorite}>
+          {currentCard.favorite ? '★ Unfavorite' : '☆ Favorite'}
         </button>
       </div>
 
-      <p>
-        Card {currentIndex + 1} / {flashcards.length}
+      <p style={{ marginBottom: '20px' }}>
+        Card {currentIndex + 1} of {cards.length}
       </p>
+
+      <button
+        onClick={() => onDone(flippedCards.size)}
+        style={{
+          padding: '10px 20px',
+          fontSize: '16px',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        Done
+      </button>
     </div>
   );
 };

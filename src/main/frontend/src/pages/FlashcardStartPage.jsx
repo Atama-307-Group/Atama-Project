@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FlashcardStartPage = ({ onStart }) => {
+const FlashcardStartPage = ({ onLearn, onPracticeTest }) => {
   return (
     <div
       style={{
@@ -9,57 +9,38 @@ const FlashcardStartPage = ({ onStart }) => {
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
+        textAlign: 'center'
       }}
     >
       <h1>Flashcard Set Title</h1>
 
-      {/* Buttons side by side */}
       <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
         <button
-          onClick={onStart}
-          style={{
-            padding: '10px 20px',
-            fontSize: '18px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
+          onClick={onLearn}
+          style={{ padding: '10px 20px', fontSize: '18px', borderRadius: '5px', cursor: 'pointer' }}
         >
-          Study
+          Learn
         </button>
+
         <button
-          onClick={() => alert('Match soon...')}
-          style={{
-            padding: '10px 20px',
-            fontSize: '18px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
+          onClick={() => alert('Match coming soon!')}
+          style={{ padding: '10px 20px', fontSize: '18px', borderRadius: '5px', cursor: 'pointer' }}
         >
           Match
         </button>
 
         <button
-          onClick={() => alert('Practice Test soon...')}
-          style={{
-            padding: '10px 20px',
-            fontSize: '18px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
+          onClick={onPracticeTest}
+          style={{ padding: '10px 20px', fontSize: '18px', borderRadius: '5px', cursor: 'pointer' }}
         >
           Practice Test
         </button>
 
         <button
-          onClick={() => alert('Other cool feature soon...')}
-          style={{
-            padding: '10px 20px',
-            fontSize: '18px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
+          onClick={() => alert('Other feature coming soon!')}
+          style={{ padding: '10px 20px', fontSize: '18px', borderRadius: '5px', cursor: 'pointer' }}
         >
-          Other cool feature
+          Other Feature
         </button>
       </div>
     </div>

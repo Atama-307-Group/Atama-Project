@@ -50,7 +50,12 @@ public class FlashcardSetController {
     }
 
     @PutMapping("/flashcards/{flashcardId}/favorite")
-    public ResponseEntity<Flashcard> toggleFavorite(@PathVariable UUID flashcardId) {
+    public ResponseEntity<Flashcard> toggleFavorite(@PathVariable Long flashcardId) {
         return ResponseEntity.ok(flashcardSetService.toggleFavorite(flashcardId));
+    }
+
+    @GetMapping("/{setId}/favorites")
+    public List<Flashcard> getFavoriteFlashcards(@PathVariable UUID setId) {
+        return flashcardSetService.getFavoriteFlashcardsBySetId(setId);
     }
 }
