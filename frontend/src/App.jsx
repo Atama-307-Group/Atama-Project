@@ -152,7 +152,6 @@ export default function App() {
             return Number.isFinite(t) ? t : 0;
         }
 
-        // TODO fix
         function compareBySort(a, b) {
             switch (sortBy) {
                 case "alpha-desc":
@@ -178,11 +177,11 @@ export default function App() {
             // ⭐ Always keep starred at the top
             if (a.starred !== b.starred) return a.starred ? -1 : 1;
 
-            // Then sort within the starred group / unstarred group
+            // Then sort within the starred group / un-starred group
             const primary = compareBySort(a, b);
             if (primary !== 0) return primary;
 
-            // Stable-ish tie breakers so order doesn’t jitter
+            // Stable-ish tiebreakers so order doesn’t jitter
             const byName = (a.name ?? "").localeCompare(b.name ?? "");
             if (byName !== 0) return byName;
 
@@ -336,6 +335,7 @@ export default function App() {
     async function confirmPrivacyChange() {
         if (privacyId == null) return;
         const prevFolders = folders; // save for rollback
+        const newValue = nextIsPublic;
         setPrivacyId(null);
 
         try {
@@ -362,16 +362,6 @@ export default function App() {
                         <div className="brandSub">Library</div>
                     </div>
                 </div>
-
-                {/*<button TODO Probably remove later */}
-                {/*    className="btn settings"*/}
-                {/*    type="button"*/}
-                {/*    onClick={openPrivacy}*/}
-                {/*    aria-haspopup="dialog"*/}
-                {/*    aria-expanded={showPrivacyModal}*/}
-                {/*>*/}
-                {/*    Privacy Settings*/}
-                {/*</button>*/}
 
                 <button className="btn primary" onClick={openCreateFolderModal} type="button">
                     TODO New Flashcard Set

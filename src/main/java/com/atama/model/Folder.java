@@ -38,6 +38,7 @@ public class Folder {
     private Instant lastAccessed;
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column(nullable = false)
