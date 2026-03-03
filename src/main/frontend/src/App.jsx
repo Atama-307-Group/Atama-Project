@@ -3,24 +3,16 @@ import FlashcardStartPage from './pages/FlashcardStartPage';
 import PreLearnPage from './pages/PreLearnPage';
 import StudyPage from './pages/StudyPage';
 import PostLearnPage from './pages/PostLearnPage';
-import PreTestPage from './pages/PreTestPage';
-import PracticeTestPage from './pages/PracticeTestPage';
-import PostTestPage from './pages/PostTestPage';
+import PreMatchPage from './pages/PreMatchPage';
+import MatchPage from './pages/MatchPage';
+import PostMatchPage from './pages/PostMatchPage';
 
 const App = () => {
   const [page, setPage] = useState('start');
-  // 'start', 'prelearn', 'study', 'postlearn', 'pretest', 'test', 'posttest'
-
-  // Learning state
-  const [studyMode, setStudyMode] = useState(null); // 'term' or 'definition'
   const [cardsToStudy, setCardsToStudy] = useState([]);
-  const [studiedCount, setStudiedCount] = useState(0);
+  const [totalCards, setTotalCards] = useState(0);
+  const [attempts, setAttempts] = useState(0);
 
-  // Practice test state
-  const [testSettings, setTestSettings] = useState(null); // { promptType, cardsPool, numQuestions }
-  const [testResults, setTestResults] = useState(null);   // { correct, total }
-
-  // Sample flashcards
   const flashcards = [
     { term: 'React', definition: 'A JS library for building UI', favorite: true },
     { term: 'Node', definition: 'JS runtime', favorite: false },
@@ -29,86 +21,68 @@ const App = () => {
 
   return (
     <div>
-      {/* START PAGE */}
       {page === 'start' && (
         <FlashcardStartPage
           onLearn={() => setPage('prelearn')}
-          onPracticeTest={() => setPage('pretest')}
+          onMatch={() => setPage('prematch')}
         />
       )}
 
-      {/* PRE-LEARN PAGE */}
       {page === 'prelearn' && (
         <PreLearnPage
           flashcards={flashcards}
           onStart={(mode, selectedCards) => {
-            setStudyMode(mode);
             setCardsToStudy(selectedCards);
+            setTotalCards(selectedCards.length);
             setPage('study');
           }}
         />
       )}
 
-      {/* STUDY PAGE */}
       {page === 'study' && (
         <StudyPage
-          studyMode={studyMode}
+          studyMode={'term'}
           flashcards={cardsToStudy}
-          onDone={(count) => {
-            setStudiedCount(count);
+          onDone={(studiedCount) => {
+            setTotalCards(studiedCount);
             setPage('postlearn');
           }}
         />
       )}
 
-      {/* POST-LEARN PAGE */}
       {page === 'postlearn' && (
         <PostLearnPage
-          studiedCount={studiedCount}
+          studiedCount={totalCards}
           totalCount={cardsToStudy.length}
-          onRestart={() => {
-            setCardsToStudy([]);
-            setStudyMode(null);
-            setStudiedCount(0);
-            setPage('start');
-          }}
+          onRestart={() => setPage('start')}
         />
       )}
 
-      {/* PRE-TEST PAGE */}
-      {page === 'pretest' && (
-        <PreTestPage
+      {/* Match Mode */}
+      {page === 'prematch' && (
+        <PreMatchPage
           flashcards={flashcards}
-          onStartTest={(promptType, cardsPool, numQuestions) => {
-            setTestSettings({ promptType, cardsPool, numQuestions });
-            setPage('test');
+          onStart={(selectedCards) => {
+            setCardsToStudy(selectedCards);
+            setPage('match');
           }}
         />
       )}
 
-      {/* PRACTICE TEST PAGE */}
-      {page === 'test' && testSettings && (
-        <PracticeTestPage
-          promptType={testSettings.promptType}
-          cards={testSettings.cardsPool}
-          numQuestions={testSettings.numQuestions}
-          onDone={(correct, total) => {
-            setTestResults({ correct, total });
-            setPage('posttest'); // move to post-test after finishing
+      {page === 'match' && (
+        <MatchPage
+          flashcards={cardsToStudy}
+          onDone={(attemptsCount) => {
+            setAttempts(attemptsCount);
+            setPage('postmatch');
           }}
         />
       )}
 
-      {/* POST-TEST PAGE */}
-      {page === 'posttest' && testResults && (
-        <PostTestPage
-          correct={testResults.correct}
-          total={testResults.total}
-          onRestart={() => {
-            setTestResults(null);
-            setTestSettings(null);
-            setPage('start');
-          }}
+      {page === 'postmatch' && (
+        <PostMatchPage
+          attempts={attempts}
+          onRestart={() => setPage('start')}
         />
       )}
     </div>

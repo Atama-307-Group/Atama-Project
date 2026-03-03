@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FlashcardStartPage = ({ onLearn, onPracticeTest }) => {
+const FlashcardStartPage = ({ onLearn, onPracticeTest, onMatch }) => {
   return (
     <div
       style={{
@@ -23,7 +23,7 @@ const FlashcardStartPage = ({ onLearn, onPracticeTest }) => {
         </button>
 
         <button
-          onClick={() => alert('Match coming soon!')}
+          onClick={onMatch}
           style={{ padding: '10px 20px', fontSize: '18px', borderRadius: '5px', cursor: 'pointer' }}
         >
           Match
