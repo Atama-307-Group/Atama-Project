@@ -85,4 +85,43 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+
+    public void deleteAccountWithPassword(UUID id, String password) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect password.");
+        }
+
+        userRepository.delete(user);
+    }
+
+    public void changePassword(UUID id, String oldPassword, String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public User changeUsername(UUID id, String newUsername, String password) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect password.");
+        }
+
+        if (userRepository.existsByUsername(newUsername)) {
+            throw new IllegalArgumentException("Username is already taken.");
+        }
+
+        user.setUsername(newUsername);
+        return userRepository.save(user);
+    }
 }

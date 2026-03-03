@@ -91,6 +91,9 @@ const LoginPage = ({ onLoginSuccess }) => {
                 <p className="signup-prompt">
                     Don't have an account? <span className="signup-link" onClick={() => navigate('/signup')}>Sign up here</span>
                 </p>
+                <p className="forgot-prompt">
+                    <span className="forgot-link" onClick={() => navigate('/forgot-password')}>Forgot Password?</span>
+                </p>
             </div>
         </div>
     );

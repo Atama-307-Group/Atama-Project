@@ -3,21 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import './FlashcardStartPage.css';
 
 const FlashcardStartPage = ({ currentUser, onLogout }) => {
-    const navigate = useNavigate();
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-                setDropdownOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <div className="start-page">
@@ -47,6 +46,9 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
                   </div>
                 </div>
                 <div className="dropdown-divider" />
+                <button className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/profile'); }}>
+                  Profile
+                </button>
                 <button className="dropdown-item logout-btn" onClick={onLogout}>
                   Log Out
                 </button>
@@ -68,33 +70,38 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
 
       {/* Main content */}
       <div className="start-content">
+        <h1>Flashcard Set Title</h1>
+        <div className="action-buttons">
+          <button className="action-btn" onClick={() => navigate('/create')}>
+            Create New Set
+          </button>
         <h1>Study with Atama</h1>
           <div className="action-buttons">
               <button className="action-btn" onClick={() => navigate('/create')}>
                   Create New Set
               </button>
 
-              <button className="action-btn" onClick={() => navigate('/study/term')}>
-                  Study
-              </button>
+          <button className="action-btn" onClick={() => navigate('/study/term')}>
+            Study
+          </button>
 
-              <button
-                  className="action-btn"
-                  onClick={() => alert('Match soon...')}
-              >
-                  Match
-              </button>
+          <button
+            className="action-btn"
+            onClick={() => alert('Match soon...')}
+          >
+            Match
+          </button>
 
-              <button
-                  className="action-btn"
-                  onClick={() => alert('Practice Test soon...')}
-              >
-                  Practice Test
-              </button>
-              <button className="action-btn" onClick={() => navigate('/folders')}>
-                  Library
-              </button>
-          </div>
+          <button
+            className="action-btn"
+            onClick={() => alert('Practice Test soon...')}
+          >
+            Practice Test
+          </button>
+          <button className="action-btn" onClick={() => navigate('/folders')}>
+            Library
+          </button>
+        </div>
       </div>
     </div>
   );

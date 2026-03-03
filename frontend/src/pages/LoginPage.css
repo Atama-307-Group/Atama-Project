@@ -58,6 +58,23 @@
     text-decoration: underline;
 }
 
+.forgot-prompt {
+    text-align: center;
+    font-size: 13px;
+    color: #4a6b57;
+    margin-top: 4px;
+}
+
+.forgot-link {
+    color: #2b5c3f;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
 @keyframes slideUp {
     from {
         opacity: 0;
