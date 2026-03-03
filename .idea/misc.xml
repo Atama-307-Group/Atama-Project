@@ -8,6 +8,12 @@
       </list>
     </option>
   </component>
+  <component name="NullableNotNullManager">
+    <instrumentedNotNulls>
+      <option value="lombok.NonNull" />
+      <option value="org.jetbrains.annotations.NotNull" />
+    </instrumentedNotNulls>
+  </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="22" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>

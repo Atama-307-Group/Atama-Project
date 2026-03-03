@@ -16,9 +16,11 @@ export default function StudyGoal() {
     const [selectedDays, setSelectedDays] = useState(["M", "T", "W", "Th", "F", "Sa", "Su"]);
     const [minutesPerDay, setMinutesPerDay] = useState(15);
 
-    // Edit mode + draft settings
-    const [isEditing, setIsEditing] = useState(false);
+    // Edit mode + draft settings (separate per card)
+    const [isEditingSchedule, setIsEditingSchedule] = useState(false);
     const [draftDays, setDraftDays] = useState(selectedDays);
+
+    const [isEditingGoal, setIsEditingGoal] = useState(false);
     const [draftMinutes, setDraftMinutes] = useState(minutesPerDay);
 
     // Optional progress preview
@@ -31,9 +33,9 @@ export default function StudyGoal() {
         return arr;
     }, []);
 
-    // What the UI should display (draft in edit mode, saved otherwise)
-    const effectiveDays = isEditing ? draftDays : selectedDays;
-    const effectiveMinutes = isEditing ? draftMinutes : minutesPerDay;
+    // Effective values: each card chooses draft vs saved independently
+    const effectiveDays = isEditingSchedule ? draftDays : selectedDays;
+    const effectiveMinutes = isEditingGoal ? draftMinutes : minutesPerDay;
 
     const weeklyTotal = useMemo(() => {
         return effectiveDays.length * effectiveMinutes;
@@ -46,7 +48,7 @@ export default function StudyGoal() {
     }, [progress, effectiveMinutes]);
 
     function toggleDay(dayKey) {
-        if (!isEditing) return;
+        if (!isEditingSchedule) return;
 
         setDraftDays((prev) => {
             const has = prev.includes(dayKey);
@@ -55,25 +57,37 @@ export default function StudyGoal() {
         });
     }
 
-    function startEdit() {
+    // Schedule card actions
+    function startEditSchedule() {
         setDraftDays(selectedDays);
-        setDraftMinutes(minutesPerDay);
-        setIsEditing(true);
+        setIsEditingSchedule(true);
     }
 
-    function cancelEdit() {
+    function cancelEditSchedule() {
         setDraftDays(selectedDays);
-        setDraftMinutes(minutesPerDay);
-        setIsEditing(false);
+        setIsEditingSchedule(false);
     }
 
-    function saveEdit() {
-        // Optional guard: require at least 1 day
+    function saveEditSchedule() {
         if (draftDays.length === 0) return;
-
         setSelectedDays(draftDays);
+        setIsEditingSchedule(false);
+    }
+
+    // Goal card actions
+    function startEditGoal() {
+        setDraftMinutes(minutesPerDay);
+        setIsEditingGoal(true);
+    }
+
+    function cancelEditGoal() {
+        setDraftMinutes(minutesPerDay);
+        setIsEditingGoal(false);
+    }
+
+    function saveEditGoal() {
         setMinutesPerDay(draftMinutes);
-        setIsEditing(false);
+        setIsEditingGoal(false);
     }
 
     return (
@@ -96,8 +110,8 @@ export default function StudyGoal() {
                                         className={`dayBtn ${active ? "active" : ""}`}
                                         onClick={() => toggleDay(d.key)}
                                         aria-pressed={active}
-                                        disabled={!isEditing}
-                                        title={isEditing ? "Toggle day" : "Click Edit to change"}
+                                        disabled={!isEditingSchedule}
+                                        title={isEditingSchedule ? "Toggle day" : "Click Edit to change"}
                                     >
                                         {d.label}
                                     </button>
@@ -113,15 +127,12 @@ export default function StudyGoal() {
                                     .map((d) => d.label)
                                     .join(" ")}
                         </div>
-
-                        {/* TODO: later - notification time selector */}
-                        {/* <div className="hint">TODO: you will receive an email notif on these days at this time</div> */}
                     </div>
 
-                    {/* Bottom buttons */}
+                    {/* Schedule buttons */}
                     <div className="bottomActions">
-                        {!isEditing ? (
-                            <button type="button" className="goalBtnPrimary" onClick={startEdit}>
+                        {!isEditingSchedule ? (
+                            <button type="button" className="goalBtnPrimary" onClick={startEditSchedule}>
                                 Edit
                             </button>
                         ) : (
@@ -129,21 +140,19 @@ export default function StudyGoal() {
                                 <button
                                     type="button"
                                     className="goalBtnPrimary"
-                                    onClick={saveEdit}
+                                    onClick={saveEditSchedule}
                                     disabled={draftDays.length === 0}
                                     title={draftDays.length === 0 ? "Select at least one day" : "Save changes"}
                                 >
                                     Save
                                 </button>
-                                <button type="button" className="goalBtnSecondary" onClick={cancelEdit}>
+                                <button type="button" className="goalBtnSecondary" onClick={cancelEditSchedule}>
                                     Cancel
                                 </button>
                             </>
                         )}
                     </div>
                 </div>
-
-
 
                 {/* Card 2: Study Goal */}
                 <div className="card">
@@ -159,9 +168,9 @@ export default function StudyGoal() {
                                 id="minutesSelect"
                                 className="goalSelect"
                                 value={effectiveMinutes}
-                                onChange={(e) => isEditing && setDraftMinutes(Number(e.target.value))}
-                                disabled={!isEditing}
-                                title={isEditing ? "Change minutes" : "Click Edit to change"}
+                                onChange={(e) => isEditingGoal && setDraftMinutes(Number(e.target.value))}
+                                disabled={!isEditingGoal}
+                                title={isEditingGoal ? "Change minutes" : "Click Edit to change"}
                             >
                                 {options.map((m) => (
                                     <option key={m} value={m}>
@@ -173,31 +182,43 @@ export default function StudyGoal() {
 
                         <div className="summary">
                             Weekly target: <strong>{weeklyTotal} minutes</strong>
-                            {effectiveDays.length === 0 ? (
-                                <span className="summaryWarn"> (select at least 1 day)</span>
-                            ) : null}
+                            {effectiveDays.length === 0 ? <span className="summaryWarn"> (select at least 1 day)</span> : null}
                         </div>
                     </div>
 
                     {/* Progress */}
                     <div className="section">
                         <div className="progressRow">
-            <span>
-              {progress} / {effectiveMinutes} min (today)
-            </span>
+              <span>
+                {progress} / {effectiveMinutes} min (today)
+              </span>
                             <span>{Math.round(percent)}%</span>
                         </div>
 
                         <div className="bar">
-                            <div className="fill" style={{width: `${percent}%`}}/>
+                            <div className="fill" style={{ width: `${percent}%` }} />
                         </div>
                     </div>
+
+                    {/* Goal buttons */}
+                    <div className="bottomActions">
+                        {!isEditingGoal ? (
+                            <button type="button" className="goalBtnPrimary" onClick={startEditGoal}>
+                                Edit
+                            </button>
+                        ) : (
+                            <>
+                                <button type="button" className="goalBtnPrimary" onClick={saveEditGoal}>
+                                    Save
+                                </button>
+                                <button type="button" className="goalBtnSecondary" onClick={cancelEditGoal}>
+                                    Cancel
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
-
-
             </div>
         </div>
     );
 }
-
-// TODO Make two edit buttons tbh

@@ -16,7 +16,20 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // or SEQUENCE
-    private Long id;
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "university_id")
+    private University university;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Library library;

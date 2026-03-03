@@ -16,19 +16,23 @@ public class DragDropFlashcard extends Flashcard {
 
     private String prompt;
 
-    @ElementCollection
-    @CollectionTable(name = "drag_drop_draggable_items", joinColumns = @JoinColumn(name = "flashcard_id"))
-    @Column(name = "item")
-    private List<String> draggableItems;
+    private String imageUrl;
 
     @ElementCollection
-    @CollectionTable(name = "drag_drop_drop_targets", joinColumns = @JoinColumn(name = "flashcard_id"))
-    @Column(name = "target")
-    private List<String> dropTargets;
+    @CollectionTable(name = "drag_drop_zones", joinColumns = @JoinColumn(name = "flashcard_id"))
+    private List<DropZone> dropZones;
 
-    public DragDropFlashcard(String prompt, List<String> draggableItems, List<String> dropTargets) {
+    @ElementCollection
+    @CollectionTable(name = "drag_drop_labels", joinColumns = @JoinColumn(name = "flashcard_id"))
+    @Column(name = "label")
+    private List<String> draggableLabels;
+
+    public DragDropFlashcard(String prompt, String imageUrl, List<DropZone> dropZones, List<String> draggableLabels) {
         this.prompt = prompt;
-        this.draggableItems = draggableItems;
-        this.dropTargets = dropTargets;
+        this.imageUrl = imageUrl;
+        this.dropZones = dropZones;
+        this.draggableLabels = draggableLabels;
     }
 }
+
+
