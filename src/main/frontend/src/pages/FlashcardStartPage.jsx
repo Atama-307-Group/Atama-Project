@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './FlashcardStartPage.css';
 
-const FlashcardStartPage = ({ onStart, onSignup, onLoginClick, currentUser, onLogout }) => {
+const FlashcardStartPage = ({ onStart, onSignup, onLoginClick, currentUser, onLogout, onCreate }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
