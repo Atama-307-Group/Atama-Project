@@ -84,3 +84,11 @@ export async function setFolderPrivacy(folderId, isPublic) {
     if (!res.ok) throw new Error("Failed to update folder privacy");
     return res.json();
 }
+export async function getFlashcardSetById(id) {
+    const res = await fetch(`${BASE}/api/flashcard-sets/${id}`);
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "Failed to load flashcard set");
+    }
+    return res.json();
+}

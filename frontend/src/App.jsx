@@ -111,6 +111,7 @@ import CreateFlashcardSetPage from './pages/CreateFlashcardSetPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import FoldersPage from './pages/FoldersPage.jsx';
+import FlashcardSetPage from './pages/FlashcardSetPage.jsx';
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
         const saved = localStorage.getItem('currentUser');
@@ -172,6 +173,11 @@ function App() {
             <Route
                 path="/study/:mode"
                 element={<StudyPage />}
+            />
+
+            <Route
+                path="/sets/:id"
+                element={<FlashcardSetPage />}
             />
 
             {/* Personal Library Page */}

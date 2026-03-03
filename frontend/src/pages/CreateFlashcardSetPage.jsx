@@ -94,7 +94,7 @@ const CreateFlashcardSetPage = () => {
       }
       const saved = await response.json(); //how does it get sent?
       //onSave(saved); // pass the response DTO back up instead of the raw local data
-      navigate('/'); // /set/${saved.id} later, to go to created set page
+      navigate(`/sets/${saved.id}`);
     } catch (err) {
       console.error(err);
       alert('Something went wrong saving your set.' + err.message);

@@ -1,0 +1,76 @@
+.set-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding-top: 64px;
+    padding-bottom: 40px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.set-page h1 {
+    text-align: center;
+    font-weight: 950;
+    font-size: 26px;
+    letter-spacing: 0.2px;
+    color: var(--deep);
+    margin-bottom: 8px;
+}
+
+.set-page h2 {
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--deep);
+    margin-bottom: 12px;
+}
+
+.set-page-description {
+    text-align: center;
+    color: var(--pine);
+    margin-bottom: 24px;
+    font-size: 1em;
+}
+
+.set-page-back {
+    display: inline-block;
+    margin-bottom: 24px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(51,81,69,0.35);
+    background: transparent;
+    color: var(--pine);
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 14px;
+    transition: background 120ms ease, border-color 120ms ease;
+}
+
+.set-page-back:hover {
+    background: rgba(51,81,69,0.06);
+    border-color: rgba(51,81,69,0.55);
+}
+
+.set-page-cards {
+    display: grid;
+    gap: 14px;
+    padding: 0;
+    list-style: none;
+    counter-reset: card-counter;
+}
+
+.set-page-cards {
+    display: grid;
+    gap: 14px;
+}
+
+
+.set-page-loading,
+.set-page-error {
+    text-align: center;
+    padding-top: 80px;
+    font-size: 1.1em;
+    color: var(--pine);
+}
+
+.set-page-error {
+    color: crimson;
+}
