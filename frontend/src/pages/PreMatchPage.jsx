@@ -16,7 +16,7 @@ const PreMatchPage = ({ flashcards }) => {
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
-            <h2>Match Mode Settings</h2>
+            <h2>Match Settings</h2>
             <label>
                 <input
                     type="checkbox"
