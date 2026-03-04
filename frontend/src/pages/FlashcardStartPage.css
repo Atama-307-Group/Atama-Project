@@ -89,6 +89,14 @@
     flex-shrink: 0;
 }
 
+.avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 .profile-username {
     font-size: 14px;
     font-weight: 600;
@@ -139,6 +147,14 @@
     flex-shrink: 0;
 }
 
+.dropdown-avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 .dropdown-info {
     display: flex;
     flex-direction: column;
@@ -169,6 +185,7 @@
     background: none;
     text-align: left;
     font-size: 14px;
+    color: #1a3c27;
     cursor: pointer;
     transition: background-color 0.15s ease;
     font-family: inherit;

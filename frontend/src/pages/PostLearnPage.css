@@ -1,0 +1,20 @@
+.postlearn-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* vertical center */
+  align-items: center;      /* horizontal center */
+  text-align: center;
+  gap: 20px;
+}
+
+.results-text {
+  font-size: 20px;
+}
+
+.restart-button {
+  padding: 10px 25px;
+  font-size: 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}

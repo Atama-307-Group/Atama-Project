@@ -26,7 +26,7 @@ const LoginPage = ({ onLoginSuccess }) => {
             }
 
             const data = await response.json();
-            onLoginSuccess(data.id, data.username, data.email);
+            onLoginSuccess(data.id, data.username, data.email, data.profilePictureUrl);
             navigate('/');
         } catch (err) {
             setStatus({ loading: false, error: err.message || 'Failed to connect to server.' });
@@ -90,6 +90,9 @@ const LoginPage = ({ onLoginSuccess }) => {
 
                 <p className="signup-prompt">
                     Don't have an account? <span className="signup-link" onClick={() => navigate('/signup')}>Sign up here</span>
+                </p>
+                <p className="forgot-prompt">
+                    <span className="forgot-link" onClick={() => navigate('/forgot-password')}>Forgot Password?</span>
                 </p>
             </div>
         </div>

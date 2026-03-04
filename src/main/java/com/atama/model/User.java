@@ -15,7 +15,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // or SEQUENCE
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -26,6 +26,9 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(columnDefinition = "TEXT")
+    private String profilePictureUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")

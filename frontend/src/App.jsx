@@ -1,107 +1,3 @@
-/*import React, { useState } from 'react';
-import StartPage from './pages/FlashcardStartPage';
-import StudyPage from './pages/StudyPage';
-import CreateFlashcardSetPage from './pages/CreateFlashcardSetPage';
-import SignupPage from "./pages/SignupPage.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
-function FoldersPage() {
-  const [started, setStarted] = useState(false); // Have they clicked "Learn"?
-  const [studyMode, setStudyMode] = useState(null); // "term" or "definition"
-  const [creating, setCreating] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-
-  const [currentUser, setCurrentUser] = useState(() => {
-      const saved = localStorage.getItem('currentUser');
-      return saved ? JSON.parse(saved) : null;
-  });
-  const handleSaveNewSet = (savedSet) => {
-    console.log('Saved flashcard set:', savedSet);
-    setCreating(false); // back to start page
-  };
-    const handleLoginSuccess = (id, username, email) => {
-        const user = { id, username, email };
-        setCurrentUser(user);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        setShowLogin(false);
-    };
-
-    const handleLogout = () => {
-        setCurrentUser(null);
-        localStorage.removeItem('currentUser');
-        setStarted(false);
-        setStudyMode(null);
-    };
-
-  if (creating) {
-    return (
-      <CreateFlashcardSetPage
-        onCancel={() => setCreating(false)} // back to start page
-        onSave={handleSaveNewSet} // eventually will do something real
-      />
-    );
-  }
-  if (showLogin) {
-      return (
-          <LoginPage
-              onBack={() => setShowLogin(false)}
-              onLoginSuccess={handleLoginSuccess}
-              onSignupClick={() => {
-                  setShowLogin(false);
-                  setShowSignup(true);
-              }}
-          />
-      );
-  }
-    if (showSignup) {
-        return (
-            <SignupPage
-                onBack={() => setShowSignup(false)}
-                onLoginClick={() => {
-                    setShowSignup(false);
-                    setShowLogin(true);
-                }}
-            />
-        );
-    }
-
-    return (
-        <div>
-            {!started && (
-                <StartPage
-                    onStart={() => setStarted(true)}
-                    onCreate={() => setCreating(true)}
-                    onSignup={() => setShowSignup(true)}
-                    onLoginClick={() => setShowLogin(true)}
-                    currentUser={currentUser}
-                    onLogout={handleLogout}
-                />
-            )}
-
-            {started && !studyMode && (
-                <div style={{ textAlign: 'center', marginTop: '100px' }}>
-                    <h2>Choose what appears on the front of the flashcards:</h2>
-                    <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '20px' }}>
-                        <button onClick={() => setStudyMode('term')}>Term on Front</button>
-                        <button onClick={() => setStudyMode('definition')}>Definition on Front</button>
-                    </div>
-                </div>
-            )}
-
-            {started && studyMode && (
-                <StudyPage
-                    onBack={() => {
-                        setStarted(false);
-                        setStudyMode(null);
-                    }}
-                    studyMode={studyMode}
-                />
-            )}
-        </div>
-    );
-}
-
-export default FoldersPage;*/
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -112,14 +8,43 @@ import SignupPage from './pages/SignupPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import FoldersPage from './pages/FoldersPage.jsx';
 import FlashcardSetPage from './pages/FlashcardSetPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+import ChangePasswordPage from './pages/ChangePasswordPage.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
+import PreMatchPage from "./pages/PreMatchPage.jsx";
+import MatchPage from './pages/MatchPage.jsx';
+import PostMatchPage from "./pages/PostMatchPage.jsx";
+import PreLearnPage from "./pages/PreLearnPage.jsx";
+import PostLearnPage from "./pages/PostLearnPage.jsx";
+import PreTestPage from "./pages/PreTestPage.jsx";
+import PracticeTestPage from "./pages/PracticeTestPage.jsx";
+import PostTestPage from "./pages/PostTestPage.jsx";
+
+
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
         const saved = localStorage.getItem('currentUser');
         return saved ? JSON.parse(saved) : null;
-    });
+    })
 
-    const handleLoginSuccess = (id, username, email) => {
-        const user = { id, username, email };
+    const [flashcards, setFlashcards] = useState([
+        { id: 1, term: 'Mitosis', definition: 'Cell division producing two identical daughter cells', favorite: false },
+        { id: 2, term: 'Osmosis', definition: 'Movement of water through a semipermeable membrane', favorite: true },
+        { id: 3, term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into glucose', favorite: false },
+        { id: 4, term: 'Homeostasis', definition: 'Maintaining a stable internal environment', favorite: true },
+        { id: 5, term: 'Meiosis', definition: 'Cell division producing four genetically unique gametes', favorite: false },
+        { id: 6, term: 'DNA', definition: 'Molecule carrying genetic instructions for life', favorite: false },
+    ]);
+
+    const handleToggleFavorite = (id) => {
+        setFlashcards(prev =>
+            prev.map(card => card.id === id ? { ...card, favorite: !card.favorite } : card)
+        );
+    };
+
+    const handleLoginSuccess = (id, username, email, profilePictureUrl) => {
+        const user = { id, username, email, profilePictureUrl };
         setCurrentUser(user);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
@@ -158,6 +83,36 @@ function App() {
                 element={<SignupPage />}
             />
 
+            {/* Forgot / Reset Password */}
+            <Route
+                path="/forgot-password"
+                element={<ForgotPasswordPage />}
+            />
+
+            <Route
+                path="/reset-password"
+                element={<ResetPasswordPage />}
+            />
+
+            {/* Profile & Account Management */}
+            <Route
+                path="/profile"
+                element={
+                    currentUser
+                        ? <ProfilePage currentUser={currentUser} />
+                        : <Navigate to="/login" />
+                }
+            />
+
+            <Route
+                path="/change-password"
+                element={
+                    currentUser
+                        ? <ChangePasswordPage currentUser={currentUser} />
+                        : <Navigate to="/login" />
+                }
+            />
+
             {/* Create Flashcard Set */}
             <Route
                 path="/create"
@@ -165,15 +120,24 @@ function App() {
                     // currentUser
                     //     ? <CreateFlashcardSetPage />
                     //     : <Navigate to="/login" />
-                    <CreateFlashcardSetPage />
+                    <CreateFlashcardSetPage onSave={setFlashcards} />
                 }
             />
 
-            {/* Study Page */}
-            <Route
-                path="/study/:mode"
-                element={<StudyPage />}
-            />
+            {/* Study & Learning Flow */}
+            <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
+            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite}/>} />
+            <Route path="/post_learn" element={<PostLearnPage />} />
+
+            {/* Match Flow */}
+            <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
+            <Route path="/match" element={<MatchPage />} />
+            <Route path="/post_match" element={<PostMatchPage />} />
+
+            {/* Test Flow */}
+            <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
+            <Route path="/practice_test" element={<PracticeTestPage />} />
+            <Route path="/post_test" element={<PostTestPage />} />
 
             <Route
                 path="/sets/:id"
@@ -183,12 +147,7 @@ function App() {
             {/* Personal Library Page */}
             <Route
                 path="/folders"
-                element={
-                    // currentUser
-                    //     ? <FoldersPage />
-                    //     : <Navigate to ="/login" />
-                    <FoldersPage />
-            }
+                element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 
             {/* Catch-all */}
