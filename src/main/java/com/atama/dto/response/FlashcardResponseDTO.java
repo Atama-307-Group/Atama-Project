@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.Setter;
-
+import java.util.UUID;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = NormalFlashcardResponseDTO.class, name = "NORMAL"),
@@ -16,6 +16,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FlashcardResponseDTO {
-    private Long id;
+    private UUID id;
     private FlashcardType type;
 }

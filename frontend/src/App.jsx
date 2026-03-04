@@ -7,6 +7,7 @@ import CreateFlashcardSetPage from './pages/CreateFlashcardSetPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import FoldersPage from './pages/FoldersPage.jsx';
+import FlashcardSetPage from './pages/FlashcardSetPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import ChangePasswordPage from './pages/ChangePasswordPage.jsx';
 import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
@@ -19,6 +20,7 @@ import PostLearnPage from "./pages/PostLearnPage.jsx";
 import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
+
 
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
@@ -136,6 +138,11 @@ function App() {
             <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
             <Route path="/practice_test" element={<PracticeTestPage />} />
             <Route path="/post_test" element={<PostTestPage />} />
+
+            <Route
+                path="/sets/:id"
+                element={<FlashcardSetPage />}
+            />
 
             {/* Personal Library Page */}
             <Route

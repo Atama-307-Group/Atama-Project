@@ -18,6 +18,8 @@ public class FlashcardSetMapper {
         FlashcardSet entity = new FlashcardSet();
         libraryItemMapper.applyRequestDTO(dto, entity); // handles title, etc.
         entity.setDescription(dto.getDescription());
+        entity.setUniversity(dto.getUniversity());
+        entity.setCourse(dto.getCourse());
         entity.setOwnerId(dto.getOwnerId());
         dto.getFlashcards().stream()
                 .map(flashcardMapper::toEntity)
@@ -29,6 +31,8 @@ public class FlashcardSetMapper {
         FlashcardSetResponseDTO dto = new FlashcardSetResponseDTO();
         libraryItemMapper.toResponseDTO(entity, dto); // handles id, title, timestamps, etc.
         dto.setDescription(entity.getDescription());
+        dto.setUniversity(entity.getUniversity());
+        dto.setCourse(entity.getCourse());
         dto.setOwnerId(entity.getOwnerId());
         dto.setFlashcards(
                 entity.getFlashcards().stream()

@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @DiscriminatorValue("FLASHCARD_SET")
@@ -15,6 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class FlashcardSet extends LibraryItem {
     private String description;
+    private String university;
+    private String course;
 
     @OneToMany(mappedBy = "flashcardSet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Flashcard> flashcards = new ArrayList<>();
@@ -25,7 +28,7 @@ public class FlashcardSet extends LibraryItem {
     }
 
     @Column(nullable = true) // TODO: should be false or in library item
-    private Long ownerId;
+    private UUID ownerId;
 
     public void removeFlashcard(Flashcard flashcard) {
         flashcards.remove(flashcard);

@@ -84,3 +84,31 @@ export async function setFolderPrivacy(folderId, isPublic) {
     if (!res.ok) throw new Error("Failed to update folder privacy");
     return res.json();
 }
+export async function getFlashcardSetById(id) {
+    const res = await fetch(`${BASE}/api/flashcard-sets/${id}`);
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "Failed to load flashcard set");
+    }
+    return res.json();
+}
+
+export async function updateFlashcardSetMeta(id, { title, description, university, course}) {
+    const res = await fetch(`/api/flashcard-sets/${id}/meta`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, university, course }),
+    });
+    if (!res.ok) throw new Error('Failed to update set');
+    return res.json();
+}
+
+export async function updateFlashcard(setId, flashcardId, cardData) {
+    const res = await fetch(`/api/flashcard-sets/${setId}/flashcards/${flashcardId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cardData),
+    });
+    if (!res.ok) throw new Error('Failed to update flashcard');
+    return res.json();
+}

@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.UUID;
 @Entity
 @Getter
 @Setter
@@ -16,8 +16,8 @@ import java.util.List;
 public class Library {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)

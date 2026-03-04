@@ -1,3 +1,3 @@
 package com.atama.dto.request;
-
-public record CreateFolderRequest(String name, Long libraryId) {}
+import java.util.UUID;
+public record CreateFolderRequest(String name, UUID libraryId) {}

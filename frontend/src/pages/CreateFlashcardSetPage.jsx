@@ -10,6 +10,8 @@ const CreateFlashcardSetPage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [cards, setCards] = useState([newNormalCard(), newNormalCard()]);
+  const [university, setUniversity] = useState('');
+  const [course, setCourse] = useState('');
 
   const handleCardChange = (index, updatedCard) => {
     const updated = cards.map((card, i) => (i === index ? updatedCard : card));
@@ -83,6 +85,8 @@ const CreateFlashcardSetPage = () => {
         body: JSON.stringify({
           title: trimmedTitle,
           description: description.trim(),
+          university: university.trim(),
+          course: course.trim(),
           flashcards: cleanedCards,
         }),
       });
@@ -94,7 +98,7 @@ const CreateFlashcardSetPage = () => {
       }
       const saved = await response.json(); //how does it get sent?
       //onSave(saved); // pass the response DTO back up instead of the raw local data
-      navigate('/'); // /set/${saved.id} later, to go to created set page
+      navigate(`/sets/${saved.id}`);
     } catch (err) {
       console.error(err);
       alert('Something went wrong saving your set.' + err.message);
@@ -103,6 +107,8 @@ const CreateFlashcardSetPage = () => {
 
   return (
     <div className="create-set-page">
+      <button className="back-btn" onClick={() => navigate('/')}>&larr; Back</button>
+
       <h1>Create a New Flashcard Set</h1>
       {/* TODO: add fields for university and class */}
 
@@ -120,6 +126,20 @@ const CreateFlashcardSetPage = () => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         rows={2}
+      />
+      <input
+          type="text"
+          className="create-set-description"
+          placeholder="University (optional)"
+          value={university}
+          onChange={(e) => setUniversity(e.target.value)}
+      />
+      <input
+          type="text"
+          className="create-set-description"
+          placeholder="Course (optional)"
+          value={course}
+          onChange={(e) => setCourse(e.target.value)}
       />
 
       <div className="create-set-cards">

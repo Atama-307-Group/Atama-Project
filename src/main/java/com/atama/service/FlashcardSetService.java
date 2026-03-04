@@ -35,21 +35,21 @@ public class FlashcardSetService {
     }
 
     @Transactional(readOnly = true)
-    public FlashcardSetResponseDTO getFlashcardSetById(Long id) {
+    public FlashcardSetResponseDTO getFlashcardSetById(UUID id) {
         FlashcardSet entity = flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
         return mapper.toResponseDTO(entity);
     }
 
     @Transactional(readOnly = true)
-    public List<FlashcardSetResponseDTO> getFlashcardSetsByOwner(Long ownerId) {
+    public List<FlashcardSetResponseDTO> getFlashcardSetsByOwner(UUID ownerId) {
         return flashcardSetRepository.findByOwnerId(ownerId)
                 .stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }
 
-    public FlashcardSetResponseDTO addFlashcard(Long flashcardSetId, FlashcardRequestDTO flashcardDTO) {
+    public FlashcardSetResponseDTO addFlashcard(UUID flashcardSetId, FlashcardRequestDTO flashcardDTO) {
         FlashcardSet set = flashcardSetRepository.findById(flashcardSetId)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", flashcardSetId));
         // map DTO to entity via flashcardMapper, not raw entity from request
@@ -58,38 +58,31 @@ public class FlashcardSetService {
     }
 
     @Transactional(readOnly = true)
-    public List<FlashcardResponseDTO> getFlashcardsBySetId(Long flashcardSetId) {
+    public List<FlashcardResponseDTO> getFlashcardsBySetId(UUID flashcardSetId) {
         return flashcardRepository.findByFlashcardSetId(flashcardSetId)
                 .stream()
                 .map(flashcardMapper::toResponseDTO)
                 .toList();
     }
-    /*@Transactional(readOnly = true)
-    public FlashcardSet getFlashcardSetById(Long id) {
-        return flashcardSetRepository.findById(id)
+    public FlashcardSetResponseDTO updateFlashcardSetMeta(UUID id, String title, String description, String university, String course) {
+        FlashcardSet set = flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
+        if (title != null && !title.isBlank()) set.setTitle(title);
+        set.setDescription(description);
+        set.setUniversity(university);
+        set.setCourse(course);
+        return mapper.toResponseDTO(flashcardSetRepository.save(set));
     }
 
-    @Transactional(readOnly = true)
-    public List<FlashcardSet> getFlashcardSetsByOwner(Long ownerId) {
-        return flashcardSetRepository.findByOwnerId(ownerId);
+    public FlashcardResponseDTO updateFlashcard(UUID flashcardSetId, UUID flashcardId, FlashcardRequestDTO dto) {
+        flashcardSetRepository.findById(flashcardSetId)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", flashcardSetId));
+        Flashcard existing = flashcardRepository.findById(flashcardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Flashcard", "id", flashcardId));
+
+        // Replace fields based on type — entity subclass must match DTO subclass
+        Flashcard updated = flashcardMapper.applyUpdate(existing, dto);
+        return flashcardMapper.toResponseDTO(flashcardRepository.save(updated));
     }
 
-    public FlashcardSet addFlashcard(Long flashcardSetId, Flashcard flashcard) {
-        FlashcardSet set = getFlashcardSetById(flashcardSetId);
-        set.addFlashcard(flashcard);
-        return flashcardSetRepository.save(set);
-    }
-
-    public void deleteFlashcardSet(Long id) {
-        if (!flashcardSetRepository.existsById(id)) {
-            throw new ResourceNotFoundException("FlashcardSet", "id", id);
-        }
-        flashcardSetRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Flashcard> getFlashcardsBySetId(Long flashcardSetId) {
-        return flashcardRepository.findByFlashcardSetId(flashcardSetId);
-    }*/
 }

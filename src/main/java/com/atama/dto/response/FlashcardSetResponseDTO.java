@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -28,6 +29,8 @@ import java.util.List;
 })
 public class FlashcardSetResponseDTO extends LibraryItemResponseDTO {
     private String description;
-    private Long ownerId;
+    private String university;
+    private String course;
+    private UUID ownerId;
     private List<FlashcardResponseDTO> flashcards = new ArrayList<>();
 }

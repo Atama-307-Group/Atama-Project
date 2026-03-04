@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/folders")
@@ -49,14 +50,14 @@ public class FolderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFolder(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFolder(@PathVariable UUID id) {
         folderService.deleteFolder(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/rename")
     public ResponseEntity<FolderResponse> renameFolder(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody RenameFolderRequest request
     ) {
         Folder renamed = folderService.renameFolder(id, request.newName());
@@ -65,7 +66,7 @@ public class FolderController {
 
     @PatchMapping("/{id}/starred")
     public ResponseEntity<FolderResponse> setStarred(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody SetFolderStarredRequest request
     ) {
         Folder updated = folderService.setFolderStarred(id, request.starred());
@@ -73,7 +74,7 @@ public class FolderController {
     }
 
     @PostMapping("/{id}/starred/toggle")
-    public ResponseEntity<FolderResponse> toggleStarred(@PathVariable Long id) {
+    public ResponseEntity<FolderResponse> toggleStarred(@PathVariable UUID id) {
         Folder updated = folderService.toggleFolderStarred(id);
         return ResponseEntity.ok(toResponse(updated));
     }
@@ -90,7 +91,7 @@ public class FolderController {
 
     // Get all LibraryItems in a Folder
     @GetMapping("/{id}/items")
-    public ResponseEntity<FolderItemsResponse> getFolderItems(@PathVariable Long id) {
+    public ResponseEntity<FolderItemsResponse> getFolderItems(@PathVariable UUID id) {
         Folder folder = folderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Folder not found: " + id));
 
@@ -102,7 +103,7 @@ public class FolderController {
 
     @PatchMapping("/{id}/privacy")
     public ResponseEntity<FolderResponse> setPrivacy(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody SetFolderPrivacyRequest request
     ) {
         Folder updated = folderService.setFolderPrivacy(id, request.isPublic());
