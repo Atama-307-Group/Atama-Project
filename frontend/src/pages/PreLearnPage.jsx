@@ -21,7 +21,7 @@ const PreLearnPage = ({ flashcards }) => {
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', fontFamily: 'sans-serif' }}>
-            <h2>Study Settings</h2>
+            <h2>Learn Settings</h2>
             <h3>Front of Card:</h3>
             <div>
                 <label>
@@ -34,6 +34,7 @@ const PreLearnPage = ({ flashcards }) => {
                            onChange={() => setFrontChoice('definition')} /> Definition
                 </label>
             </div>
+            <h3>Other Options:</h3>
             <div style={{ marginTop: '20px' }}>
                 <label>
                     <input type="checkbox" checked={favoritesOnly}

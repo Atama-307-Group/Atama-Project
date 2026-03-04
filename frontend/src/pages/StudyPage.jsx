@@ -64,7 +64,7 @@ const handleToggleFavorite = (e) => {
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
-            <h2>Study Mode: {studyMode === 'term' ? 'Term on Front' : 'Definition on Front'}</h2>
+            <h2>Learn</h2>
 
             {/* Wrapper gives us a positioned parent for the star */}
             <div style={{ position: 'relative', display: 'inline-block' }}>
