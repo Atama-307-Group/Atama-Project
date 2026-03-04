@@ -124,3 +124,15 @@
   background: #6ab59a;
   border-color: #6ab59a;
 }
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #2b5c3f;
+  /* Forest green */
+  cursor: pointer;
+  transition: color 0.2s ease;
+}

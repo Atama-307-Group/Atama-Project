@@ -16,12 +16,12 @@ public class LibraryController {
     private final LibraryService libraryService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Library> getLibraryById(@PathVariable Long id) {
+    public ResponseEntity<Library> getLibraryById(@PathVariable UUID id) {
         return ResponseEntity.ok(libraryService.getLibraryById(id));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Library> getLibraryByUserId(@PathVariable Long userId) {
+    public ResponseEntity<Library> getLibraryByUserId(@PathVariable UUID userId) {
         return ResponseEntity.ok(libraryService.getLibraryByUserId(userId));
     }
 

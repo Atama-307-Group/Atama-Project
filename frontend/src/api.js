@@ -92,3 +92,23 @@ export async function getFlashcardSetById(id) {
     }
     return res.json();
 }
+
+export async function updateFlashcardSetMeta(id, { title, description }) {
+    const res = await fetch(`/api/flashcard-sets/${id}/meta`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description }),
+    });
+    if (!res.ok) throw new Error('Failed to update set');
+    return res.json();
+}
+
+export async function updateFlashcard(setId, flashcardId, cardData) {
+    const res = await fetch(`/api/flashcard-sets/${setId}/flashcards/${flashcardId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cardData),
+    });
+    if (!res.ok) throw new Error('Failed to update flashcard');
+    return res.json();
+}

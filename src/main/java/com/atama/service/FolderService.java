@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-
+import java.util.UUID;
 @Service
 public class FolderService {
     private final FolderRepository folderRepository;
@@ -42,7 +42,7 @@ public class FolderService {
     }
 
     @Transactional
-    public Folder renameFolder(Long folderId, String newName) {
+    public Folder renameFolder(UUID folderId, String newName) {
         if (newName == null || newName.trim().isEmpty()) {
             throw new IllegalArgumentException("Folder name cannot be empty");
         }
@@ -56,7 +56,7 @@ public class FolderService {
     }
 
     @Transactional
-    public void deleteFolder(Long folderId) {
+    public void deleteFolder(UUID folderId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new RuntimeException("Folder not found"));
 
@@ -68,7 +68,7 @@ public class FolderService {
     }
 
     @Transactional
-    public Folder setFolderStarred(Long folderId, boolean starred) {
+    public Folder setFolderStarred(UUID folderId, boolean starred) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new RuntimeException("Folder not found"));
 
@@ -77,7 +77,7 @@ public class FolderService {
     }
 
     @Transactional
-    public Folder toggleFolderStarred(Long folderId) {
+    public Folder toggleFolderStarred(UUID folderId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new RuntimeException("Folder not found"));
 
@@ -90,7 +90,7 @@ public class FolderService {
         return folderRepository.findAll();
     }
 
-    public FolderItemsResponse getFolderItems(Long folderId) {
+    public FolderItemsResponse getFolderItems(UUID folderId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new IllegalArgumentException("Folder not found"));
 
@@ -112,7 +112,7 @@ public class FolderService {
     }
 
     @Transactional
-    public Folder setFolderPrivacy(Long folderId, boolean isPublic) {
+    public Folder setFolderPrivacy(UUID folderId, boolean isPublic) {
         Folder f = folderRepository.findById(folderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 

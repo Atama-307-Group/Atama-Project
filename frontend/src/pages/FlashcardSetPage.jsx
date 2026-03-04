@@ -2,14 +2,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getFlashcardSetById } from "../api.js";
+import { updateFlashcardSetMeta, updateFlashcard } from '../api.js';
 import FlashcardCard from "../components/FlashcardCard.jsx";
 import FlashcardInput from "../components/FlashcardInput.jsx";
 import "./FlashcardSetPage.css";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const FlashcardSetPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const parsedId = useMemo(() => Number(id), [id]);
 
     const [setData, setSetData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -23,17 +25,18 @@ const FlashcardSetPage = () => {
     const [editingMeta, setEditingMeta] = useState(false);
     const [metaDraft, setMetaDraft] = useState({ title: '', description: '' });
 
+
     useEffect(() => {
-        if (!Number.isFinite(parsedId) || parsedId <= 0) {
+        if (!UUID_REGEX.test(id)) {
             setError("Invalid flashcard set.");
             setLoading(false);
             return;
         }
-        getFlashcardSetById(parsedId)
+        getFlashcardSetById(id)
             .then(setSetData)
             .catch((e) => setError(e.message ?? "Failed to load flashcard set."))
             .finally(() => setLoading(false));
-    }, [parsedId]);
+    }, [id]);
 
     const startEditing = (card, index) => {
         setEditingId(card.id ?? index);
@@ -46,8 +49,15 @@ const FlashcardSetPage = () => {
     };
 
     const saveCard = async (index) => {
-        // TODO: call API to persist the updated card
-        // e.g. await updateFlashcard(editDraft.id, editDraft);
+        const updated = await updateFlashcard(id, editDraft.id, editDraft);
+        setSetData((prev) => ({
+            ...prev,
+            flashcards: prev.flashcards.map((c, i) => i === index ? updated : c),
+        }));
+        setEditingId(null);
+        setEditDraft(null);
+    };
+    /*const saveCard = async (index) => {
 
         // Optimistically update local state
         setSetData((prev) => ({
@@ -56,7 +66,7 @@ const FlashcardSetPage = () => {
         }));
         setEditingId(null);
         setEditDraft(null);
-    };
+    };*/
 
     const startEditingMeta = () => {
         setMetaDraft({ title: setData.title, description: setData.description ?? '' });
@@ -68,12 +78,14 @@ const FlashcardSetPage = () => {
     };
 
     const saveMeta = async () => {
-        // TODO: call API to persist title/description
-        // e.g. await updateFlashcardSet(parsedId, { title: metaDraft.title, description: metaDraft.description });
-
-        setSetData((prev) => ({ ...prev, ...metaDraft }));
+        const updated = await updateFlashcardSetMeta(id, metaDraft);
+        setSetData((prev) => ({ ...prev, title: updated.title, description: updated.description }));
         setEditingMeta(false);
     };
+    /*const saveMeta = async () => {
+        setSetData((prev) => ({ ...prev, ...metaDraft }));
+        setEditingMeta(false);
+    };*/
 
     if (loading) return <div className="set-page-loading">Loading...</div>;
     if (error)   return <div className="set-page-error">{error}</div>;

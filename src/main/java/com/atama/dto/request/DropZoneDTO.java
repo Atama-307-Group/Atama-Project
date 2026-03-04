@@ -1,7 +1,7 @@
 package com.atama.dto.request;
-
+import java.util.UUID;
 public class DropZoneDTO {
-    private Long id;
+    private UUID id;
     private double x;
     private double y;
     private String correctLabel;
@@ -14,11 +14,11 @@ public class DropZoneDTO {
         return y;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id; //not sure if this is needed
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

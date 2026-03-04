@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @JsonTypeInfo(
@@ -20,6 +22,6 @@ import lombok.Setter;
         @JsonSubTypes.Type(value = FillBlankFlashcardRequestDTO.class, name = "FILL_BLANK")
 })
 public class FlashcardRequestDTO {
-    private Long id;
+    private UUID id;
 
 }

@@ -2,11 +2,10 @@ package com.atama.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import java.util.UUID;
+
 @Getter
 @Setter
-
-public class LibraryItemRequestDTO {
+public class UpdateMetaRequest {
     private String title;
-    private UUID folderID;
+    private String description;
 }

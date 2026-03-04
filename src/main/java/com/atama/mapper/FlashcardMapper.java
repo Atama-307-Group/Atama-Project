@@ -120,4 +120,30 @@ public class FlashcardMapper {
 
         throw new IllegalStateException("Unknown Flashcard subclass: " + card.getClass());
     }
+
+    public Flashcard applyUpdate(Flashcard existing, FlashcardRequestDTO dto) {
+        if (existing instanceof NormalFlashcard n && dto instanceof NormalFlashcardRequestDTO d) {
+            n.setTerm(d.getTerm());
+            n.setDefinition(d.getDefinition());
+            return n;
+        }
+        if (existing instanceof FillBlankFlashcard f && dto instanceof FillBlankFlashcardRequestDTO d) {
+            f.setTextWithBlanks(d.getTextWithBlanks());
+            f.setCorrectAnswers(d.getCorrectAnswers());
+            return f;
+        }
+        if (existing instanceof StepsFlashcard s && dto instanceof StepsFlashcardRequestDTO d) {
+            s.setTitle(d.getTitle());
+            s.setSteps(d.getSteps());
+            return s;
+        }
+        if (existing instanceof DragDropFlashcard dd && dto instanceof DragDropFlashcardRequestDTO d) {
+            dd.setPrompt(d.getPrompt());
+            dd.setImageUrl(d.getImageUrl());
+            dd.setDraggableLabels(d.getDraggableLabels());
+            dd.setDropZones(d.getDropZones().stream().map(this::toEntity).toList());
+            return dd;
+        }
+        throw new IllegalArgumentException("Flashcard type mismatch or unsupported type");
+    }
 }

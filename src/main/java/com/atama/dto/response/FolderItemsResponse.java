@@ -4,14 +4,14 @@ import com.atama.model.LibraryItemType;
 
 import java.time.Instant;
 import java.util.List;
-
+import java.util.UUID;
 public record FolderItemsResponse(
-        Long folderId,
+        UUID folderId,
         String folderName,
         List<LibraryItemSummary> items
 ) {
     public record LibraryItemSummary(
-            Long id,
+            UUID id,
             String title,
             boolean starred,
             Instant createdAt,

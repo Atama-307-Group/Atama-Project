@@ -27,7 +27,7 @@ public class LibraryService {
     Function to retrieve a Library based off of its ID.
      */
     @Transactional(readOnly = true)
-    public Library getLibraryById(Long id) {
+    public Library getLibraryById(UUID id) {
         return libraryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Library", "id", id));
     }
@@ -36,7 +36,7 @@ public class LibraryService {
     Function to retrieve a Library based off of its User's ID.
     */
     @Transactional(readOnly = true)
-    public Library getLibraryByUserId(Long userId) {
+    public Library getLibraryByUserId(UUID userId) {
         return libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Library", "userId", userId));
     }
@@ -94,7 +94,7 @@ public class LibraryService {
     /*
     Function
      */
-    public List<Object> getSortedLibraryContents(Long userId, LibrarySortType sortType) {
+    public List<Object> getSortedLibraryContents(UUID userId, LibrarySortType sortType) {
 
         Library library = getLibraryByUserId(userId);   // Obtain Library
 
@@ -119,7 +119,7 @@ public class LibraryService {
     Function to toggle a library's privacy.
      */
     @Transactional
-    public void setLibraryPrivacy(Long userId, boolean makePrivate) {
+    public void setLibraryPrivacy(UUID userId, boolean makePrivate) {
 
         // Look for the User's Library
         Library library = libraryRepository.findByUserId(userId)

@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
-public interface LibraryItemRepository extends JpaRepository<LibraryItem, Long> {
+import java.util.UUID;
+public interface LibraryItemRepository extends JpaRepository<LibraryItem, UUID> {
 
     @Modifying
     @Query("update LibraryItem li set li.folder = null where li.folder.id = :folderId")
-    void clearFolderForItems(@Param("folderId") Long folderId);
+    void clearFolderForItems(@Param("folderId") UUID folderId);
 
     @Query("""
            select li
@@ -20,5 +20,5 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, Long> 
            where li.folder.id = :folderId
            order by li.updatedAt desc
            """)
-    List<LibraryItem> findAllByFolderId(@Param("folderId") Long folderId);
+    List<LibraryItem> findAllByFolderId(@Param("folderId") UUID folderId);
 }

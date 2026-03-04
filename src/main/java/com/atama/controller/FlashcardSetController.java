@@ -2,19 +2,18 @@ package com.atama.controller;
 
 import com.atama.dto.request.FlashcardRequestDTO;
 import com.atama.dto.request.FlashcardSetRequestDTO;
+import com.atama.dto.request.UpdateMetaRequest;
 import com.atama.dto.response.FlashcardResponseDTO;
 import com.atama.dto.response.FlashcardSetResponseDTO;
-import com.atama.model.Flashcard;
-import com.atama.model.FlashcardSet;
 import com.atama.service.FlashcardSetService;
 import lombok.RequiredArgsConstructor;
-//import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-//import jakarta.validation.Valid;
+
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/flashcard-sets")
@@ -31,65 +30,45 @@ public class FlashcardSetController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(saved); // hope this is correct
     }
-    /*@PostMapping
-    public ResponseEntity<FlashcardSet> createFlashcardSet(@RequestBody FlashcardSet flashcardSet) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.createFlashcardSet(flashcardSet));
-    }*/
-    /*@PostMapping("/flashcard-sets")
-    public ResponseEntity<FlashcardSetResponseDTO> create(
-            @RequestBody FlashcardSetRequestDTO dto,
-            Authentication authentication
-    ) {
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = user.getId();
 
-        return ResponseEntity.ok(
-                flashcardSetService.createFlashcardSet(dto, userId)
-        );
-    }*/
     @GetMapping("/{id}")
-    public ResponseEntity<FlashcardSetResponseDTO> getFlashcardSetById(@PathVariable Long id) {
+    public ResponseEntity<FlashcardSetResponseDTO> getFlashcardSetById(@PathVariable UUID id) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
     }
 
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<FlashcardSetResponseDTO>> getFlashcardSetsByOwner(@PathVariable Long ownerId) {
+    public ResponseEntity<List<FlashcardSetResponseDTO>> getFlashcardSetsByOwner(@PathVariable UUID ownerId) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(ownerId));
     }
 
     @GetMapping("/{id}/flashcards")
-    public ResponseEntity<List<FlashcardResponseDTO>> getFlashcardsBySetId(@PathVariable Long id) {
+    public ResponseEntity<List<FlashcardResponseDTO>> getFlashcardsBySetId(@PathVariable UUID id) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardsBySetId(id));
     }
 
     @PostMapping("/{id}/flashcards")
-    public ResponseEntity<FlashcardSetResponseDTO> addFlashcard(@PathVariable Long id, @RequestBody FlashcardRequestDTO flashcardDTO) {
+    public ResponseEntity<FlashcardSetResponseDTO> addFlashcard(@PathVariable UUID id, @RequestBody FlashcardRequestDTO flashcardDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.addFlashcard(id, flashcardDTO));
     }
-    /*
-    @GetMapping("/{id}")
-    public ResponseEntity<FlashcardSet> getFlashcardSetById(@PathVariable Long id) {
-        return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
+    // Add this small DTO as a static inner class or its own file
+
+    @PatchMapping("/{id}/meta")
+    public ResponseEntity<FlashcardSetResponseDTO> updateMeta(
+            @PathVariable UUID id,
+            @RequestBody UpdateMetaRequest request) {
+        return ResponseEntity.ok(
+                flashcardSetService.updateFlashcardSetMeta(id, request.getTitle(), request.getDescription())
+        );
     }
 
-    @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<FlashcardSet>> getFlashcardSetsByOwner(@PathVariable Long ownerId) {
-        return ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(ownerId));
+    @PatchMapping("/{id}/flashcards/{flashcardId}")
+    public ResponseEntity<FlashcardResponseDTO> updateFlashcard(
+            @PathVariable UUID id,
+            @PathVariable UUID flashcardId,
+            @RequestBody FlashcardRequestDTO dto) {
+        return ResponseEntity.ok(
+                flashcardSetService.updateFlashcard(id, flashcardId, dto)
+        );
     }
-
-    @GetMapping("/{id}/flashcards")
-    public ResponseEntity<List<Flashcard>> getFlashcardsBySetId(@PathVariable Long id) {
-        return ResponseEntity.ok(flashcardSetService.getFlashcardsBySetId(id));
-    }
-
-    @PostMapping("/{id}/flashcards")
-    public ResponseEntity<FlashcardSet> addFlashcard(@PathVariable Long id, @RequestBody Flashcard flashcard) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(flashcardSetService.addFlashcard(id, flashcard));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFlashcardSet(@PathVariable Long id) {
-        flashcardSetService.deleteFlashcardSet(id);
-        return ResponseEntity.noContent().build();
-    }*/
 }
+

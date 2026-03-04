@@ -10,7 +10,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
-
+import java.util.UUID;
 @Entity
 @Getter
 @Setter
@@ -18,8 +18,8 @@ import java.util.Set;
 public class Goal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)

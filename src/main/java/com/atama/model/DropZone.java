@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.UUID;
 
 @Embeddable
 @Getter
@@ -12,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DropZone {
-    private Long id;
+    private UUID id;
     /** X position on the image (percentage, 0–100) */
     private double x;
 
