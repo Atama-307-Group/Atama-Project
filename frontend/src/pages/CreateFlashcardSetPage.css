@@ -124,15 +124,26 @@
   background: #6ab59a;
   border-color: #6ab59a;
 }
-.back-btn {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: none;
-  border: none;
-  font-size: 16px;
-  color: #2b5c3f;
-  /* Forest green */
+
+.create-set-top {
+  text-align: left;
+}
+.set-page-back {
+  display: block;
+  width: fit-content;
+  margin-bottom: 24px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(51,81,69,0.35);
+  background: transparent;
+  color: var(--pine);
   cursor: pointer;
-  transition: color 0.2s ease;
+  font-weight: 800;
+  font-size: 14px;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.set-page-back:hover {
+  background: rgba(51,81,69,0.06);
+  border-color: rgba(51,81,69,0.55);
 }

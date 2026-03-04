@@ -107,8 +107,9 @@ const CreateFlashcardSetPage = () => {
 
   return (
     <div className="create-set-page">
-      <button className="back-btn" onClick={() => navigate('/')}>&larr; Back</button>
-
+      <div className="create-set-top">
+        <button className="set-page-back" onClick={() => navigate('/')}>&larr; Back</button>
+      </div>
       <h1>Create a New Flashcard Set</h1>
       {/* TODO: add fields for university and class */}
 
