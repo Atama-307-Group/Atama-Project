@@ -26,7 +26,7 @@ const LoginPage = ({ onLoginSuccess }) => {
             }
 
             const data = await response.json();
-            onLoginSuccess(data.id, data.username, data.email);
+            onLoginSuccess(data.id, data.username, data.email, data.profilePictureUrl);
             navigate('/');
         } catch (err) {
             setStatus({ loading: false, error: err.message || 'Failed to connect to server.' });

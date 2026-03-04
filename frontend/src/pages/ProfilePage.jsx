@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ProfilePage.css';
 
 const ProfilePage = ({ currentUser }) => {
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
+
+    // Profile picture state
+    const [profilePic, setProfilePic] = useState(currentUser.profilePictureUrl || null);
+    const [picStatus, setPicStatus] = useState({ loading: false, error: '', success: '' });
 
     // Change username state
     const [showUsernameModal, setShowUsernameModal] = useState(false);
@@ -15,6 +20,79 @@ const ProfilePage = ({ currentUser }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deletePassword, setDeletePassword] = useState('');
     const [deleteStatus, setDeleteStatus] = useState({ loading: false, error: '' });
+
+    // Load profile picture on mount
+    useEffect(() => {
+        const fetchProfilePic = async () => {
+            try {
+                const res = await fetch(`/api/users/${currentUser.id}/profile-picture`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.profilePictureUrl) {
+                        setProfilePic(data.profilePictureUrl);
+                        // Update localStorage too
+                        const saved = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                        saved.profilePictureUrl = data.profilePictureUrl;
+                        localStorage.setItem('currentUser', JSON.stringify(saved));
+                    }
+                }
+            } catch (err) {
+                // Silently fail — just use the initial letter
+            }
+        };
+        fetchProfilePic();
+    }, [currentUser.id]);
+
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type and size
+        if (!file.type.startsWith('image/')) {
+            setPicStatus({ loading: false, error: 'Please select an image file.', success: '' });
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            setPicStatus({ loading: false, error: 'Image must be under 2MB.', success: '' });
+            return;
+        }
+
+        setPicStatus({ loading: true, error: '', success: '' });
+
+        // Read file as Base64
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const base64 = event.target.result;
+            try {
+                const res = await fetch(`/api/users/${currentUser.id}/upload-profile-picture`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ profilePictureUrl: base64 })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Upload failed.');
+                }
+
+                setProfilePic(base64);
+                // Update localStorage
+                const saved = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                saved.profilePictureUrl = base64;
+                localStorage.setItem('currentUser', JSON.stringify(saved));
+
+                setPicStatus({ loading: false, error: '', success: 'Profile picture updated!' });
+                setTimeout(() => setPicStatus(s => ({ ...s, success: '' })), 2000);
+            } catch (err) {
+                setPicStatus({ loading: false, error: err.message, success: '' });
+            }
+        };
+        reader.readAsDataURL(file);
+    };
 
     const handleChangeUsername = async (e) => {
         e.preventDefault();
@@ -33,7 +111,6 @@ const ProfilePage = ({ currentUser }) => {
             }
 
             const data = await response.json();
-            // Update localStorage
             const updatedUser = { ...currentUser, username: data.username };
             localStorage.setItem('currentUser', JSON.stringify(updatedUser));
 
@@ -73,9 +150,27 @@ const ProfilePage = ({ currentUser }) => {
             <button className="back-btn" onClick={() => navigate('/')}>&larr; Back</button>
 
             <div className="profile-card">
-                <div className="profile-avatar-large">
-                    {currentUser.username.charAt(0).toUpperCase()}
+                {/* Avatar */}
+                <div className="profile-avatar-wrapper">
+                    {profilePic ? (
+                        <img src={profilePic} alt="Profile" className="profile-avatar-img" />
+                    ) : (
+                        <div className="profile-avatar-large">
+                            {currentUser.username.charAt(0).toUpperCase()}
+                        </div>
+                    )}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                    />
                 </div>
+                <span className="change-pic-link" onClick={handleAvatarClick}>Change Profile Picture</span>
+                {picStatus.loading && <p className="pic-status loading">Uploading...</p>}
+                {picStatus.error && <p className="pic-status error">{picStatus.error}</p>}
+                {picStatus.success && <p className="pic-status success">{picStatus.success}</p>}
 
                 <h2 className="profile-display-name">{currentUser.username}</h2>
 

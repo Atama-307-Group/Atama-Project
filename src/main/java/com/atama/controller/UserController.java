@@ -28,10 +28,12 @@ public class UserController {
 
         try {
             User user = userService.loginUser(identifier, password);
-            return ResponseEntity.ok(Map.of(
-                    "id", user.getId().toString(),
-                    "username", user.getUsername(),
-                    "email", user.getEmail()));
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("id", user.getId().toString());
+            response.put("username", user.getUsername());
+            response.put("email", user.getEmail());
+            response.put("profilePictureUrl", user.getProfilePictureUrl());
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", e.getMessage()));
@@ -129,6 +131,31 @@ public class UserController {
             return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/upload-profile-picture")
+    public ResponseEntity<?> uploadProfilePicture(@PathVariable UUID id, @RequestBody Map<String, String> request) {
+        String profilePictureUrl = request.get("profilePictureUrl");
+        try {
+            userService.updateProfilePicture(id, profilePictureUrl);
+            return ResponseEntity
+                    .ok(Map.of("message", "Profile picture updated.", "profilePictureUrl", profilePictureUrl));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/profile-picture")
+    public ResponseEntity<?> getProfilePicture(@PathVariable UUID id) {
+        try {
+            User user = userService.getUserById(id);
+            String url = user.getProfilePictureUrl();
+            return ResponseEntity.ok(Map.of("profilePictureUrl", url != null ? url : ""));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", e.getMessage()));
         }
     }

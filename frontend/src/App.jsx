@@ -18,8 +18,8 @@ function App() {
         return saved ? JSON.parse(saved) : null;
     });
 
-    const handleLoginSuccess = (id, username, email) => {
-        const user = { id, username, email };
+    const handleLoginSuccess = (id, username, email, profilePictureUrl) => {
+        const user = { id, username, email, profilePictureUrl };
         setCurrentUser(user);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
@@ -114,7 +114,7 @@ function App() {
                     //     ? <FoldersPage />
                     //     : <Navigate to ="/login" />
                     <FoldersPage />
-            }
+                }
             />
 
             {/* Catch-all */}
