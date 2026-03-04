@@ -1,0 +1,80 @@
+/* Full page container centered vertically + horizontally */
+.study-page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical center */
+  align-items: center;     /* horizontal center */
+  text-align: center;
+  width: 100%; /* ensure full width */
+}
+
+/* Card container for flipping */
+.card-container {
+  perspective: 1000px;
+  display: flex;
+  justify-content: center; /* horizontal center */
+  align-items: center;     /* vertical center inside container */
+  margin-bottom: 20px;
+  width: 100%; /* stretch container full width */
+}
+
+/* Flippable card */
+.card {
+  width: 400px;       /* fixed width for consistent centering */
+  max-width: 90%;     /* responsive on smaller screens */
+  min-height: 150px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  padding: 30px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card .front,
+.card .back {
+  position: absolute;
+  backface-visibility: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card .back {
+  transform: rotateY(180deg);
+}
+
+/* Buttons below the card */
+.study-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.study-buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Card counter */
+.card-counter {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #555;
+}

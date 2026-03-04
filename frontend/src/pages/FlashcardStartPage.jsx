@@ -84,23 +84,21 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
             Create New Set
           </button>
 
-          <button className="action-btn" onClick={() => navigate('/study/term')}>
+          {/* Changed from /study/term to match your PreLearn route */}
+          <button className="action-btn" onClick={() => navigate('/pre_learn')}>
             Study
           </button>
 
-          <button
-            className="action-btn"
-            onClick={() => alert('Match soon...')}
-          >
+          {/* Replaced alert with actual navigation */}
+          <button className="action-btn" onClick={() => navigate('/pre_match')}>
             Match
           </button>
 
-          <button
-            className="action-btn"
-            onClick={() => alert('Practice Test soon...')}
-          >
+          {/* Replaced alert with actual navigation */}
+          <button className="action-btn" onClick={() => navigate('/pre_test')}>
             Practice Test
           </button>
+
           <button className="action-btn" onClick={() => navigate('/folders')}>
             Library
           </button>
