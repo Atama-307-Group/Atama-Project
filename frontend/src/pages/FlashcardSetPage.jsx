@@ -69,7 +69,8 @@ const FlashcardSetPage = () => {
     };*/
 
     const startEditingMeta = () => {
-        setMetaDraft({ title: setData.title, description: setData.description ?? '' });
+        setMetaDraft({ title: setData.title, description: setData.description ?? '', university: setData.university ?? '',
+            course: setData.course ?? ''});
         setEditingMeta(true);
     };
 
@@ -79,7 +80,7 @@ const FlashcardSetPage = () => {
 
     const saveMeta = async () => {
         const updated = await updateFlashcardSetMeta(id, metaDraft);
-        setSetData((prev) => ({ ...prev, title: updated.title, description: updated.description }));
+        setSetData((prev) => ({ ...prev, title: updated.title, description: updated.description, university: updated.university, course: updated.course }));
         setEditingMeta(false);
     };
     /*const saveMeta = async () => {
@@ -111,6 +112,19 @@ const FlashcardSetPage = () => {
                         placeholder="Description (optional)"
                         rows={2}
                     />
+                    <input
+                        className="set-page-meta-description-input"
+                        value={metaDraft.university}
+                        onChange={(e) => setMetaDraft((d) => ({ ...d, university: e.target.value }))}
+                        placeholder="University (optional)"
+                    />
+                    <input
+                        className="set-page-meta-description-input"
+                        value={metaDraft.course}
+                        onChange={(e) => setMetaDraft((d) => ({ ...d, course: e.target.value }))}
+                        placeholder="Course (optional)"
+                    />
+
                     <div className="set-page-edit-actions">
                         <button className="set-page-cancel-btn" onClick={cancelEditingMeta}>Cancel</button>
                         <button className="set-page-save-btn" disabled={!metaDraft.title.trim()} onClick={saveMeta}>Save</button>
@@ -120,6 +134,7 @@ const FlashcardSetPage = () => {
                 <div className="set-page-meta">
                     <h1>{setData.title}</h1>
                     {setData.description && <p className="set-page-description">{setData.description}</p>}
+                    {setData.university && <p className="set-page-meta-sub">{setData.university}{setData.course ? ` · ${setData.course}` : ''}</p>}
                     <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
                 </div>
             )}

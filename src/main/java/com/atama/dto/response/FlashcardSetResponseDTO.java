@@ -29,6 +29,8 @@ import java.util.UUID;
 })
 public class FlashcardSetResponseDTO extends LibraryItemResponseDTO {
     private String description;
+    private String university;
+    private String course;
     private UUID ownerId;
     private List<FlashcardResponseDTO> flashcards = new ArrayList<>();
 }

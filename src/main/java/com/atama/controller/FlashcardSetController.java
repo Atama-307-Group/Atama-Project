@@ -57,7 +57,7 @@ public class FlashcardSetController {
             @PathVariable UUID id,
             @RequestBody UpdateMetaRequest request) {
         return ResponseEntity.ok(
-                flashcardSetService.updateFlashcardSetMeta(id, request.getTitle(), request.getDescription())
+                flashcardSetService.updateFlashcardSetMeta(id, request.getTitle(), request.getDescription(), request.getUniversity(), request.getCourse())
         );
     }
 

@@ -8,4 +8,6 @@ import lombok.Setter;
 public class UpdateMetaRequest {
     private String title;
     private String description;
+    private String university;
+    private String course;
 }

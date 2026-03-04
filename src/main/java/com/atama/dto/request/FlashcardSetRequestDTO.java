@@ -11,6 +11,8 @@ import java.util.UUID;
 @Setter
 public class FlashcardSetRequestDTO extends LibraryItemRequestDTO {
     private String description;
+    private String university;
+    private String course;
     private UUID ownerId;
     private List<FlashcardRequestDTO> flashcards = new ArrayList<>();
 }

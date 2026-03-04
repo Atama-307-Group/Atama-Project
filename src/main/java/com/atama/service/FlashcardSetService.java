@@ -64,11 +64,13 @@ public class FlashcardSetService {
                 .map(flashcardMapper::toResponseDTO)
                 .toList();
     }
-    public FlashcardSetResponseDTO updateFlashcardSetMeta(UUID id, String title, String description) {
+    public FlashcardSetResponseDTO updateFlashcardSetMeta(UUID id, String title, String description, String university, String course) {
         FlashcardSet set = flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
         if (title != null && !title.isBlank()) set.setTitle(title);
         set.setDescription(description);
+        set.setUniversity(university);
+        set.setCourse(course);
         return mapper.toResponseDTO(flashcardSetRepository.save(set));
     }
 

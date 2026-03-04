@@ -93,11 +93,11 @@ export async function getFlashcardSetById(id) {
     return res.json();
 }
 
-export async function updateFlashcardSetMeta(id, { title, description }) {
+export async function updateFlashcardSetMeta(id, { title, description, university, course}) {
     const res = await fetch(`/api/flashcard-sets/${id}/meta`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description }),
+        body: JSON.stringify({ title, description, university, course }),
     });
     if (!res.ok) throw new Error('Failed to update set');
     return res.json();
