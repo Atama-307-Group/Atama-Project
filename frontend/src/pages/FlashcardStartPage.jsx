@@ -28,18 +28,26 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
               className="profile-trigger"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
-              <div className="avatar">
-                {currentUser.username.charAt(0).toUpperCase()}
-              </div>
+              {currentUser.profilePictureUrl ? (
+                <img src={currentUser.profilePictureUrl} alt="" className="avatar-img" />
+              ) : (
+                <div className="avatar">
+                  {currentUser.username.charAt(0).toUpperCase()}
+                </div>
+              )}
               <span className="profile-username">{currentUser.username}</span>
               <span className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`}>▾</span>
             </div>
             {dropdownOpen && (
               <div className="dropdown-menu">
                 <div className="dropdown-header">
-                  <div className="dropdown-avatar">
-                    {currentUser.username.charAt(0).toUpperCase()}
-                  </div>
+                  {currentUser.profilePictureUrl ? (
+                    <img src={currentUser.profilePictureUrl} alt="" className="dropdown-avatar-img" />
+                  ) : (
+                    <div className="dropdown-avatar">
+                      {currentUser.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div className="dropdown-info">
                     <span className="dropdown-name">{currentUser.username}</span>
                     <span className="dropdown-email">{currentUser.email}</span>

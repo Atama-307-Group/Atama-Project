@@ -124,4 +124,11 @@ public class UserService {
         user.setUsername(newUsername);
         return userRepository.save(user);
     }
+
+    public void updateProfilePicture(UUID id, String profilePictureUrl) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        user.setProfilePictureUrl(profilePictureUrl);
+        userRepository.save(user);
+    }
 }

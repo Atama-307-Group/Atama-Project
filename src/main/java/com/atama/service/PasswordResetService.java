@@ -3,6 +3,8 @@ package com.atama.service;
 import com.atama.model.User;
 import com.atama.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PasswordResetService {
 
     private final UserRepository userRepository;
+    private final JavaMailSender mailSender;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // In-memory store: code -> { userId, expiry }
@@ -45,12 +48,20 @@ public class PasswordResetService {
 
         resetTokens.put(resetCode, new ResetToken(user.getId().toString(), expiry));
 
-        // Log the code to the console (in production, send via email)
-        System.out.println("========================================");
-        System.out.println("PASSWORD RESET CODE for " + user.getEmail());
-        System.out.println("Code: " + resetCode);
-        System.out.println("Expires in " + EXPIRY_MINUTES + " minutes");
-        System.out.println("========================================");
+        // Send the reset code via email
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Atama - Password Reset Code");
+        message.setText(
+                "Hi " + user.getUsername() + ",\n\n" +
+                "Your password reset code is: " + resetCode + "\n\n" +
+                "This code will expire in " + EXPIRY_MINUTES + " minutes.\n\n" +
+                "If you did not request this, please ignore this email.\n\n" +
+                "— Atama Team"
+        );
+        mailSender.send(message);
+
+        System.out.println("Password reset email sent to " + user.getEmail());
 
         return user.getEmail();
     }
