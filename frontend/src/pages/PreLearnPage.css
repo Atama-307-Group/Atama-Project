@@ -1,0 +1,35 @@
+/* Full page container centered vertically + horizontally */
+.prelearn-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertical center */
+  align-items: center;     /* horizontal center */
+  text-align: center;
+  padding: 20px;
+  gap: 20px;
+}
+
+/* Sections for grouping options */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+  align-items: flex-start; /* labels stacked nicely */
+}
+
+/* Radio buttons and checkbox labels */
+.section label {
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Start Learning button */
+.start-button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+}
