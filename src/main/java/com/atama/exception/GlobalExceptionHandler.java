@@ -21,6 +21,16 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
+    @ExceptionHandler(LinkExpiredException.class)
+    public ResponseEntity<Map<String, Object>> handleLinkExpired(LinkExpiredException ex) {
+        Map<String, Object> body = Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.GONE.value(),
+                "error", "Gone",
+                "message", ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.GONE).body(body);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
@@ -32,4 +42,5 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
+
 }

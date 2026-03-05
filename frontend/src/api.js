@@ -112,3 +112,20 @@ export async function updateFlashcard(setId, flashcardId, cardData) {
     if (!res.ok) throw new Error('Failed to update flashcard');
     return res.json();
 }
+
+export async function generateSharedLink(flashcardSetId) {
+    const res = await fetch('/api/shared-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flashcardSetId }),
+    });
+    if (!res.ok) throw new Error('Failed to generate link');
+    return res.json(); // { token }
+}
+
+export async function resolveSharedLink(token) {
+    const res = await fetch(`/api/shared-links/${token}`);
+    if (res.status === 410) throw new Error('This link has expired.');
+    if (!res.ok) throw new Error('Link not found.');
+    return res.json();
+}

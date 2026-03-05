@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { generateSharedLink } from '../api.js';
 import './FlashcardStartPage.css';
 
 const FlashcardStartPage = ({ currentUser, onLogout }) => {

@@ -1,8 +1,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getFlashcardSetById } from "../api.js";
-import { updateFlashcardSetMeta, updateFlashcard } from '../api.js';
+import {generateSharedLink, getFlashcardSetById, updateFlashcardSetMeta, updateFlashcard} from "../api.js";
 import FlashcardCard from "../components/FlashcardCard.jsx";
 import FlashcardInput from "../components/FlashcardInput.jsx";
 import "./FlashcardSetPage.css";
@@ -24,6 +23,7 @@ const FlashcardSetPage = () => {
 
     const [editingMeta, setEditingMeta] = useState(false);
     const [metaDraft, setMetaDraft] = useState({ title: '', description: '' });
+    const [shareStatus, setShareStatus] = useState(null);
 
 
     useEffect(() => {
@@ -88,6 +88,20 @@ const FlashcardSetPage = () => {
         setEditingMeta(false);
     };*/
 
+    const handleShare = async () => {
+        try {
+            const { token } = await generateSharedLink(setData.id);
+            const url = `${window.location.origin}/shared/${token}`;
+            await navigator.clipboard.writeText(url);
+            setShareStatus('success');
+        } catch (e) {
+            setShareStatus('error');
+        } finally {
+            setTimeout(() => setShareStatus(null), 3000);
+        }
+    };
+
+
     if (loading) return <div className="set-page-loading">Loading...</div>;
     if (error)   return <div className="set-page-error">{error}</div>;
 
@@ -135,8 +149,14 @@ const FlashcardSetPage = () => {
                     <h1>{setData.title}</h1>
                     {setData.description && <p className="set-page-description">{setData.description}</p>}
                     {setData.university && <p className="set-page-meta-sub">{setData.university}{setData.course ? ` · ${setData.course}` : ''}</p>}
-                    <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
+                    <div>
+                        <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
+                        <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
+                    </div>
+                    {shareStatus === 'success' && <div className="set-page-toast success">Link copied to clipboard!</div>}
+                    {shareStatus === 'error' && <div className="set-page-toast error">Failed to generate link. Please try again.</div>}
                 </div>
+
             )}
 
             <h2>Cards ({setData.flashcards?.length ?? 0})</h2>
