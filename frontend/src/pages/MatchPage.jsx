@@ -15,10 +15,18 @@ const MatchPage = () => {
 
   useEffect(() => {
     if (flashcards.length === 0) return;
+    //Max out at a 4 x 3 grid
+    const limitedCards = [...flashcards]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 6)
     let tempCards = [];
-    flashcards.forEach((card, idx) => {
-      tempCards.push({ id: idx + 't', content: card.term, pairId: idx, matched: false });
-      tempCards.push({ id: idx + 'd', content: card.definition, pairId: idx, matched: false });
+    limitedCards.forEach((card, index) => {
+      const isFITB = card.type === 'FILL_BLANK';
+      const frontText = isFITB ? card.textWithBlanks : card.term;
+      const backText = isFITB ? card.correctAnswers.join(', ') : card.definition;
+
+      tempCards.push({ id: `t-${index}`, content: frontText, pairId: index, matched: false });
+      tempCards.push({ id: `d-${index}`, content: backText, pairId: index, matched: false });
     });
     tempCards.sort(() => Math.random() - 0.5);
     setCards(tempCards);
