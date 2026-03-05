@@ -29,12 +29,34 @@ function App() {
     })
 
     const [flashcards, setFlashcards] = useState([
-        { id: 1, term: 'Mitosis', definition: 'Cell division producing two identical daughter cells', favorite: false },
-        { id: 2, term: 'Osmosis', definition: 'Movement of water through a semipermeable membrane', favorite: true },
-        { id: 3, term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into glucose', favorite: false },
-        { id: 4, term: 'Homeostasis', definition: 'Maintaining a stable internal environment', favorite: true },
-        { id: 5, term: 'Meiosis', definition: 'Cell division producing four genetically unique gametes', favorite: false },
-        { id: 6, term: 'DNA', definition: 'Molecule carrying genetic instructions for life', favorite: false },
+        { id: 1, type: 'REGULAR', term: 'Mitosis', definition: 'Cell division producing two identical daughter cells', favorite: false },
+        { id: 2, type: 'REGULAR', term: 'Osmosis', definition: 'Movement of water through a semipermeable membrane', favorite: false },
+        { id: 3, type: 'REGULAR', term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into glucose', favorite: false },
+        { id: 4, type: 'REGULAR', term: 'Homeostasis', definition: 'Maintaining a stable internal environment', favorite: false },
+        { id: 5, type: 'REGULAR', term: 'Meiosis', definition: 'Cell division producing four genetically unique gametes', favorite: false },
+        { id: 6, type: 'REGULAR', term: 'DNA', definition: 'Molecule carrying genetic instructions for life', favorite: false },
+
+        {
+            id: 7,
+            type: 'FILL_BLANK',
+            textWithBlanks: 'This app is called __ and is a project for CS __.',
+            correctAnswers: ['Atama', '307'],
+            favorite: true
+        },
+        {
+            id: 8,
+            type: 'FILL_BLANK',
+            textWithBlanks: 'Water freezes at __°C and boils at __°C at sea level.',
+            correctAnswers: ['0', '100'],
+            favorite: true
+        },
+        {
+            id: 9,
+            type: 'FILL_BLANK',
+            textWithBlanks: 'The chemical symbol for Gold is __ and for Silver is __.',
+            correctAnswers: ['Au', 'Ag'],
+            favorite: true
+        }
     ]);
 
     const handleToggleFavorite = (id) => {
