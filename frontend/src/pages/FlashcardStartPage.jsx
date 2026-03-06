@@ -87,7 +87,7 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
 
           {/* Changed from /study/term to match your PreLearn route */}
           <button className="action-btn" onClick={() => navigate('/pre_learn')}>
-            Study
+            Learn
           </button>
 
           {/* Replaced alert with actual navigation */}
