@@ -65,8 +65,8 @@ function App() {
         );
     };
 
-    const handleLoginSuccess = (id, username, email, profilePictureUrl) => {
-        const user = { id, username, email, profilePictureUrl };
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
+        const user = { id, username, email, profilePictureUrl, verified };
         setCurrentUser(user);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };

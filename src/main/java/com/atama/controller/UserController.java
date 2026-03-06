@@ -20,6 +20,7 @@ public class UserController {
 
     private final UserService userService;
     private final PasswordResetService passwordResetService;
+    private final com.atama.service.EmailVerificationService emailVerificationService;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> request) {
@@ -33,6 +34,7 @@ public class UserController {
             response.put("username", user.getUsername());
             response.put("email", user.getEmail());
             response.put("profilePictureUrl", user.getProfilePictureUrl());
+            response.put("verified", user.isVerified());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -156,6 +158,58 @@ public class UserController {
             return ResponseEntity.ok(Map.of("profilePictureUrl", url != null ? url : ""));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/send-verification")
+    public ResponseEntity<?> sendVerification(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || !email.toLowerCase().endsWith("@purdue.edu")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Only @purdue.edu emails can be verified."));
+        }
+        try {
+            emailVerificationService.sendVerificationCode(email);
+            return ResponseEntity.ok(Map.of("message", "Verification code sent to " + email));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/register-verified")
+    public ResponseEntity<?> registerVerified(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String email = request.get("email");
+        String password = request.get("password");
+        String code = request.get("code");
+
+        if (email == null || !email.toLowerCase().endsWith("@purdue.edu")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Only @purdue.edu emails can be verified."));
+        }
+
+        try {
+            emailVerificationService.verifyCode(email, code);
+
+            UserRegistrationRequest regRequest = new UserRegistrationRequest();
+            regRequest.setUsername(username);
+            regRequest.setEmail(email);
+            regRequest.setPassword(password);
+
+            User user = userService.registerUser(regRequest);
+            user.setVerified(true);
+            userService.createUser(user);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "message", "Account created and verified!",
+                    "id", user.getId().toString(),
+                    "username", user.getUsername(),
+                    "email", user.getEmail(),
+                    "verified", true));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", e.getMessage()));
         }
     }
