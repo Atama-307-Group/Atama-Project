@@ -20,6 +20,8 @@ import PostLearnPage from "./pages/PostLearnPage.jsx";
 import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
+import GoalsPage from "./pages/StudyGoal.jsx"
+
 import SharedSetPage from "./pages/SharedSetPage.jsx";
 
 function App() {
@@ -148,7 +150,7 @@ function App() {
 
             {/* Study & Learning Flow */}
             <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
-            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite}/>} />
+            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id}/>} />
             <Route path="/post_learn" element={<PostLearnPage />} />
 
             {/* Match Flow */}
@@ -170,7 +172,15 @@ function App() {
             {/* Personal Library Page */}
             <Route
                 path="/folders"
-                element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+                element={<FoldersPage />}
+                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+            />
+
+            {/* Study Goals Page */}
+            <Route
+                path="/goals"
+                element={<GoalsPage userId={currentUser?.id} />}
+                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 
             {/* Catch-all */}

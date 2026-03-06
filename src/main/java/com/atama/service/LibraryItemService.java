@@ -1,6 +1,6 @@
 package com.atama.service;
 
-import com.atama.exception.ResourceNotFoundException;
+import com.atama.dto.response.LibraryItemResponseDTO;
 import com.atama.repository.*;
 import com.atama.model.*;
 import com.atama.dto.request.*;
@@ -8,18 +8,49 @@ import com.atama.dto.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class LibraryItemService {
 
     private final LibraryRepository libraryRepository;
     private final FolderRepository folderRepository;
+    private final LibraryItemRepository libraryItemRepository;
 
+
+//    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto) {
+//        item.setTitle(dto.getTitle());
+//
+////        item.setItem_type(resolveItemType(item));
+//    }
 
     public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto) {
+        // TODO need to fix so that the user UUID is sent
+        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+                .orElseThrow(() -> new RuntimeException("Library not found"));
+
         item.setTitle(dto.getTitle());
-        item.setItem_type(resolveItemType(item));
+        item.setLibrary(library);
+        item.setItemType(resolveItemType(item));
+        System.out.println("Found library: " + library.getId());
+        System.out.println("Setting library on item: " + item.getClass().getSimpleName());
+
+
+        if (dto.getFolderID() != null) {
+            Folder folder = folderRepository.findById(dto.getFolderID())
+                    .orElseThrow(() -> new RuntimeException("Folder not found"));
+
+            // make sure folder belongs to this library
+            if (!folder.getLibrary().getId().equals(library.getId())) {
+                throw new RuntimeException("Folder does not belong to this library");
+            }
+
+            item.setFolder(folder);
+        }
     }
+
     // for when we start actually using id
     /*public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto, Long userId) {
         Library library = libraryRepository.findByOwnerId(userId)
@@ -41,4 +72,27 @@ public class LibraryItemService {
         // add other subtypes
         throw new IllegalArgumentException("Unknown LibraryItem subtype: " + item.getClass());
     }
+
+    public List<LibraryItem> getAllItems() {
+        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+                .orElseThrow(() -> new RuntimeException("Library not found"));
+        return libraryItemRepository.findAllByLibraryId(library.getId());
+    }
+
+    public LibraryItem moveToFolder(UUID itemId, UUID folderId) {
+        LibraryItem item = libraryItemRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found"));
+        item.setFolder(folder);
+        return libraryItemRepository.save(item);
+    }
+
+    public LibraryItem removeFromFolder(UUID itemId) {
+        LibraryItem item = libraryItemRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+        item.setFolder(null);
+        return libraryItemRepository.save(item);
+    }
+
 }

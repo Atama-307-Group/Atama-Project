@@ -2,6 +2,7 @@ package com.atama.service;
 
 import com.atama.dto.request.UserRegistrationRequest;
 import com.atama.exception.ResourceNotFoundException;
+import com.atama.model.Library;
 import com.atama.model.University;
 import com.atama.model.User;
 import com.atama.repository.UniversityRepository;
@@ -22,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
+    private final LibraryService libraryService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User registerUser(UserRegistrationRequest request) {
@@ -48,7 +50,14 @@ public class UserService {
 
         user.setUniversity(university);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Create a Library for the new user and persist it
+        Library library = new Library();
+        library.setUser(savedUser);
+        libraryService.createLibrary(library);
+
+        return savedUser;
     }
 
     public User loginUser(String identifier, String password) {
