@@ -174,6 +174,13 @@ const ProfilePage = ({ currentUser }) => {
 
                 <h2 className="profile-display-name">{currentUser.username}</h2>
 
+                {currentUser.verified && (
+                    <div className="purdue-badge">
+                        <span className="purdue-p">P</span>
+                        <span>Verified Purdue Student</span>
+                    </div>
+                )}
+
                 <div className="profile-details">
                     <div className="profile-field">
                         <label>Username</label>
@@ -183,6 +190,17 @@ const ProfilePage = ({ currentUser }) => {
                     <div className="profile-field">
                         <label>Email</label>
                         <div className="profile-value">{currentUser.email}</div>
+                    </div>
+
+                    <div className="profile-field">
+                        <label>Status</label>
+                        <div className="profile-value">
+                            {currentUser.verified ? (
+                                <span className="verified-text">✅ Verified Purdue Student</span>
+                            ) : (
+                                <span className="unverified-text">Standard User</span>
+                            )}
+                        </div>
                     </div>
                 </div>
 

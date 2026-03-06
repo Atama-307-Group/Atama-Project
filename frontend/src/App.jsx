@@ -22,6 +22,7 @@ import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
 import GoalsPage from "./pages/StudyGoal.jsx"
 
+import SharedSetPage from "./pages/SharedSetPage.jsx";
 
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
@@ -66,8 +67,8 @@ function App() {
         );
     };
 
-    const handleLoginSuccess = (id, username, email, profilePictureUrl) => {
-        const user = { id, username, email, profilePictureUrl };
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
+        const user = { id, username, email, profilePictureUrl, verified };
         setCurrentUser(user);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
@@ -166,6 +167,7 @@ function App() {
                 path="/sets/:id"
                 element={<FlashcardSetPage />}
             />
+            <Route path="/shared/:token" element={<SharedSetPage />} />
 
             {/* Personal Library Page */}
             <Route

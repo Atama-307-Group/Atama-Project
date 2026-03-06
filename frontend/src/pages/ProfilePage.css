@@ -91,7 +91,46 @@
     font-size: 24px;
     font-weight: 700;
     color: #1a3c27;
-    margin-bottom: 32px;
+    margin-bottom: 12px;
+}
+
+.purdue-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #c28e0e, #9e7400);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.purdue-p {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: white;
+    color: #9e7400;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.verified-text {
+    color: #166534;
+    font-weight: 600;
+}
+
+.unverified-text {
+    color: #4a6b57;
 }
 
 /* Details section */

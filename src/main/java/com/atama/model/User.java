@@ -30,6 +30,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String profilePictureUrl;
 
+    @Column
+    private boolean verified = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")
     private University university;

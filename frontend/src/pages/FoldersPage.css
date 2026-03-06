@@ -11,7 +11,10 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body { margin: 0; overflow-y: auto; overflow-x: hidden; }
-
+body {
+  background-color: #fdfbf7;
+  margin: 0;
+}
 .srOnly {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
