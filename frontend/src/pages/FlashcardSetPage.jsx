@@ -25,6 +25,7 @@ const FlashcardSetPage = () => {
     const [metaDraft, setMetaDraft] = useState({ title: '', description: '' });
     const [shareStatus, setShareStatus] = useState(null);
     const [shareUrl, setShareUrl] = useState('');
+    const [downloadStatus, setDownloadStatus] = useState(null);
 
     //Downloading
     const [showDownloadOptions, setShowDownloadOptions] = useState(false);
@@ -109,12 +110,12 @@ const FlashcardSetPage = () => {
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
 
-            setShareStatus('File downloaded successfully!');
-            setTimeout(() => setShareStatus(null), 3000);
+            setDownloadStatus('Flashcard set downloaded!');
+            setTimeout(() => setDownloadStatus(null), 3000);
         } catch (err) {
             console.error(err);
-            setShareStatus('Download failed. Please reload and try again.');
-            setTimeout(() => setShareStatus(null), 3000);
+            setDownloadStatus('Download failed. Please reload and try again.');
+            setTimeout(() => setDownloadStatus(null), 3000);
         }
     };
 
@@ -205,20 +206,22 @@ const FlashcardSetPage = () => {
                             )}
                         </div>
                     </div>
-<<<<<<< feature/download
                     {shareStatus && (
                         <div className={`set-page-toast ${shareStatus.includes('failed') ? 'error' : 'success'}`}>
                             {shareStatus}
+                            {shareUrl && !shareStatus.includes('failed') && (
+                                <a href={shareUrl} target="_blank" rel="noreferrer" className="set-page-toast-link">
+                                    {shareUrl}
+                                </a>
+                            )}
                         </div>
                     )}
-=======
-                    {shareStatus === 'success' && (
-                        <div className="set-page-toast success">
-                            Link copied! <a href={shareUrl} target="_blank" rel="noreferrer" className="set-page-toast-link">{shareUrl}</a>
+                    {downloadStatus && (
+                        <div className={`set-page-toast ${downloadStatus.includes('failed') ? 'error' : 'success'}`}>
+                            {downloadStatus}
                         </div>
                     )}
-                    {shareStatus === 'error' && <div className="set-page-toast error">Failed to generate link. Please try again.</div>}
->>>>>>> main
+
                 </div>
 
             )}

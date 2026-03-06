@@ -76,12 +76,11 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         );
     };
 
-<<<<<<< feature/download
     const handleReset = () => {
         setIsFlipped(false);
         setCurrentIndex(0);
     }
-=======
+
     useEffect(() => {
         console.log("StudyPage userId:", userId);
         if (!userId) return;
@@ -100,7 +99,6 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         window.addEventListener("beforeunload", handleUnload);
         return () => window.removeEventListener("beforeunload", handleUnload);
     }, [userId]);
->>>>>>> main
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
