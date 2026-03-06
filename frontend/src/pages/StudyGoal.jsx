@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { getGoal, updateGoal } from "../api.js"; // adjust path as needed
+import { useNavigate } from "react-router-dom";
 import "./studyGoal.css";
 
 const DAYS = [
@@ -11,9 +13,18 @@ const DAYS = [
     { key: "Su", label: "Su" },
 ];
 
-export default function StudyGoal() {
-    // Saved (committed) settings
-    const [selectedDays, setSelectedDays] = useState(["M", "T", "W", "Th", "F", "Sa", "Su"]);
+// Map between your UI day keys and Java DayOfWeek enum values
+const DAY_KEY_TO_JAVA = {
+    M: "MONDAY", T: "TUESDAY", W: "WEDNESDAY",
+    Th: "THURSDAY", F: "FRIDAY", Sa: "SATURDAY", Su: "SUNDAY"
+};
+const JAVA_TO_DAY_KEY = Object.fromEntries(
+    Object.entries(DAY_KEY_TO_JAVA).map(([k, v]) => [v, k])
+);
+
+const GoalsPage = ({ userId }) => {
+    const navigate = useNavigate();
+    const [selectedDays, setSelectedDays] = useState(["M","T","W","Th","F","Sa","Su"]);
     const [minutesPerDay, setMinutesPerDay] = useState(15);
 
     // Edit mode + draft settings (separate per card)
@@ -25,6 +36,9 @@ export default function StudyGoal() {
 
     // Optional progress preview
     const [progress, setProgress] = useState(0);
+
+    // Track when a save is in flight so polls don't overwrite fresh local state
+    const pendingSaveRef = useRef(false);
 
     // 5..60 by 5
     const options = useMemo(() => {
@@ -47,6 +61,38 @@ export default function StudyGoal() {
         return Math.min(100, (progress / target) * 100);
     }, [progress, effectiveMinutes]);
 
+    const goalMet = percent >= 100;
+
+    useEffect(() => {
+        if (!userId) return;
+
+        const loadGoal = () => {
+            getGoal(userId).then(goal => {
+                // Only overwrite goal settings if there's no pending save in flight.
+                // This prevents a stale poll response from clobbering a goal the
+                // user just changed (race condition: save fires, poll returns old
+                // value before the backend has committed the update).
+                if (!pendingSaveRef.current) {
+                    if (goal.selectedDaysOfWeek) {
+                        setSelectedDays(goal.selectedDaysOfWeek.map(d => JAVA_TO_DAY_KEY[d]).filter(Boolean));
+                    }
+                    if (goal.minutesPerDay) {
+                        setMinutesPerDay(goal.minutesPerDay);
+                    }
+                }
+                // Always update progress — this is the value we want live
+                if (goal.totalStudyMinutes !== undefined) {
+                    setProgress(goal.totalStudyMinutes);
+                }
+            }).catch(console.error);
+        };
+
+        loadGoal();
+
+        // Then poll every 60 seconds to keep progress bar updated
+        const interval = setInterval(loadGoal, 60000);
+        return () => clearInterval(interval);
+    }, [userId]);
     function toggleDay(dayKey) {
         if (!isEditingSchedule) return;
 
@@ -68,11 +114,28 @@ export default function StudyGoal() {
         setIsEditingSchedule(false);
     }
 
+    async function persistGoal(days, minutes) {
+        if (!userId) return;
+        pendingSaveRef.current = true;
+        try {
+            await updateGoal(userId, {
+                selectedDaysOfWeek: days.map(d => DAY_KEY_TO_JAVA[d]),
+                minutesPerDay: minutes,
+            });
+        } finally {
+            // Clear the flag after a short buffer so any in-flight poll that
+            // started just before the save completes doesn't stomp our state
+            setTimeout(() => { pendingSaveRef.current = false; }, 3000);
+        }
+    }
+
     function saveEditSchedule() {
         if (draftDays.length === 0) return;
         setSelectedDays(draftDays);
         setIsEditingSchedule(false);
+        persistGoal(draftDays, minutesPerDay);
     }
+
 
     // Goal card actions
     function startEditGoal() {
@@ -88,10 +151,31 @@ export default function StudyGoal() {
     function saveEditGoal() {
         setMinutesPerDay(draftMinutes);
         setIsEditingGoal(false);
+        persistGoal(selectedDays, draftMinutes);
     }
+
 
     return (
         <div className="goalPage">
+
+            <button
+                type="button"
+                className="backBtn"
+                onClick={() => navigate('/')}
+                style={{
+                    alignSelf: 'flex-start',
+                    marginBottom: '8px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '1.5rem',
+                    color: '#2f3e3b',
+                    padding: '4px 8px',
+                }}
+            >
+                ← Back
+            </button>
+
             <h1>Study Schedule and Goal</h1>
 
             <div className="stack">
@@ -196,8 +280,14 @@ export default function StudyGoal() {
                         </div>
 
                         <div className="bar">
-                            <div className="fill" style={{ width: `${percent}%` }} />
+                            <div className={`fill ${goalMet ? "fill--complete" : ""}`} style={{ width: `${percent}%` }} />
                         </div>
+
+                        {goalMet && (
+                            <div className="goalMetMessage" role="status" aria-live="polite">
+                                🎉 Goal reached! Great work today!
+                            </div>
+                        )}
                     </div>
 
                     {/* Goal buttons */}
@@ -222,3 +312,4 @@ export default function StudyGoal() {
         </div>
     );
 }
+export default GoalsPage;

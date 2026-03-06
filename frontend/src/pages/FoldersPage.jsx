@@ -231,7 +231,7 @@ const FoldersPage = () => {
         setError("");
         setSubmitting(true);
         try {
-            const created = await createFolder({name, libraryId: 1});
+            const created = await createFolder({ name });
             setFolders((prev) => [created, ...prev]);
             setSelectedFolderId(created.id);
             closeModal();
@@ -373,7 +373,7 @@ const FoldersPage = () => {
                     New Flashcard Set
                 </button>
 
-                <button className="btn secondary" onClick={openCreateFolderModal} type="button">
+                <button className="btn secondary" type="button">
                     TODO New Upload
                 </button>
 
@@ -495,7 +495,7 @@ const FoldersPage = () => {
                                     >
                                         <div className="folderName">{f.name}</div>
                                         <div className="folderMeta">
-                                            <span>#{f.id}</span>
+                                            {/*<span>#{f.id}</span>*/}
 
                                             <div className="folderActions">
                                                 {/* actionable star toggle */}

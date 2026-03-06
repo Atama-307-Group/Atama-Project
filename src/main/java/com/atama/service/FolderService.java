@@ -27,8 +27,9 @@ public class FolderService {
         this.libraryItemRepository = libraryItemRepository;
     }
 
+    // TODO need to fix so that the user UUID is sent
     public Folder createFolder(CreateFolderRequest request) {
-        Library library = libraryRepository.findById(request.libraryId())
+        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
                 .orElseThrow(() -> new RuntimeException("Library not found"));
 
         Folder folder = new Folder();

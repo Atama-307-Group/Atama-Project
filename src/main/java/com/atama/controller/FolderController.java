@@ -45,6 +45,7 @@ public class FolderController {
 
     @PostMapping
     public ResponseEntity<FolderResponse> createFolder(@RequestBody CreateFolderRequest request) {
+
         Folder saved = folderService.createFolder(request);
         return ResponseEntity.ok(toResponse(saved));
     }

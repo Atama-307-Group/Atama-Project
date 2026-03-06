@@ -100,6 +100,10 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
             Practice Test
           </button>
 
+          <button className="action-btn" onClick={() => navigate('/goals')}>
+            Goals
+          </button>
+
           <button className="action-btn" onClick={() => navigate('/folders')}>
             Library
           </button>
