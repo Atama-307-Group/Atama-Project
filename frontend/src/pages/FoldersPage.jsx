@@ -1,6 +1,8 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy,
-    getLibraryItems, moveItemToFolder, removeItemFromFolder} from "../api.js";
+import {
+    createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy,
+    getLibraryItems, moveItemToFolder, removeItemFromFolder
+} from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
 
@@ -49,10 +51,11 @@ const FoldersPage = () => {
 
     const menuRef = useRef(null);
 
+    // Loose library items
     const [libItems, setLibItems] = useState([]);
 
     const [organizeMode, setOrganizeMode] = useState(false);
-    const [selectedItemId, setSelectedItemId] = useState(null);
+    const [selectedItemIds, setSelectedItemIds] = useState(new Set());
 
     const [openItemMenuId, setOpenItemMenuId] = useState(null);
 
@@ -166,6 +169,7 @@ const FoldersPage = () => {
                 setError(err.message ?? "Failed to load items");
             }
         }
+
         loadLibItems();
     }, []);
 
@@ -319,7 +323,7 @@ const FoldersPage = () => {
         setError("");
         setSubmitting(true);
         try {
-            const created = await createFolder({ name });
+            const created = await createFolder({name});
             setFolders((prev) => [created, ...prev]);
             setSelectedFolderId(created.id);
             closeModal();
@@ -477,7 +481,7 @@ const FoldersPage = () => {
                     className={`btn ${organizeMode ? "primary" : "organize"}`}
                     onClick={() => {
                         setOrganizeMode(p => !p);
-                        setSelectedItemId(null);
+                        setSelectedItemIds(new Set());
                     }}
                 >
                     {organizeMode ? "Done" : "Organize"}
@@ -588,12 +592,14 @@ const FoldersPage = () => {
                                 {filtered.map((f) => (
                                     <div
                                         key={f.id}
-                                        className={`folderCard ${organizeMode && selectedItemId ? "folderDropTarget" : ""}`}
+                                        className={`folderCard ${organizeMode && selectedItemIds.size > 0 ? "folderDropTarget" : ""}`}
                                         onClick={async () => {
-                                            if (organizeMode && selectedItemId) {
-                                                await moveItemToFolder(selectedItemId, f.id);
-                                                setLibItems(prev => prev.filter(i => i.id !== selectedItemId));
-                                                setSelectedItemId(null);
+                                            if (organizeMode && selectedItemIds.size > 0) {
+                                                await Promise.all(
+                                                    [...selectedItemIds].map(id => moveItemToFolder(id, f.id))
+                                                );
+                                                setLibItems(prev => prev.filter(i => !selectedItemIds.has(i.id)));
+                                                setSelectedItemIds(new Set());
                                             } else if (!organizeMode) {
                                                 setSelectedFolderId(f.id);
                                             }
@@ -681,14 +687,23 @@ const FoldersPage = () => {
                                     .map((item) => (
                                         <div
                                             key={item.id}
-                                            className={`itemCard ${organizeMode && selectedItemId === item.id ? "selectedItem" : ""} ${organizeMode ? "organizeModeItem" : ""}`}
-                                            onClick={() => {
-                                                if (organizeMode) {
-                                                    setSelectedItemId(item.id === selectedItemId ? null : item.id);
-                                                } else {
-                                                    navigate(`/sets/${item.id}`);
-                                                }
-                                            }}
+                                            className={`itemCard
+                                            ${organizeMode && selectedItemIds.has(item.id) ? "selectedItem" : ""} 
+                                            ${organizeMode ? "organizeModeItem" : ""}`} onClick={() => {
+                                            if (organizeMode) {
+                                                setSelectedItemIds(prev => {
+                                                    const next = new Set(prev);
+                                                    if (next.has(item.id)) {
+                                                        next.delete(item.id);
+                                                    } else {
+                                                        next.add(item.id);
+                                                    }
+                                                    return next;
+                                                });
+                                            } else {
+                                                navigate(`/sets/${item.id}`);
+                                            }
+                                        }}
                                         >
                                             <div className="folderName">{item.title}</div>
                                             <div className="folderMeta">
@@ -724,11 +739,13 @@ const FoldersPage = () => {
                             ) : (
                                 <div className="itemsList">
                                     {filteredFolderItems.map((it) => (
-                                        <div key={it.id} className="itemCard" onClick={() => navigate(`/sets/${it.id}`)}>
+                                        <div key={it.id} className="itemCard"
+                                             onClick={() => navigate(`/sets/${it.id}`)}>
                                             <div className="folderName">{it.title}</div>
                                             <div className="folderMeta">
                                                 <span className="itemTypeBadge">{it.item_type}</span>
-                                                <div className="menuWrap" ref={openItemMenuId === it.id ? menuRef : null}>
+                                                <div className="menuWrap"
+                                                     ref={openItemMenuId === it.id ? menuRef : null}>
                                                     <button
                                                         type="button"
                                                         className="iconBtn menuTrigger"
