@@ -31,11 +31,11 @@ const PreTestPage = ({ flashcards }) => {
             <div>
                 <h3>Prompt Type</h3>
                 <label>
-                    <input type="radio" value="term" checked={promptType === 'term'} onChange={() => setPromptType('term')} /> Term on Front
+                    <input type="radio" value="term" checked={promptType === 'term'} onChange={() => setPromptType('term')} /> Term
                 </label>
                 <br />
                 <label>
-                    <input type="radio" value="definition" checked={promptType === 'definition'} onChange={() => setPromptType('definition')} /> Definition on Front
+                    <input type="radio" value="definition" checked={promptType === 'definition'} onChange={() => setPromptType('definition')} /> Definition
                 </label>
             </div>
             <div style={{ marginTop: '20px' }}>

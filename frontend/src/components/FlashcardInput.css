@@ -1,8 +1,131 @@
+/*.flashcard-input-card {*/
+/*  border: 1px solid #444;*/
+/*  border-radius: 10px;*/
+/*  padding: 16px;*/
+/*  margin-bottom: 16px;*/
+/*}*/
+
+/*.flashcard-input-header {*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*  gap: 12px;*/
+/*  margin-bottom: 12px;*/
+/*}*/
+
+/*.flashcard-input-number {*/
+/*  font-weight: 700;*/
+/*  font-size: 1.1em;*/
+/*  min-width: 24px;*/
+/*  text-align: center;*/
+/*  color: #888;*/
+/*}*/
+
+/*.flashcard-input-type-select {*/
+/*  padding: 6px 10px;*/
+/*  font-size: 0.95em;*/
+/*  border: 1px solid #555;*/
+/*  border-radius: 6px;*/
+/*  background: transparent;*/
+/*  color: inherit;*/
+/*  font-family: inherit;*/
+/*  cursor: pointer;*/
+/*}*/
+
+/*.flashcard-input-type-select:focus {*/
+/*  outline: none;*/
+/*  border-color: #646cff;*/
+/*}*/
+
+/*.flashcard-input-fields {*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  gap: 10px;*/
+/*}*/
+
+/*.flashcard-input-field {*/
+/*  width: 100%;*/
+/*  padding: 10px 12px;*/
+/*  font-size: 1em;*/
+/*  border: 1px solid #555;*/
+/*  border-radius: 6px;*/
+/*  background: transparent;*/
+/*  color: inherit;*/
+/*  font-family: inherit;*/
+/*  box-sizing: border-box;*/
+/*}*/
+
+/*.flashcard-input-field:focus {*/
+/*  outline: none;*/
+/*  border-color: #646cff;*/
+/*}*/
+
+/*.flashcard-input-remove {*/
+/*  padding: 6px 10px;*/
+/*  font-size: 0.9em;*/
+/*  background: transparent;*/
+/*  border: 1px solid transparent;*/
+/*  color: #888;*/
+/*  cursor: pointer;*/
+/*  border-radius: 6px;*/
+/*  margin-left: auto;*/
+/*}*/
+
+/*.flashcard-input-remove:hover:not(:disabled) {*/
+/*  color: #ff4d4d;*/
+/*  border-color: #ff4d4d;*/
+/*}*/
+
+/*.flashcard-input-remove:disabled {*/
+/*  opacity: 0.3;*/
+/*  cursor: not-allowed;*/
+/*}*/
+
+/*!* ListEditor sub-component *!*/
+/*.list-editor {*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  gap: 6px;*/
+/*}*/
+
+/*.list-editor-label {*/
+/*  font-size: 0.85em;*/
+/*  font-weight: 600;*/
+/*  color: #aaa;*/
+/*  margin-top: 4px;*/
+/*}*/
+
+/*.list-editor-row {*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*  gap: 8px;*/
+/*}*/
+
+/*.list-editor-row .flashcard-input-field {*/
+/*  flex: 1;*/
+/*}*/
+
+/*.list-editor-add {*/
+/*  align-self: flex-start;*/
+/*  padding: 4px 10px;*/
+/*  font-size: 0.85em;*/
+/*  background: transparent;*/
+/*  border: 1px dashed #555;*/
+/*  color: inherit;*/
+/*  cursor: pointer;*/
+/*  border-radius: 6px;*/
+/*  margin-top: 2px;*/
+/*}*/
+
+/*.list-editor-add:hover {*/
+/*  border-color: #646cff;*/
+/*  color: #646cff;*/
+/*}*/
 .flashcard-input-card {
-  border: 1px solid #444;
+  border: 1px solid #c3d4cc;
   border-radius: 10px;
   padding: 16px;
   margin-bottom: 16px;
+  background: white;
 }
 
 .flashcard-input-header {
@@ -17,23 +140,24 @@
   font-size: 1.1em;
   min-width: 24px;
   text-align: center;
-  color: #888;
+  color: #4a6b57;
 }
 
 .flashcard-input-type-select {
   padding: 6px 10px;
   font-size: 0.95em;
-  border: 1px solid #555;
+  border: 1px solid #c3d4cc;
   border-radius: 6px;
   background: transparent;
-  color: inherit;
+  color: #1a3c27;
   font-family: inherit;
   cursor: pointer;
 }
 
 .flashcard-input-type-select:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #2b5c3f;
+  box-shadow: 0 0 0 3px rgba(43,92,63,0.15);
 }
 
 .flashcard-input-fields {
@@ -46,17 +170,19 @@
   width: 100%;
   padding: 10px 12px;
   font-size: 1em;
-  border: 1px solid #555;
+  border: 1px solid #c3d4cc;
   border-radius: 6px;
-  background: transparent;
-  color: inherit;
+  background: white;
+  color: #1a3c27;
   font-family: inherit;
   box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
 .flashcard-input-field:focus {
-  outline: none;
-  border-color: #646cff;
+  border-color: #2b5c3f;
+  box-shadow: 0 0 0 3px rgba(43,92,63,0.15);
 }
 
 .flashcard-input-remove {
@@ -64,15 +190,18 @@
   font-size: 0.9em;
   background: transparent;
   border: 1px solid transparent;
-  color: #888;
+  color: #4a6b57;
   cursor: pointer;
   border-radius: 6px;
   margin-left: auto;
+  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .flashcard-input-remove:hover:not(:disabled) {
-  color: #ff4d4d;
-  border-color: #ff4d4d;
+  color: #c92a2a;
+  border-color: #c92a2a;
+  background: rgba(201,42,42,0.06);
 }
 
 .flashcard-input-remove:disabled {
@@ -80,7 +209,6 @@
   cursor: not-allowed;
 }
 
-/* ListEditor sub-component */
 .list-editor {
   display: flex;
   flex-direction: column;
@@ -90,7 +218,7 @@
 .list-editor-label {
   font-size: 0.85em;
   font-weight: 600;
-  color: #aaa;
+  color: #4a6b57;
   margin-top: 4px;
 }
 
@@ -109,14 +237,16 @@
   padding: 4px 10px;
   font-size: 0.85em;
   background: transparent;
-  border: 1px dashed #555;
-  color: inherit;
+  border: 1px dashed #c3d4cc;
+  color: #2b5c3f;
   cursor: pointer;
   border-radius: 6px;
   margin-top: 2px;
+  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .list-editor-add:hover {
-  border-color: #646cff;
-  color: #646cff;
+  border-color: #2b5c3f;
+  background: rgba(43,92,63,0.06);
 }
