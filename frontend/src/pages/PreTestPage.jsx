@@ -49,7 +49,7 @@ const PreTestPage = ({ flashcards }) => {
                     <input type="number" min="1" max={flashcards.length} value={numQuestions} onChange={(e) => setNumQuestions(Number(e.target.value))} />
                 </label>
             </div>
-            <button onClick={handleStart} style={{ marginTop: '30px', padding: '10px 20px', fontSize: '16px' }}>
+            <button onClick={handleStart} style={{ borderRadius: '5px', marginTop: '30px', padding: '10px 20px', fontSize: '16px' }}>
                 Start Test
             </button>
         </div>
