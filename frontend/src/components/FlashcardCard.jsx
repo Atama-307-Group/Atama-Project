@@ -39,10 +39,21 @@ const FlashcardCard = ({ index, card }) => {
             case 'DRAG_DROP':
                 return (
                     <>
-                        <div className="flashcard-card-field">
-                            <span className="flashcard-card-label">Prompt</span>
-                            <div className="flashcard-card-value">{card.prompt || '—'}</div>
-                        </div>
+                        {card.imageUrl && (
+                            <div className="flashcard-card-field">
+                                <img
+                                    src={card.imageUrl}
+                                    alt="Drag and drop"
+                                    className="flashcard-card-image"
+                                />
+                            </div>
+                        )}
+                        {card.prompt && (
+                            <div className="flashcard-card-field">
+                                <span className="flashcard-card-label">Prompt</span>
+                                <div className="flashcard-card-value">{card.prompt}</div>
+                            </div>
+                        )}
                         {card.draggableLabels?.length > 0 && (
                             <div className="flashcard-card-field">
                                 <span className="flashcard-card-label">Labels</span>
@@ -53,19 +64,8 @@ const FlashcardCard = ({ index, card }) => {
                                 </div>
                             </div>
                         )}
-                        {card.dropZones?.length > 0 && (
-                            <div className="flashcard-card-field">
-                                <span className="flashcard-card-label">Drop Zones</span>
-                                <ol className="flashcard-card-list">
-                                    {card.dropZones.map((z, i) => (
-                                        <li key={i}>{z.correctLabel}</li>
-                                    ))}
-                                </ol>
-                            </div>
-                        )}
                     </>
                 );
-
             case 'STEPS':
                 return (
                     <>
