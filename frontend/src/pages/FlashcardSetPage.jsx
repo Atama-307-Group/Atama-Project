@@ -24,6 +24,7 @@ const FlashcardSetPage = () => {
     const [editingMeta, setEditingMeta] = useState(false);
     const [metaDraft, setMetaDraft] = useState({ title: '', description: '' });
     const [shareStatus, setShareStatus] = useState(null);
+    const [shareUrl, setShareUrl] = useState('');
 
 
     useEffect(() => {
@@ -92,6 +93,7 @@ const FlashcardSetPage = () => {
         try {
             const { token } = await generateSharedLink(setData.id);
             const url = `${window.location.origin}/shared/${token}`;
+            setShareUrl(url);
             await navigator.clipboard.writeText(url);
             setShareStatus('success');
         } catch (e) {
@@ -153,7 +155,11 @@ const FlashcardSetPage = () => {
                         <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
                     </div>
-                    {shareStatus === 'success' && <div className="set-page-toast success">Link copied to clipboard!</div>}
+                    {shareStatus === 'success' && (
+                        <div className="set-page-toast success">
+                            Link copied! <a href={shareUrl} target="_blank" rel="noreferrer" className="set-page-toast-link">{shareUrl}</a>
+                        </div>
+                    )}
                     {shareStatus === 'error' && <div className="set-page-toast error">Failed to generate link. Please try again.</div>}
                 </div>
 
