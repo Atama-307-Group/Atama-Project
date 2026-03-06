@@ -74,6 +74,11 @@ const StudyPage = ({ onToggleFavorite }) => {
         );
     };
 
+    const handleReset = () => {
+        setIsFlipped(false);
+        setCurrentIndex(0);
+    }
+
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
             <h2>Learn</h2>
@@ -110,6 +115,7 @@ const StudyPage = ({ onToggleFavorite }) => {
             <div style={{ marginBottom: '20px' }}>
                 <button onClick={handlePrev} style={{ marginRight: '10px' }}>Previous</button>
                 <button onClick={handleNext}>Next</button>
+                <button onClick={handleReset} style ={{ marginLeft: '10px' }} disabled={currentIndex === 0}>Return To Beginning</button>
             </div>
 
             <p>Card {currentIndex + 1} of {cards.length}</p>

@@ -25,6 +25,8 @@ const FlashcardSetPage = () => {
     const [metaDraft, setMetaDraft] = useState({ title: '', description: '' });
     const [shareStatus, setShareStatus] = useState(null);
 
+    //Downloading
+    const [showDownloadOptions, setShowDownloadOptions] = useState(false);
 
     useEffect(() => {
         if (!UUID_REGEX.test(id)) {
@@ -87,15 +89,42 @@ const FlashcardSetPage = () => {
         setSetData((prev) => ({ ...prev, ...metaDraft }));
         setEditingMeta(false);
     };*/
+    const downloadSet = (format) => {
+        try {
+            const content = generateFileContent(setData.flashcards, format);
+            if (!content) throw new Error("No content generated");
+
+            const filename = `${setData.title.replace(/\s+/g, '_')}.${format}`;
+            const blob = new Blob([content], { type: 'text/plain' });
+
+            // Create download link
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+
+            // Cleanup
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+
+            setShareStatus('File downloaded successfully!');
+            setTimeout(() => setShareStatus(null), 3000);
+        } catch (err) {
+            console.error(err);
+            setShareStatus('Download failed. Please reload and try again.');
+            setTimeout(() => setShareStatus(null), 3000);
+        }
+    };
 
     const handleShare = async () => {
         try {
             const { token } = await generateSharedLink(setData.id);
             const url = `${window.location.origin}/shared/${token}`;
             await navigator.clipboard.writeText(url);
-            setShareStatus('success');
+            setShareStatus('Link copied to clipboard!');
         } catch (e) {
-            setShareStatus('error');
+            setShareStatus('Failed to generate/copy link.');
         } finally {
             setTimeout(() => setShareStatus(null), 3000);
         }
@@ -152,9 +181,33 @@ const FlashcardSetPage = () => {
                     <div>
                         <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
+                        <div className="download-container" style={{position: 'relative', display: 'inline-block'}}>
+                            <button className="set-page-edit-btn"
+                                    onClick={() => setShowDownloadOptions(!showDownloadOptions)}>
+                                Download
+                            </button>
+
+                            {showDownloadOptions && (
+                                <div className="download-dropdown">
+                                    <button onClick={() => {
+                                        downloadSet('csv');
+                                        setShowDownloadOptions(false);
+                                    }}>CSV file
+                                    </button>
+                                    <button onClick={() => {
+                                        downloadSet('txt');
+                                        setShowDownloadOptions(false);
+                                    }}>TXT file
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    {shareStatus === 'success' && <div className="set-page-toast success">Link copied to clipboard!</div>}
-                    {shareStatus === 'error' && <div className="set-page-toast error">Failed to generate link. Please try again.</div>}
+                    {shareStatus && (
+                        <div className={`set-page-toast ${shareStatus.includes('failed') ? 'error' : 'success'}`}>
+                            {shareStatus}
+                        </div>
+                    )}
                 </div>
 
             )}
@@ -203,6 +256,30 @@ const FlashcardSetPage = () => {
             )}
         </div>
     );
+};
+
+//Helper for conversion
+const generateFileContent = (cards, format) => {
+    if (!cards) return "";
+
+    if (format === 'csv') {
+        const header = "Term,Definition\n";
+        const rows = cards
+            .map(c => {
+                const term = (c.term || "").replace(/"/g, '""');
+                const def = (c.definition || "").replace(/"/g, '""');
+                return `"${term}","${def}"`;
+            })
+            .join("\n");
+        return header + rows;
+    }
+
+    if (format === 'txt') {
+        return cards
+            .map(c => `${c.term || "Untitled"} : ${c.definition || "No definition"}`)
+            .join("\n");
+    }
+    return "";
 };
 
 export default FlashcardSetPage;
