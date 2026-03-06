@@ -20,7 +20,7 @@ public class LibraryItemMapper {
         dto.setUpdatedAt(entity.getUpdatedAt());
         dto.setLastAccessed(entity.getLastAccessed());
         dto.setStarred(entity.isStarred());
-        dto.setItemType(entity.getItem_type());
+        dto.setItemType(entity.getItemType());
         if (entity.getFolder() != null) {
             dto.setFolderId(entity.getFolder().getId());
         }

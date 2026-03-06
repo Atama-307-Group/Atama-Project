@@ -86,7 +86,7 @@ public class FolderService {
         return folder;
     }
 
-    // Get all FOlders
+    // Get all Folders TODO maybe fix this later??
     public List<Folder> getAllFolders() {
         return folderRepository.findAll();
     }
@@ -105,7 +105,7 @@ public class FolderService {
                         li.getCreatedAt(),
                         li.getUpdatedAt(),
                         li.getLastAccessed(),
-                        li.getItem_type()
+                        li.getItemType()
                 ))
                 .toList();
 

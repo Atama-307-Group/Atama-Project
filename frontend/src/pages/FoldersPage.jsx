@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from "react";
-import {createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy} from "../api.js";
+import {createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy,
+    getLibraryItems, moveItemToFolder, removeItemFromFolder} from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
 
@@ -47,6 +48,14 @@ const FoldersPage = () => {
     const [itemsError, setItemsError] = useState("");
 
     const menuRef = useRef(null);
+
+    const [libItems, setLibItems] = useState([]);
+
+    const [organizeMode, setOrganizeMode] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
+
+    const [openItemMenuId, setOpenItemMenuId] = useState(null);
+
 
     async function loadFolders() {
         setError("");
@@ -132,7 +141,8 @@ const FoldersPage = () => {
             setItemsLoading(true);
             try {
                 const data = await getFolderItems(selectedFolderId);
-                if (!cancelled) setItems(Array.isArray(data) ? data : []);
+                if (!cancelled) setItems(Array.isArray(data.items) ? data.items : []);
+                //if (!cancelled) setLibItems(Array.isArray(data) ? data : []);
             } catch (e) {
                 if (!cancelled) setItemsError(e.message ?? "Failed to load folder contents");
             } finally {
@@ -145,6 +155,84 @@ const FoldersPage = () => {
             cancelled = true;
         };
     }, [selectedFolderId]);
+
+    // Loading library items
+    useEffect(() => {
+        async function loadLibItems() {
+            try {
+                const data = await getLibraryItems();
+                setLibItems(Array.isArray(data) ? data : []);
+            } catch (err) {
+                setError(err.message ?? "Failed to load items");
+            }
+        }
+        loadLibItems();
+    }, []);
+
+    const filteredFolderItems = useMemo(() => {
+        function safeTime(x) {
+            const t = x ? new Date(x).getTime() : 0;
+            return Number.isFinite(t) ? t : 0;
+        }
+
+        // Sort items in Folders
+        function compareBySort(a, b) {
+            switch (sortBy) {
+                case "alpha-desc":
+                    return (b.title ?? "").localeCompare(a.title ?? "");
+                case "created-asc":
+                    return safeTime(a.createdAt) - safeTime(b.createdAt);
+                case "created-desc":
+                    return safeTime(b.createdAt) - safeTime(a.createdAt);
+                case "accessed-desc":
+                    return safeTime(b.lastAccessed) - safeTime(a.lastAccessed);
+                case "alpha-asc":
+                default:
+                    return (a.title ?? "").localeCompare(b.title ?? "");
+            }
+        }
+
+        return [...items].sort((a, b) => {
+            if (a.starred !== b.starred) return a.starred ? -1 : 1;
+            return compareBySort(a, b);
+        });
+    }, [items, sortBy]);
+
+    // Sort all library items
+    const filteredItems = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        const list = libItems.filter(item =>
+            item.title?.toLowerCase().includes(q) && !item.folderId
+        );
+
+        function safeTime(x) {
+            const t = x ? new Date(x).getTime() : 0;
+            return Number.isFinite(t) ? t : 0;
+        }
+
+        function compareBySort(a, b) {
+            switch (sortBy) {
+                case "alpha-desc":
+                    return (b.title ?? "").localeCompare(a.title ?? "");
+                case "created-asc":
+                    return safeTime(a.createdAt) - safeTime(b.createdAt);
+                case "created-desc":
+                    return safeTime(b.createdAt) - safeTime(a.createdAt);
+                case "accessed-desc":
+                    return safeTime(b.lastAccessed) - safeTime(a.lastAccessed);
+                case "alpha-asc":
+                default:
+                    return (a.title ?? "").localeCompare(b.title ?? "");
+            }
+        }
+
+        return [...list].sort((a, b) => {
+            if (a.starred !== b.starred) return a.starred ? -1 : 1;
+            const primary = compareBySort(a, b);
+            if (primary !== 0) return primary;
+            return (a.title ?? "").localeCompare(b.title ?? "");
+        });
+    }, [libItems, query, sortBy]);
 
     // Sorting
     const filtered = useMemo(() => {
@@ -384,6 +472,17 @@ const FoldersPage = () => {
                     New Folder
                 </button>
 
+                <button
+                    type="button"
+                    className={`btn ${organizeMode ? "primary" : "organize"}`}
+                    onClick={() => {
+                        setOrganizeMode(p => !p);
+                        setSelectedItemId(null);
+                    }}
+                >
+                    {organizeMode ? "Done" : "Organize"}
+                </button>
+
                 <div className="panel">
                     <div className="panelTitle">Search</div>
                     <label htmlFor="folder-search" className="srOnly">Search personal library</label>
@@ -489,11 +588,19 @@ const FoldersPage = () => {
                                 {filtered.map((f) => (
                                     <div
                                         key={f.id}
-                                        className={`folderCard ${f.id === selectedFolderId ? "active" : ""}`}
-                                        onClick={() => setSelectedFolderId(f.id)}
-                                        title={`Folder #${f.id}`}
+                                        className={`folderCard ${organizeMode && selectedItemId ? "folderDropTarget" : ""}`}
+                                        onClick={async () => {
+                                            if (organizeMode && selectedItemId) {
+                                                await moveItemToFolder(selectedItemId, f.id);
+                                                setLibItems(prev => prev.filter(i => i.id !== selectedItemId));
+                                                setSelectedItemId(null);
+                                            } else if (!organizeMode) {
+                                                setSelectedFolderId(f.id);
+                                            }
+                                        }}
                                     >
                                         <div className="folderName">{f.name}</div>
+
                                         <div className="folderMeta">
                                             {/*<span>#{f.id}</span>*/}
 
@@ -569,7 +676,30 @@ const FoldersPage = () => {
                                         </div>
                                     </div>
                                 ))}
+
+                                {filteredItems // only loose items
+                                    .map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className={`itemCard ${organizeMode && selectedItemId === item.id ? "selectedItem" : ""} ${organizeMode ? "organizeModeItem" : ""}`}
+                                            onClick={() => {
+                                                if (organizeMode) {
+                                                    setSelectedItemId(item.id === selectedItemId ? null : item.id);
+                                                } else {
+                                                    navigate(`/sets/${item.id}`);
+                                                }
+                                            }}
+                                        >
+                                            <div className="folderName">{item.title}</div>
+                                            <div className="folderMeta">
+                                                <span className="itemTypeBadge">{item.itemType}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+
                             </div>
+
+
                         )
                     ) : (
                         /* ─────────────────────────────
@@ -593,10 +723,42 @@ const FoldersPage = () => {
                                 <div className="emptyState">This folder is empty.</div>
                             ) : (
                                 <div className="itemsList">
-                                    {items.map((it) => (
-                                        <div key={it.id} className="itemRow">
-                                            <div className="itemTitle">{it.title}</div>
-                                            <div className="itemMeta">{it.type}</div>
+                                    {filteredFolderItems.map((it) => (
+                                        <div key={it.id} className="itemCard" onClick={() => navigate(`/sets/${it.id}`)}>
+                                            <div className="folderName">{it.title}</div>
+                                            <div className="folderMeta">
+                                                <span className="itemTypeBadge">{it.item_type}</span>
+                                                <div className="menuWrap" ref={openItemMenuId === it.id ? menuRef : null}>
+                                                    <button
+                                                        type="button"
+                                                        className="iconBtn menuTrigger"
+                                                        style={{opacity: 1}}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setOpenItemMenuId(openItemMenuId === it.id ? null : it.id);
+                                                        }}
+                                                        aria-label="Item options"
+                                                    >
+                                                        ⋯
+                                                    </button>
+                                                    {openItemMenuId === it.id && (
+                                                        <div className="dropdownMenu" role="menu">
+                                                            <button
+                                                                className="menuItem"
+                                                                onClick={async (e) => {
+                                                                    e.stopPropagation();
+                                                                    await removeItemFromFolder(it.id);
+                                                                    setItems(prev => prev.filter(i => i.id !== it.id));
+                                                                    setLibItems(prev => [...prev, {...it, folderId: null, itemType: it.item_type ?? it.itemType}]);
+                                                                    setOpenItemMenuId(null);
+                                                                }}
+                                                            >
+                                                                ↩ Remove from folder
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
