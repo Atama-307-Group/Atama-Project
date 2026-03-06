@@ -24,6 +24,7 @@ const FlashcardSetPage = () => {
     const [editingMeta, setEditingMeta] = useState(false);
     const [metaDraft, setMetaDraft] = useState({ title: '', description: '' });
     const [shareStatus, setShareStatus] = useState(null);
+    const [shareUrl, setShareUrl] = useState('');
 
     //Downloading
     const [showDownloadOptions, setShowDownloadOptions] = useState(false);
@@ -121,6 +122,7 @@ const FlashcardSetPage = () => {
         try {
             const { token } = await generateSharedLink(setData.id);
             const url = `${window.location.origin}/shared/${token}`;
+            setShareUrl(url);
             await navigator.clipboard.writeText(url);
             setShareStatus('Link copied to clipboard!');
         } catch (e) {
@@ -203,11 +205,20 @@ const FlashcardSetPage = () => {
                             )}
                         </div>
                     </div>
+<<<<<<< feature/download
                     {shareStatus && (
                         <div className={`set-page-toast ${shareStatus.includes('failed') ? 'error' : 'success'}`}>
                             {shareStatus}
                         </div>
                     )}
+=======
+                    {shareStatus === 'success' && (
+                        <div className="set-page-toast success">
+                            Link copied! <a href={shareUrl} target="_blank" rel="noreferrer" className="set-page-toast-link">{shareUrl}</a>
+                        </div>
+                    )}
+                    {shareStatus === 'error' && <div className="set-page-toast error">Failed to generate link. Please try again.</div>}
+>>>>>>> main
                 </div>
 
             )}

@@ -21,7 +21,7 @@ public class Library {
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true, unique = true) //TODO: should be false
+    @JoinColumn(name = "user_id", nullable = false, unique = true) //TODO: should be false
     private User user;
 
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)

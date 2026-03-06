@@ -8,11 +8,11 @@ export async function getFolders() {
     return res.json();
 }
 
-export async function createFolder({ name, libraryId }) {
+export async function createFolder({ name }) {
     const res = await fetch(`${API_BASE}/folders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, libraryId }),
+        body: JSON.stringify({ name }),
     });
     if (!res.ok) throw new Error("Failed to create folder");
     return res.json();
@@ -84,6 +84,13 @@ export async function setFolderPrivacy(folderId, isPublic) {
     if (!res.ok) throw new Error("Failed to update folder privacy");
     return res.json();
 }
+
+export async function getLibraryItems() {
+    const res = await fetch(`${API_BASE}/library-items`);
+    if (!res.ok) throw new Error("Failed to load library items");
+    return res.json();
+}
+
 export async function getFlashcardSetById(id) {
     const res = await fetch(`${BASE}/api/flashcard-sets/${id}`);
     if (!res.ok) {
@@ -128,4 +135,49 @@ export async function resolveSharedLink(token) {
     if (res.status === 410) throw new Error('This link has expired.');
     if (!res.ok) throw new Error('Link not found.');
     return res.json();
+}
+
+/* Goals ------------------------------------------- */
+
+export async function getGoal(userId) {
+    const res = await fetch(`${API_BASE}/goals/${userId}`);
+    if (!res.ok) throw new Error("Failed to load goal");
+    return res.json();
+}
+
+export async function updateGoal(userId, { selectedDaysOfWeek, minutesPerDay }) {
+    const res = await fetch(`${API_BASE}/goals/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ selectedDaysOfWeek, minutesPerDay }),
+    });
+    if (!res.ok) throw new Error("Failed to update goal");
+    return res.json();
+}
+
+export async function startStudying(userId) {
+    const res = await fetch(`${API_BASE}/goals/${userId}/start`, { method: "POST" });
+    if (!res.ok) throw new Error("Failed to start studying");
+}
+
+export async function stopStudying(userId) {
+    const res = await fetch(`${API_BASE}/goals/${userId}/stop`, { method: "POST" });
+    if (!res.ok) throw new Error("Failed to stop studying");
+}
+
+export async function moveItemToFolder(itemId, folderId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folderId }),
+    });
+    if (!res.ok) throw new Error("Failed to move item");
+    return res.json();
+}
+
+export async function removeItemFromFolder(itemId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to remove item from folder");
 }

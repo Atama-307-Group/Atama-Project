@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StudyPage.css';
+import { useEffect } from "react";
+import { startStudying, stopStudying } from "../api.js";
 
-const StudyPage = ({ onToggleFavorite }) => {
+const StudyPage = ({ onToggleFavorite, userId }) => {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -74,10 +76,31 @@ const StudyPage = ({ onToggleFavorite }) => {
         );
     };
 
+<<<<<<< feature/download
     const handleReset = () => {
         setIsFlipped(false);
         setCurrentIndex(0);
     }
+=======
+    useEffect(() => {
+        console.log("StudyPage userId:", userId);
+        if (!userId) return;
+
+        startStudying(userId).catch(console.error);
+
+        return () => {
+            // This cleanup runs when the user navigates away
+            stopStudying(userId).catch(console.error);
+        };
+    }, [userId]);
+
+// Stops studying when user closes the tab
+    useEffect(() => {
+        const handleUnload = () => stopStudying(userId).catch(console.error);
+        window.addEventListener("beforeunload", handleUnload);
+        return () => window.removeEventListener("beforeunload", handleUnload);
+    }, [userId]);
+>>>>>>> main
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>

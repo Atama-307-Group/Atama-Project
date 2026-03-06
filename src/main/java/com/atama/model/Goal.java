@@ -25,25 +25,29 @@ public class Goal {
     @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
-
-
     private Set<DayOfWeek> selectedDaysOfWeek;  // Which days the User wants to study
 
     // For tracking the User's study time
     private Instant studyStartTime;
-    private Duration totalStudyTime = Duration.ZERO;
+
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private long totalStudyMinutes = 0;
+
+    @Column(nullable = false)
+    private int minutesPerDay;
+
+    private java.time.LocalDate lastResetDate;
 
     // Mark when User starts studying
     public void startStudying() {
-        Instant studyStartTime = Instant.now();
+        this.studyStartTime = Instant.now();
     }
 
     // Call when user leaves studying part of app
     public void stopStudying() {
-        if (this.getStudyStartTime() != null) {
-            totalStudyTime = totalStudyTime.plus(
-                    Duration.between(studyStartTime, Instant.now())
-            );
+        if (this.studyStartTime != null) {
+            long minutesElapsed = Duration.between(studyStartTime, Instant.now()).toMinutes();
+            totalStudyMinutes += minutesElapsed;
             studyStartTime = null;
         }
     }

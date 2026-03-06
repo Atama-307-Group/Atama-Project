@@ -21,4 +21,16 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, UUID> 
            order by li.updatedAt desc
            """)
     List<LibraryItem> findAllByFolderId(@Param("folderId") UUID folderId);
+
+    @Query("""
+       select li
+       from LibraryItem li
+       where li.library.id = :libraryId
+       order by li.updatedAt desc
+       """)
+    List<LibraryItem> findAllByLibraryId(@Param("libraryId") UUID libraryId);
+
+    @Modifying
+    @Query("update LibraryItem li set li.folder.id = :folderId where li.id = :itemId")
+    void moveToFolder(@Param("itemId") UUID itemId, @Param("folderId") UUID folderId);
 }

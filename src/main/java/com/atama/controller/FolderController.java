@@ -9,6 +9,7 @@ import com.atama.dto.response.FolderResponse;
 import com.atama.model.Folder;
 import com.atama.model.LibraryItem;
 import com.atama.repository.FolderRepository;
+import com.atama.repository.LibraryItemRepository;
 import com.atama.service.FolderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +23,12 @@ public class FolderController {
 
     private final FolderService folderService;
     private final FolderRepository folderRepository;
+    private final LibraryItemRepository libraryItemRepository;
 
-    public FolderController(FolderService folderService, FolderRepository folderRepository) {
+    public FolderController(FolderService folderService, FolderRepository folderRepository, LibraryItemRepository libraryItemRepository) {
         this.folderService = folderService;
         this.folderRepository = folderRepository;
+        this.libraryItemRepository = libraryItemRepository;
     }
 
     private static FolderResponse toResponse(Folder f) {
@@ -45,6 +48,7 @@ public class FolderController {
 
     @PostMapping
     public ResponseEntity<FolderResponse> createFolder(@RequestBody CreateFolderRequest request) {
+
         Folder saved = folderService.createFolder(request);
         return ResponseEntity.ok(toResponse(saved));
     }
@@ -89,16 +93,25 @@ public class FolderController {
         );
     }
 
-    // Get all LibraryItems in a Folder
     @GetMapping("/{id}/items")
     public ResponseEntity<FolderItemsResponse> getFolderItems(@PathVariable UUID id) {
         Folder folder = folderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Folder not found: " + id));
 
-        // For now: always empty
-        return ResponseEntity.ok(
-                new FolderItemsResponse(folder.getId(), folder.getName(), List.of())
-        );
+        List<FolderItemsResponse.LibraryItemSummary> items = libraryItemRepository.findAllByFolderId(id)
+                .stream()
+                .map(i -> new FolderItemsResponse.LibraryItemSummary(
+                        i.getId(),
+                        i.getTitle(),
+                        i.isStarred(),
+                        i.getCreatedAt(),
+                        i.getUpdatedAt(),
+                        i.getLastAccessed(),
+                        i.getItemType()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(new FolderItemsResponse(folder.getId(), folder.getName(), items));
     }
 
     @PatchMapping("/{id}/privacy")
