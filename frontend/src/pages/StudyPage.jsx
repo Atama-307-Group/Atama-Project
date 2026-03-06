@@ -76,6 +76,12 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         );
     };
 
+<<<<<<< feature/download
+    const handleReset = () => {
+        setIsFlipped(false);
+        setCurrentIndex(0);
+    }
+=======
     useEffect(() => {
         console.log("StudyPage userId:", userId);
         if (!userId) return;
@@ -94,6 +100,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         window.addEventListener("beforeunload", handleUnload);
         return () => window.removeEventListener("beforeunload", handleUnload);
     }, [userId]);
+>>>>>>> main
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
@@ -131,6 +138,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
             <div style={{ marginBottom: '20px' }}>
                 <button onClick={handlePrev} style={{ marginRight: '10px' }}>Previous</button>
                 <button onClick={handleNext}>Next</button>
+                <button onClick={handleReset} style ={{ marginLeft: '10px' }} disabled={currentIndex === 0}>Return To Beginning</button>
             </div>
 
             <p>Card {currentIndex + 1} of {cards.length}</p>
