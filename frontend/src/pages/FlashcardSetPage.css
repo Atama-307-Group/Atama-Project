@@ -281,12 +281,10 @@
     color: white;
     border-color: #2b5c3f;
 }
-
 .set-page-cards {
-    display: grid;
+    width: 100%;
+    box-sizing: border-box;
     gap: 14px;
-    padding: 0;
-    list-style: none;
 }
 
 .set-page-loading,
@@ -335,6 +333,9 @@
     border-radius: 12px;
     padding: 4px;
     box-shadow: 0 0 0 3px rgba(43,92,63,0.12);
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .set-page-edit-actions {
