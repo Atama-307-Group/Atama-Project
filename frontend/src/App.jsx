@@ -20,7 +20,7 @@ import PostLearnPage from "./pages/PostLearnPage.jsx";
 import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
-
+import SharedSetPage from "./pages/SharedSetPage.jsx";
 
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
@@ -165,6 +165,7 @@ function App() {
                 path="/sets/:id"
                 element={<FlashcardSetPage />}
             />
+            <Route path="/shared/:token" element={<SharedSetPage />} />
 
             {/* Personal Library Page */}
             <Route
