@@ -59,7 +59,6 @@ const FoldersPage = () => {
 
     const [openItemMenuId, setOpenItemMenuId] = useState(null);
 
-
     async function loadFolders() {
         setError("");
         setLoading(true);
@@ -160,16 +159,16 @@ const FoldersPage = () => {
     }, [selectedFolderId]);
 
     // Loading library items
-    useEffect(() => {
-        async function loadLibItems() {
-            try {
-                const data = await getLibraryItems();
-                setLibItems(Array.isArray(data) ? data : []);
-            } catch (err) {
-                setError(err.message ?? "Failed to load items");
-            }
+    async function loadLibItems() {
+        try {
+            const data = await getLibraryItems();
+            setLibItems(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setError(err.message ?? "Failed to load items");
         }
+    }
 
+    useEffect(() => {
         loadLibItems();
     }, []);
 
@@ -325,7 +324,7 @@ const FoldersPage = () => {
         try {
             const created = await createFolder({name});
             setFolders((prev) => [created, ...prev]);
-            setSelectedFolderId(created.id);
+            // setSelectedFolderId(created.id);
             closeModal();
         } catch (err) {
             setError(err.message ?? "Failed to create folder");
@@ -381,12 +380,25 @@ const FoldersPage = () => {
 
     async function confirmDelete() {
         const id = confirmDeleteId;
-        setConfirmDeleteId(null); // close modal immediately
+        setConfirmDeleteId(null);
 
         try {
-            await deleteFolder(id);
+            const freedItems = await deleteFolder(id);
             setFolders((prev) => prev.filter((f) => f.id !== id));
-            if (selectedFolderId === id) setSelectedFolderId(null);
+            await loadLibItems();
+
+            if (freedItems?.length > 0) {
+                const freedIds = new Set(freedItems.map(i => i.id));
+                setLibItems((prev) => [
+                    ...prev.filter(i => !freedIds.has(i.id)),
+                    ...freedItems.map(it => ({ ...it, folderId: null })),
+                ]);
+            }
+
+            if (selectedFolderId === id) {
+                setItems([]);
+                setSelectedFolderId(null);
+            }
         } catch (err) {
             setError(err.message ?? "Failed to delete folder");
         }
@@ -584,9 +596,9 @@ const FoldersPage = () => {
                 <section className="libraryBody">
                     {selectedFolderId == null ? (
                         loading ? (
-                            <div className="emptyState">Gathering folders…</div>
-                        ) : filtered.length === 0 ? (
-                            <div className="emptyState">No folders found.</div>
+                            <div className="emptyState">Gathering your library …</div>
+                        ) : filtered.length === 0 && filteredItems.length === 0 ? (
+                            <div className="emptyState">No items found.</div>
                         ) : (
                             <div className="folderGrid">
                                 {filtered.map((f) => (

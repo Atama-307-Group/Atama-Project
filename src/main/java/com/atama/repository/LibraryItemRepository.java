@@ -33,4 +33,8 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, UUID> 
     @Modifying
     @Query("update LibraryItem li set li.folder.id = :folderId where li.id = :itemId")
     void moveToFolder(@Param("itemId") UUID itemId, @Param("folderId") UUID folderId);
+
+    @Modifying
+    @Query("UPDATE LibraryItem i SET i.folder = null WHERE i.folder.id = :folderId")
+    void detachItemsFromFolder(@Param("folderId") UUID folderId);
 }
