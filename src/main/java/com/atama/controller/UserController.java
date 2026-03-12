@@ -1,6 +1,7 @@
 package com.atama.controller;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.dto.response.LoginResult;
 import com.atama.model.User;
 import com.atama.service.PasswordResetService;
 import com.atama.service.UserService;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -22,7 +24,7 @@ public class UserController {
     private final PasswordResetService passwordResetService;
     private final com.atama.service.EmailVerificationService emailVerificationService;
 
-    @PostMapping("/login")
+    /*PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> request) {
         String identifier = request.get("identifier"); // username or email
         String password = request.get("password");
@@ -36,6 +38,30 @@ public class UserController {
             response.put("profilePictureUrl", user.getProfilePictureUrl());
             response.put("verified", user.isVerified());
             return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }*/
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> request) {
+        String identifier = request.get("identifier");
+        String password = request.get("password");
+
+        try {
+            LoginResult result = userService.loginUser(identifier, password);
+            User user = result.user(); // returns more info now, and uses JWT token
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", result.token());
+            response.put("id", user.getId().toString());
+            response.put("username", user.getUsername());
+            response.put("email", user.getEmail());
+            response.put("profilePictureUrl", user.getProfilePictureUrl());
+            response.put("verified", user.isVerified());
+
+            return ResponseEntity.ok(response);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", e.getMessage()));
