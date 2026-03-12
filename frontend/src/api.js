@@ -23,6 +23,7 @@ export async function deleteFolder(folderId) {
         method: "DELETE",
     });
     if (!res.ok) throw new Error("Failed to delete folder");
+    return res.json();
 }
 
 async function request(path, options = {}) {
@@ -96,8 +97,10 @@ export async function setFolderPrivacy(folderId, isPublic) {
 
 export async function getLibraryItems() {
     const res = await fetch(`${API_BASE}/library-items`);
-    if (!res.ok) throw new Error("Failed to load library items");
-    return res.json();
+    console.log("getLibraryItems response:", res.status);
+    const data = await res.json();
+    console.log("getLibraryItems data:", data);
+    return data;
 }
 
 export async function getFlashcardSetById(id) {
