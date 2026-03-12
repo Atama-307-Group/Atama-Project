@@ -1,0 +1,4 @@
+com\atama\service\EmailVerificationService.class
+com\atama\service\EmailVerificationService$VerificationToken.class
+com\atama\dto\request\package-info.class
+com\atama\dto\response\package-info.class

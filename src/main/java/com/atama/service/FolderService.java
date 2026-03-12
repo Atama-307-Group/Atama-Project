@@ -2,14 +2,12 @@ package com.atama.service;
 
 import com.atama.dto.request.CreateFolderRequest;
 import com.atama.dto.response.FolderItemsResponse;
-import com.atama.dto.response.LibraryItemResponseDTO;
 import com.atama.model.Folder;
 import com.atama.model.Library;
-import com.atama.model.LibraryItem;
 import com.atama.repository.FolderRepository;
 import com.atama.repository.LibraryRepository;
 import com.atama.repository.LibraryItemRepository;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,8 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 @Service
 public class FolderService {
     private final FolderRepository folderRepository;
@@ -60,29 +56,16 @@ public class FolderService {
         return folderRepository.save(folder);
     }
 
-//    @Transactional
-//    public void deleteFolder(UUID folderId) {
-//        Folder folder = folderRepository.findById(folderId)
-//                .orElseThrow(() -> new RuntimeException("Folder not found"));
-//
-//        // 1) Detach all items from this folder
-//        libraryItemRepository.clearFolderForItems(folderId);
-//
-//        // 2) Delete the folder
-//        folderRepository.delete(folder);
-//    }
-
     @Transactional
-    public List<LibraryItemResponseDTO> deleteFolder(UUID id) {
-        List<LibraryItem> items = libraryItemRepository.findAllByFolderId(id);
+    public void deleteFolder(UUID folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("Folder not found"));
 
-        libraryItemRepository.detachItemsFromFolder(id);
+        // 1) Detach all items from this folder
+        libraryItemRepository.clearFolderForItems(folderId);
 
-        folderRepository.deleteById(id);
-
-        return items.stream()
-                .map(LibraryItemResponseDTO::fromEntity)
-                .collect(Collectors.toList());
+        // 2) Delete the folder
+        folderRepository.delete(folder);
     }
 
     @Transactional

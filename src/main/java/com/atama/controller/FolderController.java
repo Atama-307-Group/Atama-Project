@@ -6,7 +6,6 @@ import com.atama.dto.request.SetFolderPrivacyRequest;
 import com.atama.dto.request.SetFolderStarredRequest;
 import com.atama.dto.response.FolderItemsResponse;
 import com.atama.dto.response.FolderResponse;
-import com.atama.dto.response.LibraryItemResponseDTO;
 import com.atama.model.Folder;
 import com.atama.model.LibraryItem;
 import com.atama.repository.FolderRepository;
@@ -55,9 +54,9 @@ public class FolderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<LibraryItemResponseDTO>> deleteFolder(@PathVariable UUID id) {
-        List<LibraryItemResponseDTO> freedItems = folderService.deleteFolder(id);
-        return ResponseEntity.ok(freedItems);
+    public ResponseEntity<Void> deleteFolder(@PathVariable UUID id) {
+        folderService.deleteFolder(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/rename")
