@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {
     createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy,
-    getLibraryItems, moveItemToFolder, removeItemFromFolder
+    getLibraryItems, moveItemToFolder, removeItemFromFolder, uploadPDF, recordAccess, openPDF, toggleItemStarred
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
@@ -58,6 +58,8 @@ const FoldersPage = () => {
     const [selectedItemIds, setSelectedItemIds] = useState(new Set());
 
     const [openItemMenuId, setOpenItemMenuId] = useState(null);
+
+    const fileInputRef = useRef(null); // PDF Uploads
 
     async function loadFolders() {
         setError("");
@@ -372,6 +374,23 @@ const FoldersPage = () => {
         }
     }
 
+    async function onToggleItemStar(itemId) {
+        const prev = libItems;
+        setLibItems((curr) =>
+            curr.map((i) => (i.id === itemId ? { ...i, starred: !i.starred } : i))
+        );
+
+        try {
+            const updated = await toggleItemStarred(itemId);
+            setLibItems((curr) =>
+                curr.map((i) => (i.id === itemId ? { ...i, starred: updated.starred } : i))
+            );
+        } catch (e) {
+            setError(e.message ?? "Failed to update star");
+            setLibItems(prev);
+        }
+    }
+
     // ── Delete ────────────────────────────────────────────────────────────────
     function openDeleteConfirm(id) {
         setOpenMenuId(null);
@@ -459,6 +478,18 @@ const FoldersPage = () => {
         }
     }
 
+    // Upload handler
+    async function onUploadPDF(e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const newItem = await uploadPDF(file);
+            setLibItems(prev => [{ ...newItem, folderId: null }, ...prev]);
+        } catch (err) {
+            setError(err.message ?? "Failed to upload PDF");
+        }
+    }
+
     // ── Main ──────────────────────────────────────────────────────────
 
     return (
@@ -477,9 +508,16 @@ const FoldersPage = () => {
                     New Flashcard Set
                 </button>
 
-                <button className="btn secondary" type="button">
-                    TODO New Upload
+                <button className="btn secondary" type="button" onClick={() => fileInputRef.current.click()}>
+                    Upload PDF
                 </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    style={{ display: "none" }}
+                    onChange={onUploadPDF}
+                />
 
                 <button className="btn ghost"
                         onClick={() => setShowModal(true)}
@@ -597,7 +635,7 @@ const FoldersPage = () => {
                     {selectedFolderId == null ? (
                         loading ? (
                             <div className="emptyState">Gathering your library …</div>
-                        ) : filtered.length === 0 && filteredItems.length === 0 ? (
+                        ) : filtered.length === 0 ? (
                             <div className="emptyState">No items found.</div>
                         ) : (
                             <div className="folderGrid">
@@ -612,7 +650,8 @@ const FoldersPage = () => {
                                                 );
                                                 setLibItems(prev => prev.filter(i => !selectedItemIds.has(i.id)));
                                                 setSelectedItemIds(new Set());
-                                            } else if (!organizeMode) {
+                                            } else {
+                                                await recordAccess(selectedItemIds.id)
                                                 setSelectedFolderId(f.id);
                                             }
                                         }}
@@ -712,6 +751,9 @@ const FoldersPage = () => {
                                                     }
                                                     return next;
                                                 });
+                                            }
+                                            else if (item.itemType === "PDF") {
+                                                openPDF(item.id);
                                             } else {
                                                 navigate(`/sets/${item.id}`);
                                             }
@@ -720,6 +762,17 @@ const FoldersPage = () => {
                                             <div className="folderName">{item.title}</div>
                                             <div className="folderMeta">
                                                 <span className="itemTypeBadge">{item.itemType}</span>
+                                                <button
+                                                    type="button"
+                                                    className={`iconBtn starBtn ${item.starred ? "starred" : ""}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onToggleItemStar(item.id);
+                                                    }}
+                                                    title={item.starred ? "Unstar" : "Star"}
+                                                >
+                                                    {item.starred ? "★" : "☆"}
+                                                </button>
                                             </div>
                                         </div>
                                     ))}

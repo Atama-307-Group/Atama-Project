@@ -65,6 +65,15 @@ export function setFolderStarred(folderId, starred) {
     });
 }
 
+export async function toggleItemStarred(itemId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}/star`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Failed to update star");
+    return res.json();
+}
+
 export async function getFolderItems(folderId) {
     const res = await fetch(`http://localhost:8080/folders/${folderId}/items`);
     if (!res.ok) throw new Error("Failed to load folder items");
@@ -183,4 +192,26 @@ export async function removeItemFromFolder(itemId) {
         method: "DELETE",
     });
     if (!res.ok) throw new Error("Failed to remove item from folder");
+}
+
+export async function uploadPDF(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API_BASE}/library-items/upload`, {
+        method: "POST",
+        body: formData,
+    });
+    if (!res.ok) throw new Error("Failed to upload PDF");
+    return res.json();
+}
+
+export async function recordAccess(itemId) {
+    await fetch(`${API_BASE}/library-items/${itemId}/access`, {
+        method: "POST",
+    });
+}
+
+export function openPDF(itemId) {
+    window.open(`${API_BASE}/library-items/${itemId}/file`, "_blank");
 }
