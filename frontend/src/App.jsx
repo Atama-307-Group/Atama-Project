@@ -183,6 +183,13 @@ function App() {
                 // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 
+            {/* University Page */}
+            <Route
+                path="/university"
+                element={<GoalsPage userId={currentUser?.id} />}
+                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+            />
+
             {/* Catch-all */}
             <Route
                 path="*"

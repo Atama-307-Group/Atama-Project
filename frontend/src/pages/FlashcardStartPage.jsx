@@ -108,6 +108,10 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
           <button className="action-btn" onClick={() => navigate('/folders')}>
             Library
           </button>
+
+          <button className="action-btn" onClick={() => navigate('/university')}>
+            University
+          </button>
         </div>
       </div>
     </div>
