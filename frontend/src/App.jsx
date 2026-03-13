@@ -21,6 +21,7 @@ import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
 import GoalsPage from "./pages/StudyGoal.jsx"
+import UniversityPage from './pages/UniversityPage.jsx';
 
 import SharedSetPage from "./pages/SharedSetPage.jsx";
 
@@ -186,7 +187,7 @@ function App() {
             {/* University Page */}
             <Route
                 path="/university"
-                element={<GoalsPage userId={currentUser?.id} />}
+                element={<UniversityPage userId={currentUser?.id} />}
                 // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 

@@ -16,6 +16,7 @@ public class DragDropFlashcard extends Flashcard {
 
     private String prompt;
 
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
     @ElementCollection

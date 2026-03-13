@@ -8,7 +8,6 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {

@@ -181,3 +181,9 @@ export async function removeItemFromFolder(itemId) {
     });
     if (!res.ok) throw new Error("Failed to remove item from folder");
 }
+
+export async function getUniversity(userId) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/university`);
+    if (!res.ok) throw new Error("Failed to fetch university");
+    return res.json();
+}
