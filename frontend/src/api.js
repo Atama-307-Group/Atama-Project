@@ -251,3 +251,85 @@ export async function logoutUser() {
     });
     if (!res.ok) throw new Error("Failed to logout");
 }
+
+// Register a regular user
+export async function registerUser({ username, email, password }) {
+    const response = await fetch(`${API_BASE}/api/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed.');
+    }
+
+    return response.json();
+}
+
+// Send a verification code to a Purdue email
+export async function sendVerificationCode(email) {
+    const response = await fetch(`${API_BASE}/api/users/send-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send verification code.');
+    }
+
+    return response.json();
+}
+
+// Verify code and register a Purdue user
+export async function registerVerifiedUser({ username, email, password, code }) {
+    const response = await fetch(`${API_BASE}/api/users/register-verified`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password, code })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Verification failed.');
+    }
+
+    return response.json();
+}
+
+// Create a new flashcard set
+export async function createFlashcardSet({ title, description, university, course, flashcards }) {
+    const response = await fetch(`${API_BASE}/api/flashcard-sets`, {
+        method: 'POST',
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, university, course, flashcards })
+    });
+
+    if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to save');
+    }
+
+    return response.json();
+}
+
+// Login a user
+export async function loginUser({ identifier, password }) {
+    const response = await fetch(`${API_BASE}/api/users/login`, {
+        method: 'POST',
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed.');
+    }
+
+    return response.json();
+}
