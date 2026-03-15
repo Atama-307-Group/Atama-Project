@@ -60,10 +60,18 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         setCurrentIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
     };
 
-    const handleDone = () => {
-        navigate('/post_learn', {
-            state: { studiedCount: flippedCards.size, totalCount: cards.length }
-        });
+    const handleDone = async () => {
+        try {
+            await stopStudying(userId); // make sure streak updates
+
+            navigate('/post_learn', {
+                state: { studiedCount: flippedCards.size, totalCount: cards.length }
+            });
+
+        } catch (err) {
+            console.error("Failed to finish session:", err);
+            alert("Could not finish session. Please try again.");
+        }
     };
 
     const handleToggleFavorite = (e) => {

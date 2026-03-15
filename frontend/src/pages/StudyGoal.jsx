@@ -126,6 +126,7 @@ const GoalsPage = ({ userId }) => {
         const loadStreak = () => {
             getStreak(userId)
                 .then(data => {
+                    console.log("getStreak response:", data);
                     setStreak(data.currentStreak);
                     setStudyDates(data.studyDates || []);
                 })
