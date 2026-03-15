@@ -212,3 +212,9 @@ export async function recordAccess(itemId) {
 export function openPDF(itemId) {
     window.open(`${API_BASE}/library-items/${itemId}/file`, "_blank");
 }
+
+export async function getStreak(userId) {
+    const res = await fetch(`${API_BASE}/users/${userId}/streak`);
+    if (!res.ok) throw new Error("Failed to fetch streak");
+    return res.json();
+}
