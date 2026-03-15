@@ -4,7 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import jakarta.servlet.http.Cookie;
 import java.security.Key;
 import java.util.Date;
 import java.util.UUID;
@@ -28,5 +28,13 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
                 .compact();
+    }
+    public Cookie createAuthCookie(String token) {
+        Cookie cookie = new Cookie("jwt", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);         // HTTPS only
+        cookie.setPath("/");
+        cookie.setMaxAge((int) (expirationMs / 1000)); // match token lifetime
+        return cookie;
     }
 }
