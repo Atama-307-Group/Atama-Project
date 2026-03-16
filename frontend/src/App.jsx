@@ -21,8 +21,10 @@ import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
 import GoalsPage from "./pages/StudyGoal.jsx"
+import CountdownPage from "./pages/CountdownPage.jsx";
 
 import SharedSetPage from "./pages/SharedSetPage.jsx";
+import ExamReminderBanner from "./components/ExamReminderBanner.jsx";
 
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
@@ -79,117 +81,126 @@ function App() {
     };
 
     return (
-        <Routes>
+        <>
+            <ExamReminderBanner userId={currentUser?.id} />
+            <Routes>
 
-            {/* Home / Dashboard */}
-            <Route
-                path="/"
-                element={
-                    <StartPage
-                        currentUser={currentUser}
-                        onLogout={handleLogout}
-                    />
-                }
-            />
+                {/* Home / Dashboard */}
+                <Route
+                    path="/"
+                    element={
+                        <StartPage
+                            currentUser={currentUser}
+                            onLogout={handleLogout}
+                        />
+                    }
+                />
 
-            {/* Auth Routes */}
-            <Route
-                path="/login"
-                element={
-                    <LoginPage
-                        onLoginSuccess={handleLoginSuccess}
-                    />
-                }
-            />
+                {/* Auth Routes */}
+                <Route
+                    path="/login"
+                    element={
+                        <LoginPage
+                            onLoginSuccess={handleLoginSuccess}
+                        />
+                    }
+                />
 
-            <Route
-                path="/signup"
-                element={<SignupPage />}
-            />
+                <Route
+                    path="/signup"
+                    element={<SignupPage />}
+                />
 
-            {/* Forgot / Reset Password */}
-            <Route
-                path="/forgot-password"
-                element={<ForgotPasswordPage />}
-            />
+                {/* Forgot / Reset Password */}
+                <Route
+                    path="/forgot-password"
+                    element={<ForgotPasswordPage />}
+                />
 
-            <Route
-                path="/reset-password"
-                element={<ResetPasswordPage />}
-            />
+                <Route
+                    path="/reset-password"
+                    element={<ResetPasswordPage />}
+                />
 
-            {/* Profile & Account Management */}
-            <Route
-                path="/profile"
-                element={
-                    currentUser
-                        ? <ProfilePage currentUser={currentUser} />
-                        : <Navigate to="/login" />
-                }
-            />
+                {/* Profile & Account Management */}
+                <Route
+                    path="/profile"
+                    element={
+                        currentUser
+                            ? <ProfilePage currentUser={currentUser} />
+                            : <Navigate to="/login" />
+                    }
+                />
 
-            <Route
-                path="/change-password"
-                element={
-                    currentUser
-                        ? <ChangePasswordPage currentUser={currentUser} />
-                        : <Navigate to="/login" />
-                }
-            />
+                <Route
+                    path="/change-password"
+                    element={
+                        currentUser
+                            ? <ChangePasswordPage currentUser={currentUser} />
+                            : <Navigate to="/login" />
+                    }
+                />
 
-            {/* Create Flashcard Set */}
-            <Route
-                path="/create"
-                element={
-                    // currentUser
-                    //     ? <CreateFlashcardSetPage />
-                    //     : <Navigate to="/login" />
-                    <CreateFlashcardSetPage onSave={setFlashcards} />
-                }
-            />
+                {/* Create Flashcard Set */}
+                <Route
+                    path="/create"
+                    element={
+                        // currentUser
+                        //     ? <CreateFlashcardSetPage />
+                        //     : <Navigate to="/login" />
+                        <CreateFlashcardSetPage onSave={setFlashcards} />
+                    }
+                />
 
-            {/* Study & Learning Flow */}
-            <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
-            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id}/>} />
-            <Route path="/post_learn" element={<PostLearnPage />} />
+                {/* Study & Learning Flow */}
+                <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
+                <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id} />} />
+                <Route path="/post_learn" element={<PostLearnPage />} />
 
-            {/* Match Flow */}
-            <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
-            <Route path="/match" element={<MatchPage />} />
-            <Route path="/post_match" element={<PostMatchPage />} />
+                {/* Match Flow */}
+                <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
+                <Route path="/match" element={<MatchPage />} />
+                <Route path="/post_match" element={<PostMatchPage />} />
 
-            {/* Test Flow */}
-            <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
-            <Route path="/practice_test" element={<PracticeTestPage />} />
-            <Route path="/post_test" element={<PostTestPage />} />
+                {/* Test Flow */}
+                <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
+                <Route path="/practice_test" element={<PracticeTestPage />} />
+                <Route path="/post_test" element={<PostTestPage />} />
 
-            <Route
-                path="/sets/:id"
-                element={<FlashcardSetPage />}
-            />
-            <Route path="/shared/:token" element={<SharedSetPage />} />
+                <Route
+                    path="/sets/:id"
+                    element={<FlashcardSetPage />}
+                />
+                <Route path="/shared/:token" element={<SharedSetPage />} />
 
-            {/* Personal Library Page */}
-            <Route
-                path="/folders"
-                element={<FoldersPage />}
+                {/* Personal Library Page */}
+                <Route
+                    path="/folders"
+                    element={<FoldersPage />}
                 // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
-            />
+                />
 
-            {/* Study Goals Page */}
-            <Route
-                path="/goals"
-                element={<GoalsPage userId={currentUser?.id} />}
+                {/* Study Goals Page */}
+                <Route
+                    path="/goals"
+                    element={<GoalsPage userId={currentUser?.id} />}
                 // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
-            />
+                />
 
-            {/* Catch-all */}
-            <Route
-                path="*"
-                element={<Navigate to="/" />}
-            />
+                {/* Exam Countdowns Page */}
+                <Route
+                    path="/countdowns"
+                    element={<CountdownPage userId={currentUser?.id} />}
+                />
 
-        </Routes>
+                {/* Catch-all */}
+                <Route
+                    path="*"
+                    element={<Navigate to="/" />}
+                />
+
+            </Routes>
+        </>
     );
 }
 
