@@ -39,6 +39,16 @@ public class GoalService {
         goal.setSelectedDaysOfWeek(request.selectedDaysOfWeek());
         goal.setMinutesPerDay((int) request.minutesPerDay());
 
+        if (request.notifyByDesktop() != null) {
+            goal.setNotifyByDesktop(request.notifyByDesktop());
+        }
+        if (request.notifyByEmail() != null) {
+            goal.setNotifyByEmail(request.notifyByEmail());
+        }
+        if (request.notificationTime() != null) {
+            goal.setNotificationTime(request.notificationTime());
+        }
+
         return goalRepository.save(goal);
     }
 

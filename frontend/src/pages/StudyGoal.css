@@ -307,3 +307,76 @@
 .fill--complete {
     background-color: #40c074;
 }
+
+/* ===== Notification Toggle Rows ===== */
+
+.notifToggleRow {
+    margin-bottom: 12px;
+}
+
+.notifToggleLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #2f3e3b;
+    cursor: pointer;
+    user-select: none;
+}
+
+.notifToggleIcon {
+    font-size: 1.15rem;
+}
+
+/* ===== Toggle Switch ===== */
+
+.toggleSwitch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.toggleSwitch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggleSlider {
+    position: absolute;
+    inset: 0;
+    background: #ccd9d5;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+}
+
+.toggleSlider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.toggleSwitch input:checked+.toggleSlider {
+    background: #4eb89f;
+}
+
+.toggleSwitch input:checked+.toggleSlider::before {
+    transform: translateX(20px);
+}
+
+.toggleSwitch input:disabled+.toggleSlider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

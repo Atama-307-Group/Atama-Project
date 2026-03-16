@@ -100,7 +100,7 @@ export async function getFlashcardSetById(id) {
     return res.json();
 }
 
-export async function updateFlashcardSetMeta(id, { title, description, university, course}) {
+export async function updateFlashcardSetMeta(id, { title, description, university, course }) {
     const res = await fetch(`/api/flashcard-sets/${id}/meta`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -145,11 +145,11 @@ export async function getGoal(userId) {
     return res.json();
 }
 
-export async function updateGoal(userId, { selectedDaysOfWeek, minutesPerDay }) {
+export async function updateGoal(userId, { selectedDaysOfWeek, minutesPerDay, notifyByDesktop, notifyByEmail, notificationTime }) {
     const res = await fetch(`${API_BASE}/goals/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selectedDaysOfWeek, minutesPerDay }),
+        body: JSON.stringify({ selectedDaysOfWeek, minutesPerDay, notifyByDesktop, notifyByEmail, notificationTime }),
     });
     if (!res.ok) throw new Error("Failed to update goal");
     return res.json();
@@ -180,4 +180,36 @@ export async function removeItemFromFolder(itemId) {
         method: "DELETE",
     });
     if (!res.ok) throw new Error("Failed to remove item from folder");
+}
+
+/* Countdowns ------------------------------------------- */
+
+export async function getCountdowns(userId) {
+    const res = await fetch(`${API_BASE}/api/countdowns/${userId}`);
+    if (!res.ok) throw new Error("Failed to load countdowns");
+    return res.json();
+}
+
+export async function createCountdown(userId, { reason, examDateTime, reminderMinutesBefore }) {
+    const res = await fetch(`${API_BASE}/api/countdowns/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason, examDateTime, reminderMinutesBefore }),
+    });
+    if (!res.ok) throw new Error("Failed to create countdown");
+    return res.json();
+}
+
+export async function deleteCountdown(countdownId) {
+    const res = await fetch(`${API_BASE}/api/countdowns/${countdownId}`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete countdown");
+}
+
+export async function deleteExpiredCountdowns(userId) {
+    const res = await fetch(`${API_BASE}/api/countdowns/${userId}/expired`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete expired countdowns");
 }
