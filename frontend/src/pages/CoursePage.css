@@ -82,3 +82,42 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+.courseToolbar {
+    display: flex;
+    gap: 10px;
+    padding: 12px 24px;
+    border-bottom: 1px solid #eee;
+}
+
+.toolbarBtn--upload {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1.5px solid #7c6fcd;
+    color: #7c6fcd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.toolbarBtn--upload:hover {
+    background: #7c6fcd;
+    color: white;
+}
+
+.toolbarBtn--library {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1.5px solid #3a9e7e;
+    color: #3a9e7e;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.toolbarBtn--library:hover {
+    background: #3a9e7e;
+    color: white;
+}

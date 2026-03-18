@@ -192,6 +192,7 @@ function App() {
                 // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 
+            {/* Course Page */}
             <Route
                 path="/course/:courseId"
                 element={<CoursePage userId={currentUser?.id} />}

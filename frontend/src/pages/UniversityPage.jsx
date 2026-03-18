@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUniversity, getCourses, getEnrolledCourses, enrollInCourse } from "../api.js";
+import { getUniversity, getCourses, getEnrolledCourses, enrollInCourse, unenrollFromCourse } from "../api.js";
 import "./UniversityPage.css";
 
 const UniversityPage = ({ userId }) => {
@@ -10,7 +10,10 @@ const UniversityPage = ({ userId }) => {
     const [enrolledIds, setEnrolledIds] = useState(new Set());
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [enrolling, setEnrolling] = useState(false);
-    const [view, setView] = useState("all"); // "all" or "enrolled"
+    const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
+    const [showLeaveAllModal, setShowLeaveAllModal] = useState(false);
+    const [leavingAll, setLeavingAll] = useState(false);
+
 
     useEffect(() => {
         if (!userId) return;
@@ -40,9 +43,27 @@ const UniversityPage = ({ userId }) => {
         }
     }
 
+    async function handleLeaveAll() {
+        setLeavingAll(true);
+        try {
+            await Promise.all([...enrolledIds].map(courseId => unenrollFromCourse(userId, courseId)));
+            setEnrolledIds(new Set());
+            setShowLeaveAllModal(false);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLeavingAll(false);
+        }
+    }
+
     const visibleCourses = view === "enrolled"
         ? courses.filter(c => enrolledIds.has(c.id))
         : courses;
+
+    function handleSetView(v) {
+        setView(v);
+        localStorage.setItem("universityView", v);
+    }
 
     return (
         <div className="universityPage">
@@ -54,16 +75,21 @@ const UniversityPage = ({ userId }) => {
             <div className="viewToggle">
                 <button
                     className={`toggleBtn ${view === "all" ? "toggleBtn--active" : ""}`}
-                    onClick={() => setView("all")}
+                    onClick={() => handleSetView("all")}
                 >
                     All Courses
                 </button>
                 <button
                     className={`toggleBtn ${view === "enrolled" ? "toggleBtn--active" : ""}`}
-                    onClick={() => setView("enrolled")}
+                    onClick={() => handleSetView("enrolled")}
                 >
                     Your Enrolled Courses
                 </button>
+                {enrolledIds.size > 0 && (
+                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
+                        Leave All Courses
+                    </button>
+                )}
             </div>
 
             <div className="coursesBody">
@@ -104,6 +130,25 @@ const UniversityPage = ({ userId }) => {
                             </button>
                             <button className="btn primary" onClick={handleEnroll} disabled={enrolling}>
                                 {enrolling ? "Enrolling..." : "Yes, enroll"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showLeaveAllModal && (
+                <div className="modalOverlay" onClick={() => setShowLeaveAllModal(false)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Leave all courses?</div>
+                        <p className="modalBody">
+                            Are you sure you want to leave all your enrolled courses? You can always re-enroll later.
+                        </p>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={() => setShowLeaveAllModal(false)}>
+                                Cancel
+                            </button>
+                            <button className="btn leaveAllConfirmBtn" onClick={handleLeaveAll} disabled={leavingAll}>
+                                {leavingAll ? "Leaving..." : "Yes, leave all"}
                             </button>
                         </div>
                     </div>

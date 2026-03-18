@@ -41,6 +41,15 @@ const CoursePage = ({ userId }) => {
                 </button>
             </div>
 
+            <div className="courseToolbar">
+                <button className="toolbarBtn--upload" onClick={() => {}}>
+                    + Upload PDF
+                </button>
+                <button className="toolbarBtn--library" onClick={() => {}}>
+                    + Add from Library
+                </button>
+            </div>
+
             <div className="courseBody">
                 <div className="emptyState">No content yet.</div>
             </div>

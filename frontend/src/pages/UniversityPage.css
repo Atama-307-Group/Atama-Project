@@ -220,3 +220,41 @@
 .toggleBtn--active:hover {
     background: #6ab59a;
 }
+
+.viewToggle {
+    display: flex;
+    align-items: center;
+}
+
+.leaveAllBtn {
+    margin-left: auto;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1.5px solid #aaa;
+    color: #888;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.leaveAllBtn:hover {
+    background: #f0f0f0;
+    color: #555;
+    border-color: #888;
+}
+
+.leaveAllConfirmBtn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.leaveAllConfirmBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
