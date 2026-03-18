@@ -96,8 +96,8 @@ const CreateFlashcardSetPage = () => {
         console.error('Backend error:', err);
         throw new Error(err.message || 'Failed to save');
       }
-      const saved = await response.json(); //how does it get sent?
-      //onSave(saved); // pass the response DTO back up instead of the raw local data
+      const saved = await response.json();
+      recordAccess(saved.id);
       navigate(`/sets/${saved.id}`);
     } catch (err) {
       console.error(err);

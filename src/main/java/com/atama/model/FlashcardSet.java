@@ -29,9 +29,4 @@ public class FlashcardSet extends LibraryItem {
 
     @Column(nullable = false) // TODO: should be false or in library item
     private UUID ownerId;
-
-    public void removeFlashcard(Flashcard flashcard) {
-        flashcards.remove(flashcard);
-        flashcard.setFlashcardSet(null);
-    }
 }
