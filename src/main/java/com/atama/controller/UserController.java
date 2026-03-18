@@ -1,6 +1,7 @@
 package com.atama.controller;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.model.Course;
 import com.atama.model.User;
 import com.atama.service.PasswordResetService;
 import com.atama.service.UserService;
@@ -212,5 +213,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", e.getMessage()));
         }
+    }
+
+    @GetMapping("/{id}/enrolled-courses")
+    public ResponseEntity<List<Course>> getEnrolledCourses(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.getEnrolledCourses(id));
+    }
+
+    @PostMapping("/{id}/enroll")
+    public ResponseEntity<?> enrollInCourse(@PathVariable UUID id, @RequestBody Map<String, String> request) {
+        try {
+            UUID courseId = UUID.fromString(request.get("courseId"));
+            userService.enrollInCourse(id, courseId);
+            return ResponseEntity.ok(Map.of("message", "Enrolled successfully."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{userId}/unenroll/{courseId}")
+    public ResponseEntity<Void> unenrollFromCourse(@PathVariable UUID userId, @PathVariable UUID courseId) {
+        userService.unenrollFromCourse(userId, courseId);
+        return ResponseEntity.noContent().build();
     }
 }

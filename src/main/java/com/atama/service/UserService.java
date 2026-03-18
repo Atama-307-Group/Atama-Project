@@ -5,6 +5,8 @@ import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.Library;
 import com.atama.model.University;
 import com.atama.model.User;
+import com.atama.model.Course;
+import com.atama.repository.CourseRepository;
 import com.atama.repository.UniversityRepository;
 import com.atama.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class UserService {
     private final UniversityRepository universityRepository;
     private final LibraryService libraryService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final CourseRepository courseRepository;
 
     public User registerUser(UserRegistrationRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -140,4 +143,33 @@ public class UserService {
         user.setProfilePictureUrl(profilePictureUrl);
         userRepository.save(user);
     }
+
+    public List<Course> getEnrolledCourses(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        return user.getEnrolledCourses();
+    }
+
+    public void enrollInCourse(UUID userId, UUID courseId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+
+        if (!user.getEnrolledCourses().contains(course)) {
+            user.getEnrolledCourses().add(course);
+            userRepository.save(user);
+        }
+    }
+
+    public void unenrollFromCourse(UUID userId, UUID courseId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+
+        user.getEnrolledCourses().remove(course);
+        userRepository.save(user);
+    }
+
 }

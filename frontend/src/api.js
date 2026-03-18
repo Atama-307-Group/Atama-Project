@@ -1,6 +1,7 @@
 const BASE = "http://localhost:8080";
 const API_BASE = "http://localhost:8080";
 
+/* Personal Library ------------------------------------------- */
 
 export async function getFolders() {
     const res = await fetch(`${API_BASE}/folders`);
@@ -91,6 +92,25 @@ export async function getLibraryItems() {
     return res.json();
 }
 
+export async function moveItemToFolder(itemId, folderId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folderId }),
+    });
+    if (!res.ok) throw new Error("Failed to move item");
+    return res.json();
+}
+
+export async function removeItemFromFolder(itemId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to remove item from folder");
+}
+
+/* Flashcards ------------------------------------------- */
+
 export async function getFlashcardSetById(id) {
     const res = await fetch(`${BASE}/api/flashcard-sets/${id}`);
     if (!res.ok) {
@@ -165,25 +185,45 @@ export async function stopStudying(userId) {
     if (!res.ok) throw new Error("Failed to stop studying");
 }
 
-export async function moveItemToFolder(itemId, folderId) {
-    const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folderId }),
-    });
-    if (!res.ok) throw new Error("Failed to move item");
-    return res.json();
-}
-
-export async function removeItemFromFolder(itemId) {
-    const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
-        method: "DELETE",
-    });
-    if (!res.ok) throw new Error("Failed to remove item from folder");
-}
+/* University & Courses ------------------------------------------- */
 
 export async function getUniversity(userId) {
     const res = await fetch(`${API_BASE}/api/users/${userId}/university`);
     if (!res.ok) throw new Error("Failed to fetch university");
     return res.json();
+}
+
+export async function getCourses(universityId) {
+    const res = await fetch(`${API_BASE}/api/universities/${universityId}/courses`);
+    if (!res.ok) throw new Error("Failed to fetch courses");
+    return res.json();
+}
+
+export async function getEnrolledCourses(userId) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/enrolled-courses`);
+    if (!res.ok) throw new Error("Failed to fetch enrolled courses");
+    return res.json();
+}
+
+export async function enrollInCourse(userId, courseId) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/enroll`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId }),
+    });
+    if (!res.ok) throw new Error("Failed to enroll in course");
+    return res.json();
+}
+
+export async function getCourse(courseId) {
+    const res = await fetch(`${API_BASE}/api/universities/course/${courseId}`);
+    if (!res.ok) throw new Error("Failed to fetch course");
+    return res.json();
+}
+
+export async function unenrollFromCourse(userId, courseId) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/unenroll/${courseId}`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to unenroll from course");
 }

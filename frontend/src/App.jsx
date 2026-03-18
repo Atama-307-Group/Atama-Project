@@ -22,8 +22,9 @@ import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
 import GoalsPage from "./pages/StudyGoal.jsx"
 import UniversityPage from './pages/UniversityPage.jsx';
-
 import SharedSetPage from "./pages/SharedSetPage.jsx";
+import CoursePage from './pages/CoursePage.jsx';
+
 
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
@@ -189,6 +190,11 @@ function App() {
                 path="/university"
                 element={<UniversityPage userId={currentUser?.id} />}
                 // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+            />
+
+            <Route
+                path="/course/:courseId"
+                element={<CoursePage userId={currentUser?.id} />}
             />
 
             {/* Catch-all */}
