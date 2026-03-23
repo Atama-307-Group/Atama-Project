@@ -35,6 +35,9 @@ public abstract class LibraryItem {
     @Column(nullable = false)
     private String title;
 
+    @Column
+    private String description;
+
     @CreationTimestamp
     private Instant createdAt;
 

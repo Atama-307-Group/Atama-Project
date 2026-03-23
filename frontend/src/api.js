@@ -237,9 +237,14 @@ export async function unenrollFromCourse(userId, courseId) {
     if (!res.ok) throw new Error("Failed to unenroll from course");
 }
 
-export async function uploadPDF(file) {
+export async function uploadPDF(file, title, year, semester, description, courseId) {
     const formData = new FormData();
     formData.append("file", file);
+    if (title) formData.append("title", title);
+    if (year) formData.append("year", year);
+    if (semester) formData.append("semester", semester);
+    if (description) formData.append("description", description);
+    if (courseId) formData.append("courseId", courseId);
 
     const res = await fetch(`${API_BASE}/library-items/upload`, {
         method: "POST",

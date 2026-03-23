@@ -1,8 +1,6 @@
 package com.atama.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +11,14 @@ import lombok.Setter;
 public class PDF extends LibraryItem {
     @Column(nullable = false)
     private String filePath;
+
+    @Column
+    private String semester;
+
+    @Column
+    private String year;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 }

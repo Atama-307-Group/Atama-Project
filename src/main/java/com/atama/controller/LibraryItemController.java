@@ -72,8 +72,15 @@ public class LibraryItemController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<LibraryItemResponseDTO> uploadPDF(@RequestParam("file") MultipartFile file) throws IOException {
-        LibraryItem item = libraryItemService.uploadPDF(file);
+    public ResponseEntity<LibraryItemResponseDTO> uploadPDF(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "semester", required = false) String semester,
+            @RequestParam(value = "year", required = false) String year,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "courseId", required = false) UUID courseId
+    ) throws IOException {
+        LibraryItem item = libraryItemService.uploadPDF(file, title, semester, year, description, courseId);
         return ResponseEntity.ok(toResponse(item));
     }
 
