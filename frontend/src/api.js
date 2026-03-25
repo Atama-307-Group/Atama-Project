@@ -237,20 +237,33 @@ export async function unenrollFromCourse(userId, courseId) {
     if (!res.ok) throw new Error("Failed to unenroll from course");
 }
 
-export async function uploadPDF(file, title, year, semester, description, courseId) {
+export async function uploadPDF(file, title) {
     const formData = new FormData();
     formData.append("file", file);
     if (title) formData.append("title", title);
-    if (year) formData.append("year", year);
-    if (semester) formData.append("semester", semester);
-    if (description) formData.append("description", description);
-    if (courseId) formData.append("courseId", courseId);
 
     const res = await fetch(`${API_BASE}/library-items/upload`, {
         method: "POST",
         body: formData,
     });
     if (!res.ok) throw new Error("Failed to upload PDF");
+    return res.json();
+}
+
+export async function uploadPDFToCourse(file, title, year, semester, description, courseId) {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (title) formData.append("title", title);
+    if (year) formData.append("year", year);
+    if (semester) formData.append("semester", semester);
+    if (description) formData.append("description", description);
+    formData.append("courseId", courseId);
+
+    const res = await fetch(`${API_BASE}/library-items/upload/course`, {
+        method: "POST",
+        body: formData,
+    });
+    if (!res.ok) throw new Error("Failed to upload PDF to course");
     return res.json();
 }
 
@@ -262,4 +275,17 @@ export async function recordAccess(itemId) {
 
 export function openPDF(itemId) {
     window.open(`${API_BASE}/library-items/${itemId}/file`, "_blank");
+}
+
+export function downloadPDF(itemId, title) {
+    const a = document.createElement("a");
+    a.href = `${API_BASE}/library-items/${itemId}/download`;
+    a.download = title ?? "document.pdf";
+    a.click();
+}
+
+export async function getCourseItems(courseId) {
+    const res = await fetch(`${API_BASE}/course-library-items/course/${courseId}`);
+    if (!res.ok) throw new Error("Failed to fetch course items");
+    return res.json();
 }

@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -53,4 +54,8 @@ public abstract class LibraryItem {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LibraryItemType itemType;
+
+    @OneToMany(mappedBy = "libraryItem")
+    @JsonIgnore
+    private List<CourseLibraryItem> courseAssignments;
 }

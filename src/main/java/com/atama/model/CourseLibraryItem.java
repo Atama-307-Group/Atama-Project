@@ -28,4 +28,5 @@ public class CourseLibraryItem {
 
     private String year;
     private String semester;
+    private String description;
 }

@@ -11,14 +11,4 @@ import lombok.Setter;
 public class PDF extends LibraryItem {
     @Column(nullable = false)
     private String filePath;
-
-    @Column
-    private String semester;
-
-    @Column
-    private String year;
-
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
 }

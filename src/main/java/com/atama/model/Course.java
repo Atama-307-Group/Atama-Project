@@ -24,14 +24,10 @@ public class Course {
     @JsonIgnore
     private University university;
 
-    private String courseCode;
-    private String courseName;
+    private String courseCode;      // e.g., CS 30700
+    private String courseName;      // e.g. Software Engineering
 
-    @ManyToMany
-    @JoinTable(
-            name = "course_library_items",
-            joinColumns = @JoinColumn(name = "course_id"),
-            inverseJoinColumns = @JoinColumn(name = "library_item_id")
-    )
-    private List<LibraryItem> items;
+    @OneToMany(mappedBy = "course")
+    @JsonIgnore
+    private List<CourseLibraryItem> items;
 }
