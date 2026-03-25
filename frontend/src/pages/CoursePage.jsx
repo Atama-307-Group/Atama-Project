@@ -12,6 +12,7 @@ const SORT_LABELS = {
     "created-desc": "Date added (Newest)",
     "created-asc": "Date added (Oldest)",
     "accessed-desc": "Last accessed",
+    "year" : "TODO by year/sem"
 };
 
 const CoursePage = ({ userId }) => {
@@ -222,7 +223,7 @@ const CoursePage = ({ userId }) => {
                     <div className="courseError">{itemsError}</div>
                 ) : filteredItems.length === 0 ? (
                     <div className="emptyState">
-                        {query ? "No items match your search." : "No content yet. Upload a PDF to get started."}
+                        {query ? "No items match your search." : "No content yet. Help out classmates by sharing your materials!"}
                     </div>
                 ) : (
                     <div className="courseItemsGrid">
@@ -307,6 +308,9 @@ const CoursePage = ({ userId }) => {
                                     maxLength={255}
                                 />
                             </label>
+                            <p className="pdfWarning">
+                                ⚠️ Ensure that you have uploaded the correct file. Ensure that all information is correct before saving.
+                            </p>
                         </div>
                         <div className="modalActions">
                             <button className="btn cancelBtn" onClick={() => setShowPDFModal(false)}>
