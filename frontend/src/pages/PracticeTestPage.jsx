@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { startStudying, stopStudying } from "../api.js"
 
 // Levenshtein Distance Algorithm for typo detection
 const getEditDistance = (a, b) => {
@@ -24,9 +25,10 @@ const getEditDistance = (a, b) => {
   return matrix[b.length][a.length];
 };
 
-const PracticeTestPage = () => {
+const PracticeTestPage = ({ userId }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const hasStoppedRef = useRef(false);
 
   const { promptType, cards, numQuestions } = location.state || { promptType: 'term', cards: [], numQuestions: 0 };
 
@@ -38,8 +40,21 @@ const PracticeTestPage = () => {
   const [totalScore, setTotalScore] = useState(0);
 
   const [fuzzyIndices, setFuzzyIndices] = useState([]);
-  // NEW: Track which indices the user explicitly said "No" to
   const [dismissedIndices, setDismissedIndices] = useState([]);
+
+  useEffect(() => {
+      if (!userId) return;
+      startStudying(userId).catch(console.error);
+      return () => {
+        if (!hasStoppedRef.current) stopStudying(userId).catch(console.error);
+      };
+    }, [userId]);
+
+    useEffect(() => {
+      const handleUnload = () => stopStudying(userId).catch(console.error);
+      window.addEventListener("beforeunload", handleUnload);
+      return () => window.removeEventListener("beforeunload", handleUnload);
+    }, [userId]);
 
   useEffect(() => {
     if (!cards || cards.length === 0) return;
@@ -125,6 +140,10 @@ const PracticeTestPage = () => {
 
   const handleNext = () => {
     if (currentIndex === questions.length - 1) {
+      if (!hasStoppedRef.current) {
+        hasStoppedRef.current = true;
+        stopStudying(userId).catch(console.error);
+      }
       navigate('/post_test', { state: { correct: totalScore.toFixed(2), total: questions.length } });
     } else {
       setCurrentIndex(currentIndex + 1);

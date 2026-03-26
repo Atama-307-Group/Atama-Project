@@ -48,6 +48,14 @@ public class GoalService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
         Goal goal = user.getGoal();
 
+        if (goal == null) {
+            goal = new Goal();
+            goal.setUser(user);
+            goal.setMinutesPerDay(15); // sensible default
+            goal = goalRepository.save(goal);
+            user.setGoal(goal); // if User has a setGoal method
+        }
+
         // Reset if it's a new day
         if (goal.getLastResetDate() == null || !goal.getLastResetDate().equals(java.time.LocalDate.now())) {
             goal.setTotalStudyMinutes(0);
@@ -62,9 +70,9 @@ public class GoalService {
     public void stopStudying(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-
         //Streak logic below:
         Goal goal = user.getGoal();
+        if (goal == null) return;
         goal.stopStudying();
         updateStreak(goal);
         goalRepository.save(goal);

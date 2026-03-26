@@ -214,7 +214,7 @@ export function openPDF(itemId) {
 }
 
 export async function getStreak(userId) {
-    const res = await fetch(`${API_BASE}/users/${userId}/streak`);
+    const res = await fetch(`${API_BASE}/goals/users/${userId}/streak`);
     if (!res.ok) throw new Error("Failed to fetch streak");
     return res.json();
 }
