@@ -16,7 +16,12 @@ const UniversityPage = ({ userId }) => {
     const [openMenuId, setOpenMenuId] = useState(null);
     const [leaveOneCourse, setLeaveOneCourse] = useState(null);
     const [leavingOne, setLeavingOne] = useState(false);
+
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [activeIndex, setActiveIndex] = useState(0);
     const menuRef = useRef(null);
+    const searchInputRef = useRef(null);
 
     useEffect(() => {
         if (!userId) return;
@@ -32,6 +37,32 @@ const UniversityPage = ({ userId }) => {
             .catch(console.error);
     }, [userId]);
 
+    // Global keyboard shortcut: Cmd/Ctrl+K to open search
+    useEffect(() => {
+        function onKeyDown(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                setSearchOpen(true);
+            }
+            if (e.key === "Escape" && searchOpen) {
+                setSearchOpen(false);
+                setSearchQuery("");
+            }
+        }
+        document.addEventListener("keydown", onKeyDown);
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [searchOpen]);
+
+    // Focus input when overlay opens
+    useEffect(() => {
+        if (searchOpen) {
+            setTimeout(() => searchInputRef.current?.focus(), 50);
+            setActiveIndex(0);
+        } else {
+            setSearchQuery("");
+        }
+    }, [searchOpen]);
+
     // Close dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(e) {
@@ -44,6 +75,52 @@ const UniversityPage = ({ userId }) => {
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [openMenuId]);
+
+    // Filtered search results
+    const searchResults = searchQuery.trim().length === 0 ? [] : courses.filter(c => {
+        const q = searchQuery.toLowerCase();
+        return (
+            c.courseCode.toLowerCase().includes(q) ||
+            c.courseName.toLowerCase().includes(q)
+        );
+    }).slice(0, 8);
+
+    useEffect(() => { setActiveIndex(0); }, [searchQuery]);
+
+    function handleSearchKeyDown(e) {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setActiveIndex(i => Math.min(i + 1, searchResults.length - 1));
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setActiveIndex(i => Math.max(i - 1, 0));
+        } else if (e.key === "Enter") {
+            if (searchResults[activeIndex]) handleSearchSelect(searchResults[activeIndex]);
+        }
+    }
+
+    function handleSearchSelect(course) {
+        setSearchOpen(false);
+        setSearchQuery("");
+        if (enrolledIds.has(course.id)) {
+            navigate(`/course/${course.id}`);
+        } else {
+            setSelectedCourse(course);
+        }
+    }
+
+    function highlightMatch(text, query) {
+        if (!query.trim()) return text;
+        const idx = text.toLowerCase().indexOf(query.toLowerCase());
+        if (idx === -1) return text;
+        return (
+            <>
+                {text.slice(0, idx)}
+                <mark className="searchHighlight">{text.slice(idx, idx + query.length)}</mark>
+                {text.slice(idx + query.length)}
+            </>
+        );
+    }
 
     async function handleEnroll() {
         if (!selectedCourse) return;
@@ -104,6 +181,11 @@ const UniversityPage = ({ userId }) => {
             <div className="universityHeader">
                 <button className="backBtn" onClick={() => navigate('/')}>← Back</button>
                 <h1 className="universityTitle">{university ? university.name : "Loading..."}</h1>
+                {enrolledIds.size > 0 && (
+                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
+                        Leave All Your Courses
+                    </button>
+                )}
             </div>
 
             <div className="viewToggle">
@@ -119,11 +201,14 @@ const UniversityPage = ({ userId }) => {
                 >
                     Your Enrolled Courses
                 </button>
-                {enrolledIds.size > 0 && (
-                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
-                        Leave All Your Courses
-                    </button>
-                )}
+                <button className="searchTriggerBtn" onClick={() => setSearchOpen(true)} aria-label="Search courses">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <span className="searchTriggerLabel">Search courses</span>
+                    <kbd className="searchKbd">⌘K</kbd>
+                </button>
             </div>
 
             <div className="coursesBody">
@@ -187,6 +272,72 @@ const UniversityPage = ({ userId }) => {
                     </div>
                 )}
             </div>
+
+            {/* Search overlay */}
+            {searchOpen && (
+                <div className="searchOverlay" onClick={() => { setSearchOpen(false); setSearchQuery(""); }}>
+                    <div className="searchPanel" onClick={e => e.stopPropagation()}>
+                        <div className="searchInputRow">
+                            <svg className="searchIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                                ref={searchInputRef}
+                                className="searchInput"
+                                placeholder="Search by course code or name…"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                onKeyDown={handleSearchKeyDown}
+                                autoComplete="off"
+                                spellCheck="false"
+                            />
+                            <kbd className="searchEscKbd" onClick={() => { setSearchOpen(false); setSearchQuery(""); }}>esc</kbd>
+                        </div>
+                        <div className="searchResults">
+                            {searchQuery.trim().length === 0 ? (
+                                <div className="searchEmpty">Start typing to search {courses.length} courses…</div>
+                            ) : searchResults.length === 0 ? (
+                                <div className="searchEmpty">No courses match "<strong>{searchQuery}</strong>"</div>
+                            ) : (
+                                searchResults.map((course, i) => {
+                                    const enrolled = enrolledIds.has(course.id);
+                                    return (
+                                        <button
+                                            key={course.id}
+                                            className={`searchResultItem ${i === activeIndex ? "searchResultItem--active" : ""}`}
+                                            onMouseEnter={() => setActiveIndex(i)}
+                                            onClick={() => handleSearchSelect(course)}
+                                        >
+                                            <div className="searchResultLeft">
+                                                <span className="searchResultCode">
+                                                    {highlightMatch(course.courseCode, searchQuery)}
+                                                </span>
+                                                <span className="searchResultName">
+                                                    {highlightMatch(course.courseName, searchQuery)}
+                                                </span>
+                                            </div>
+                                            <div className="searchResultRight">
+                                                {enrolled
+                                                    ? <span className="searchEnrolledBadge">✓ Enrolled</span>
+                                                    : <span className="searchEnrollHint">Enroll →</span>
+                                                }
+                                            </div>
+                                        </button>
+                                    );
+                                })
+                            )}
+                        </div>
+                        {searchResults.length > 0 && (
+                            <div className="searchFooter">
+                                <span>↑↓ navigate</span>
+                                <span>↵ select</span>
+                                <span>esc close</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Enroll modal */}
             {selectedCourse && (
