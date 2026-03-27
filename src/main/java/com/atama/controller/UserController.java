@@ -237,4 +237,10 @@ public class UserController {
         userService.unenrollFromCourse(userId, courseId);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{userId}/unenroll-all")
+    public ResponseEntity<Void> unenrollFromAllCourses(@PathVariable UUID userId) {
+        userService.unenrollFromAllCourses(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -230,6 +230,13 @@ export async function getCourse(courseId) {
     return res.json();
 }
 
+export async function unenrollFromAllCourses(userId) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/unenroll-all`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to unenroll from all courses");
+}
+
 export async function unenrollFromCourse(userId, courseId) {
     const res = await fetch(`${API_BASE}/api/users/${userId}/unenroll/${courseId}`, {
         method: "DELETE",

@@ -36,7 +36,6 @@
     border-radius: 8px;
 }
 
-
 .backBtn:hover {
     background: rgba(51, 81, 69, 0.08);
 }
@@ -101,8 +100,15 @@
     cursor: default;
 }
 
-.enrolledBadge {
+/* Enrolled badge + menu button row */
+.enrolledRow {
     margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.enrolledBadge {
     font-size: 11px;
     font-weight: 800;
     color: #335145;
@@ -110,8 +116,83 @@
     border-radius: 8px;
     padding: 2px 8px;
     display: inline-block;
+    flex-shrink: 0;
 }
 
+/* Menu wrapper — positions the dropdown */
+.courseMenuWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.courseMenuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1;
+    color: #335145;
+    transition: background 100ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.courseMenuButton:hover {
+    background: rgba(51, 81, 69, 0.10);
+}
+
+/* Dropdown */
+.courseDropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid rgba(51, 81, 69, 0.16);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(30, 53, 47, 0.16);
+    padding: 4px;
+    min-width: 140px;
+    animation: dropIn 100ms ease-out;
+}
+
+@keyframes dropIn {
+    from { transform: translateY(-4px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.courseDropdownItem {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #335145;
+    transition: background 100ms ease;
+}
+
+.courseDropdownItem:hover {
+    background: rgba(51, 81, 69, 0.07);
+}
+
+.courseDropdownItem--danger {
+    color: #c0392b;
+}
+
+.courseDropdownItem--danger:hover {
+    background: rgba(192, 57, 43, 0.08);
+}
+
+/* Modals */
 .modalOverlay {
     position: fixed;
     inset: 0;
@@ -188,8 +269,10 @@
     border-color: rgba(51, 81, 69, 0.55);
 }
 
+/* View toggle */
 .viewToggle {
     display: flex;
+    align-items: center;
     gap: 8px;
     margin-top: 20px;
 }
@@ -221,11 +304,6 @@
     background: #6ab59a;
 }
 
-.viewToggle {
-    display: flex;
-    align-items: center;
-}
-
 .leaveAllBtn {
     margin-left: auto;
     padding: 8px 16px;
@@ -239,13 +317,13 @@
 }
 
 .leaveAllBtn:hover {
-    background: #f0f0f0;
+    background: rgba(169, 50, 38, 0.07);
     color: #555;
     border-color: #888;
 }
 
-.leaveAllConfirmBtn {
-    background: #e74c3c;
+.btn.leaveAllConfirmBtn {
+    background: #c0392b;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -254,7 +332,11 @@
     font-size: 0.95rem;
 }
 
-.leaveAllConfirmBtn:disabled {
+.btn.leaveAllConfirmBtn:hover {
+    background: #a93226;
+}
+
+.btn.leaveAllConfirmBtn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUniversity, getCourses, getEnrolledCourses, enrollInCourse, unenrollFromCourse } from "../api.js";
+import { getUniversity, getCourses, getEnrolledCourses, enrollInCourse, unenrollFromAllCourses, unenrollFromCourse } from "../api.js";
 import "./UniversityPage.css";
 
 const UniversityPage = ({ userId }) => {
@@ -13,7 +13,10 @@ const UniversityPage = ({ userId }) => {
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
     const [showLeaveAllModal, setShowLeaveAllModal] = useState(false);
     const [leavingAll, setLeavingAll] = useState(false);
-
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const [leaveOneCourse, setLeaveOneCourse] = useState(null);
+    const [leavingOne, setLeavingOne] = useState(false);
+    const menuRef = useRef(null);
 
     useEffect(() => {
         if (!userId) return;
@@ -28,6 +31,19 @@ const UniversityPage = ({ userId }) => {
             })
             .catch(console.error);
     }, [userId]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpenMenuId(null);
+            }
+        }
+        if (openMenuId !== null) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [openMenuId]);
 
     async function handleEnroll() {
         if (!selectedCourse) return;
@@ -46,13 +62,31 @@ const UniversityPage = ({ userId }) => {
     async function handleLeaveAll() {
         setLeavingAll(true);
         try {
-            await Promise.all([...enrolledIds].map(courseId => unenrollFromCourse(userId, courseId)));
+            await Promise.all([...enrolledIds].map(courseId => unenrollFromAllCourses(userId, courseId)));
             setEnrolledIds(new Set());
             setShowLeaveAllModal(false);
         } catch (err) {
             console.error(err);
         } finally {
             setLeavingAll(false);
+        }
+    }
+
+    async function handleLeaveOne() {
+        if (!leaveOneCourse) return;
+        setLeavingOne(true);
+        try {
+            await unenrollFromCourse(userId, leaveOneCourse.id);
+            setEnrolledIds(prev => {
+                const next = new Set(prev);
+                next.delete(leaveOneCourse.id);
+                return next;
+            });
+            setLeaveOneCourse(null);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLeavingOne(false);
         }
     }
 
@@ -87,7 +121,7 @@ const UniversityPage = ({ userId }) => {
                 </button>
                 {enrolledIds.size > 0 && (
                     <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
-                        Leave All Courses
+                        Leave All Your Courses
                     </button>
                 )}
             </div>
@@ -109,7 +143,44 @@ const UniversityPage = ({ userId }) => {
                                 >
                                     <div className="courseCode">{course.courseCode}</div>
                                     <div className="courseName">{course.courseName}</div>
-                                    {enrolled && <div className="enrolledBadge">✓ Enrolled</div>}
+
+                                    {enrolled && (
+                                        <div className="enrolledRow">
+                                            <div className="enrolledBadge">✓ Enrolled</div>
+                                            <div
+                                                className="courseMenuWrapper"
+                                                ref={openMenuId === course.id ? menuRef : null}
+                                            >
+                                                <button
+                                                    className="courseMenuButton"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenMenuId(prev => prev === course.id ? null : course.id);
+                                                    }}
+                                                    aria-label="Course options"
+                                                >
+                                                    ⋯
+                                                </button>
+                                                {openMenuId === course.id && (
+                                                    <div
+                                                        className="courseDropdown"
+                                                        onClick={e => e.stopPropagation()}
+                                                    >
+                                                        <button
+                                                            className="courseDropdownItem courseDropdownItem--danger"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setLeaveOneCourse(course);
+                                                                setOpenMenuId(null);
+                                                            }}
+                                                        >
+                                                            Leave course
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -117,12 +188,14 @@ const UniversityPage = ({ userId }) => {
                 )}
             </div>
 
+            {/* Enroll modal */}
             {selectedCourse && (
                 <div className="modalOverlay" onClick={() => setSelectedCourse(null)}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         <div className="modalTitle">Enroll in course?</div>
                         <p className="modalBody">
                             Do you want to enroll in <strong>{selectedCourse.courseCode} — {selectedCourse.courseName}</strong>?
+                            This will give you access to the course page and resources.
                         </p>
                         <div className="modalActions">
                             <button className="btn cancelBtn" onClick={() => setSelectedCourse(null)}>
@@ -136,6 +209,27 @@ const UniversityPage = ({ userId }) => {
                 </div>
             )}
 
+            {/* Leave one course modal */}
+            {leaveOneCourse && (
+                <div className="modalOverlay" onClick={() => setLeaveOneCourse(null)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Leave course?</div>
+                        <p className="modalBody">
+                            Are you sure you want to leave <strong>{leaveOneCourse.courseCode} — {leaveOneCourse.courseName}</strong>? You can always re-enroll later.
+                        </p>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={() => setLeaveOneCourse(null)}>
+                                Cancel
+                            </button>
+                            <button className="btn leaveAllConfirmBtn" onClick={handleLeaveOne} disabled={leavingOne}>
+                                {leavingOne ? "Leaving..." : "Yes, leave"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Leave all courses modal */}
             {showLeaveAllModal && (
                 <div className="modalOverlay" onClick={() => setShowLeaveAllModal(false)}>
                     <div className="modal" onClick={e => e.stopPropagation()}>
