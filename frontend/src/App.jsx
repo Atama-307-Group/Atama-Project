@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useTimer } from './context/TimerContext';
+import TimerPopup from './components/TimerPopup.jsx';
 
 import StartPage from './pages/FlashcardStartPage.jsx';
 import StudyPage from './pages/StudyPage.jsx';
@@ -25,6 +27,8 @@ import GoalsPage from "./pages/StudyGoal.jsx"
 import SharedSetPage from "./pages/SharedSetPage.jsx";
 
 function App() {
+    const { openPopup } = useTimer();
+
     const [currentUser, setCurrentUser] = useState(() => {
         const saved = localStorage.getItem('currentUser');
         return saved ? JSON.parse(saved) : null;
@@ -79,7 +83,40 @@ function App() {
     };
 
     return (
-        <Routes>
+        <>
+            <TimerPopup />
+            
+            <button 
+                onClick={openPopup}
+                style={{
+                    position: 'fixed',
+                    bottom: '24px',
+                    right: '24px',
+                    padding: '12px 24px',
+                    background: '#2b5c3f',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(43, 92, 63, 0.3)',
+                    zIndex: 1000,
+                    transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 16px rgba(43, 92, 63, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(43, 92, 63, 0.3)';
+                }}
+            >
+                Study Timer
+            </button>
+
+            <Routes>
 
             {/* Home / Dashboard */}
             <Route
@@ -189,7 +226,8 @@ function App() {
                 element={<Navigate to="/" />}
             />
 
-        </Routes>
+            </Routes>
+        </>
     );
 }
 
