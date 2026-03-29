@@ -25,6 +25,7 @@ import CountdownPage from "./pages/CountdownPage.jsx";
 
 import SharedSetPage from "./pages/SharedSetPage.jsx";
 import ExamReminderBanner from "./components/ExamReminderBanner.jsx";
+import DesktopNotification from "./components/DesktopNotification.jsx";
 
 function App() {
     const [currentUser, setCurrentUser] = useState(() => {
@@ -83,6 +84,7 @@ function App() {
     return (
         <>
             <ExamReminderBanner userId={currentUser?.id} />
+            <DesktopNotification userId={currentUser?.id} />
             <Routes>
 
                 {/* Home / Dashboard */}

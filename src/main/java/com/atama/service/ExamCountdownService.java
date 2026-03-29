@@ -29,7 +29,9 @@ public class ExamCountdownService {
 
     public ExamCountdown createCountdown(UUID userId, String reason,
             Instant examDateTime,
-            int reminderMinutesBefore) {
+            int reminderMinutesBefore,
+            boolean notifyByDesktop,
+            boolean notifyByEmail) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
@@ -38,6 +40,8 @@ public class ExamCountdownService {
         countdown.setReason(reason);
         countdown.setExamDateTime(examDateTime);
         countdown.setReminderMinutesBefore(reminderMinutesBefore);
+        countdown.setNotifyByDesktop(notifyByDesktop);
+        countdown.setNotifyByEmail(notifyByEmail);
 
         return countdownRepository.save(countdown);
     }

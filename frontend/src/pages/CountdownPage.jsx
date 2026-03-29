@@ -68,6 +68,8 @@ const CountdownPage = ({ userId }) => {
     const [reason, setReason] = useState("");
     const [dateTime, setDateTime] = useState(defaultDateTime);
     const [reminderMinutes, setReminderMinutes] = useState(60);
+    const [notifyDesktop, setNotifyDesktop] = useState(true);
+    const [notifyEmail, setNotifyEmail] = useState(false);
     const [saving, setSaving] = useState(false);
 
     const tickRef = useRef();
@@ -115,11 +117,15 @@ const CountdownPage = ({ userId }) => {
                 reason: reason.trim(),
                 examDateTime: examDateTimeISO,
                 reminderMinutesBefore: reminderMinutes,
+                notifyByDesktop: notifyDesktop,
+                notifyByEmail: notifyEmail,
             });
             setCountdowns((prev) => [...prev, created]);
             setReason("");
             setDateTime(toLocalDateTimeString(new Date(Date.now() + 86400000)));
             setReminderMinutes(60);
+            setNotifyDesktop(true);
+            setNotifyEmail(false);
             setShowForm(false);
         } catch (err) {
             console.error(err);
@@ -210,6 +216,35 @@ const CountdownPage = ({ userId }) => {
                         </select>
                     </div>
 
+                    {/* Notification toggles */}
+                    <div className="cdFormField">
+                        <label>Notification Channels</label>
+                        <div className="cdNotifToggles">
+                            <label className="cdToggleLabel">
+                                <span className="cdToggleIcon">🖥️</span> Desktop
+                                <label className="cdToggleSwitch">
+                                    <input
+                                        type="checkbox"
+                                        checked={notifyDesktop}
+                                        onChange={(e) => setNotifyDesktop(e.target.checked)}
+                                    />
+                                    <span className="cdToggleSlider" />
+                                </label>
+                            </label>
+                            <label className="cdToggleLabel">
+                                <span className="cdToggleIcon">✉️</span> Email
+                                <label className="cdToggleSwitch">
+                                    <input
+                                        type="checkbox"
+                                        checked={notifyEmail}
+                                        onChange={(e) => setNotifyEmail(e.target.checked)}
+                                    />
+                                    <span className="cdToggleSlider" />
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
                     <div className="cdFormActions">
                         <button
                             type="submit"
@@ -284,6 +319,14 @@ const CountdownPage = ({ userId }) => {
                                             ? `${c.reminderMinutesBefore / 60} hr(s)`
                                             : `${c.reminderMinutesBefore} min`}{" "}
                                     before
+                                    {(c.notifyByDesktop || c.notifyByEmail) && (
+                                        <span className="cdCardReminderChannels">
+                                            {" · "}
+                                            {c.notifyByDesktop && "🖥️"}
+                                            {c.notifyByDesktop && c.notifyByEmail && " "}
+                                            {c.notifyByEmail && "✉️"}
+                                        </span>
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -19,6 +19,7 @@ const ExamReminderBanner = ({ userId }) => {
             const data = await getCountdowns(userId);
             const now = Date.now();
             const active = data.filter((c) => {
+                if (!c.notifyByDesktop) return false;
                 if (c.reminderMinutesBefore <= 0) return false;
                 const examTime = new Date(c.examDateTime).getTime();
                 const windowStart =

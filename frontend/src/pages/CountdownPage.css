@@ -272,3 +272,79 @@
     border-radius: 8px;
     display: inline-block;
 }
+
+.cdCardReminderChannels {
+    opacity: 0.85;
+}
+
+/* ===== Notification Toggles in Form ===== */
+
+.cdNotifToggles {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.cdToggleLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #2f3e3b;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.95rem;
+}
+
+.cdToggleIcon {
+    font-size: 1.1rem;
+}
+
+/* Toggle switch (reusable) */
+
+.cdToggleSwitch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.cdToggleSwitch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.cdToggleSlider {
+    position: absolute;
+    inset: 0;
+    background: #ccd9d5;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+}
+
+.cdToggleSlider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.cdToggleSwitch input:checked+.cdToggleSlider {
+    background: #4eb89f;
+}
+
+.cdToggleSwitch input:checked+.cdToggleSlider::before {
+    transform: translateX(20px);
+}

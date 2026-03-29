@@ -33,4 +33,16 @@ public class ExamCountdown {
 
     @Column(nullable = false)
     private int reminderMinutesBefore = 60;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean notifyByDesktop = true;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean notifyByEmail = false;
+
+    /**
+     * Tracks whether the email reminder has already been sent for this countdown
+     */
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean emailReminderSent = false;
 }

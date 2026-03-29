@@ -190,11 +190,11 @@ export async function getCountdowns(userId) {
     return res.json();
 }
 
-export async function createCountdown(userId, { reason, examDateTime, reminderMinutesBefore }) {
+export async function createCountdown(userId, { reason, examDateTime, reminderMinutesBefore, notifyByDesktop, notifyByEmail }) {
     const res = await fetch(`${API_BASE}/api/countdowns/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason, examDateTime, reminderMinutesBefore }),
+        body: JSON.stringify({ reason, examDateTime, reminderMinutesBefore, notifyByDesktop, notifyByEmail }),
     });
     if (!res.ok) throw new Error("Failed to create countdown");
     return res.json();

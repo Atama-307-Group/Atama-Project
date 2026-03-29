@@ -32,7 +32,9 @@ public class ExamCountdownController {
                 userId,
                 request.reason(),
                 request.examDateTime(),
-                request.reminderMinutesBefore());
+                request.reminderMinutesBefore(),
+                request.notifyByDesktop(),
+                request.notifyByEmail());
         return ResponseEntity.ok(created);
     }
 
@@ -51,6 +53,8 @@ public class ExamCountdownController {
     public record CreateCountdownRequest(
             String reason,
             Instant examDateTime,
-            int reminderMinutesBefore) {
+            int reminderMinutesBefore,
+            boolean notifyByDesktop,
+            boolean notifyByEmail) {
     }
 }
