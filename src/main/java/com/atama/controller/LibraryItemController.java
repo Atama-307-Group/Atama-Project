@@ -11,6 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,8 +47,9 @@ public class LibraryItemController {
 
     @GetMapping
     public ResponseEntity<List<LibraryItemResponseDTO>> getAllLibraryItems() {
+        UUID userId = getAuthenticatedUserId();
         return ResponseEntity.ok(
-                libraryItemService.getAllItems().stream()
+                libraryItemService.getAllItems(userId).stream()
                         .map(LibraryItemController::toResponse)
                         .toList()
         );
@@ -73,7 +75,8 @@ public class LibraryItemController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<LibraryItemResponseDTO> uploadPDF(@RequestParam("file") MultipartFile file) throws IOException {
-        LibraryItem item = libraryItemService.uploadPDF(file);
+        UUID userId = getAuthenticatedUserId();
+        LibraryItem item = libraryItemService.uploadPDF(file, userId);
         return ResponseEntity.ok(toResponse(item));
     }
 
@@ -103,5 +106,12 @@ public class LibraryItemController {
     public ResponseEntity<LibraryItemResponseDTO> starItem(@PathVariable UUID itemId) {
         LibraryItem updated = libraryItemService.toggleItemStarred(itemId);
         return ResponseEntity.ok(toResponse(updated));
+    }
+
+    private UUID getAuthenticatedUserId() {
+        String userId = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return UUID.fromString(userId);
     }
 }

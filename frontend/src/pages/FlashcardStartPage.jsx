@@ -105,7 +105,7 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
             Goals
           </button>
 
-          <button className="action-btn" onClick={() => navigate('/folders')}>
+          <button className="action-btn" onClick={() => currentUser ? navigate('/folders') : navigate('/login', { state: { from: '/folders' } })}>
             Library
           </button>
         </div>

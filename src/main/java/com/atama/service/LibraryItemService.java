@@ -32,9 +32,10 @@ public class LibraryItemService {
 ////        item.setItem_type(resolveItemType(item));
 //    }
 
-    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto) {
+    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto, UUID userId) {
         // TODO need to fix so that the user UUID is sent
-        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
 
         item.setTitle(dto.getTitle());
@@ -57,30 +58,15 @@ public class LibraryItemService {
         }
     }
 
-    // for when we start actually using id
-    /*public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto, Long userId) {
-        Library library = libraryRepository.findByOwnerId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Library not found for user"));
-
-        item.setLibrary(library);
-        item.setItem_type(resolveItemType(item));
-
-        if (dto.getFolderId() != null) {
-            Folder folder = folderRepository.findById(dto.getFolderId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Folder not found"));
-            // optionally verify folder belongs to same library
-            item.setFolder(folder);
-        }
-    }*/
-
     private LibraryItemType resolveItemType(LibraryItem item) {
         if (item instanceof FlashcardSet) return LibraryItemType.FLASHCARD_SET;
         if (item instanceof PDF) return LibraryItemType.PDF;
         throw new IllegalArgumentException("Unknown LibraryItem subtype: " + item.getClass());
     }
 
-    public List<LibraryItem> getAllItems() {
-        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+    public List<LibraryItem> getAllItems(UUID userId) {
+        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         return libraryItemRepository.findAllByLibraryId(library.getId());
     }
@@ -101,7 +87,7 @@ public class LibraryItemService {
         return libraryItemRepository.save(item);
     }
 
-    public LibraryItem uploadPDF(MultipartFile file) throws IOException {
+    public LibraryItem uploadPDF(MultipartFile file, UUID userId) throws IOException {
         String uploadsDir = "uploads/";
         Files.createDirectories(Paths.get(uploadsDir));
 
@@ -114,7 +100,8 @@ public class LibraryItemService {
         pdf.setFilePath(filePath.toString());
         pdf.setItemType(LibraryItemType.PDF);
 
-        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         pdf.setLibrary(library);
 

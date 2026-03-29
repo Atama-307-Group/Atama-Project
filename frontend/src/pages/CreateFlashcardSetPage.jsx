@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FlashcardInput from '../components/FlashcardInput.jsx';
-import { createFlashcardSet } from '../api.js'; 
+import { createFlashcardSet, recordAccess } from '../api.js';
 import './CreateFlashcardSetPage.css';
 
 const newNormalCard = () => ({ type: 'NORMAL', term: '', definition: '' });

@@ -26,10 +26,10 @@ public class FlashcardSetService {
     private final LibraryItemService libraryItemService;
 
     // TODO: the services should return the DTO not the entity
-    public FlashcardSetResponseDTO createFlashcardSet(FlashcardSetRequestDTO dto) {
+    public FlashcardSetResponseDTO createFlashcardSet(FlashcardSetRequestDTO dto, UUID userId) {
         FlashcardSet entity = mapper.toEntity(dto);
-        // entity.setOwnerId(userId); should do something like this but id has to come from auth context
-        libraryItemService.initializeLibraryItem(entity, dto); // resolve library, folder, item_type
+        entity.setOwnerId(userId);
+        libraryItemService.initializeLibraryItem(entity, dto, userId); // resolve library, folder, item_type
         FlashcardSet saved = flashcardSetRepository.save(entity);
         return mapper.toResponseDTO(saved);
     }

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { loginUser } from '../api.js';
 import './LoginPage.css';
 
 const LoginPage = ({ onLoginSuccess }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +18,8 @@ const LoginPage = ({ onLoginSuccess }) => {
         try {
             const data = await loginUser({ identifier, password });
             onLoginSuccess(data.id, data.username, data.email, data.profilePictureUrl, data.verified);
-            navigate('/');
+            const destination = location.state?.from || '/';
+            navigate(destination);
         } catch (err) {
             setStatus({ loading: false, error: err.message || 'Failed to connect to server.' });
         }
