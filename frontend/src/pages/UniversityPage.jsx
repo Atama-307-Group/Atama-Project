@@ -296,7 +296,7 @@ const UniversityPage = ({ userId }) => {
                         </div>
                         <div className="searchResults">
                             {searchQuery.trim().length === 0 ? (
-                                <div className="searchEmpty">Start typing to search {courses.length} courses…</div>
+                                <div className="searchEmpty">Start typing to search from {courses.length} courses…</div>
                             ) : searchResults.length === 0 ? (
                                 <div className="searchEmpty">No courses match "<strong>{searchQuery}</strong>"</div>
                             ) : (

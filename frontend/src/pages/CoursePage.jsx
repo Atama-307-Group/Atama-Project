@@ -4,16 +4,42 @@ import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openP
 import "./CoursePage.css";
 
 const YEARS = ["Unknown", ...Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - i))];
+const NUMERIC_YEARS = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
 const SEMESTERS = ["Unknown", "Fall", "Spring", "Summer", "Winter"];
+const ITEM_TYPES = ["PDF", "FLASHCARD_SET", "PRACTICE_TEST"];
 
 const SORT_LABELS = {
     "alpha-asc": "Alphabetical (A → Z)",
     "alpha-desc": "Alphabetical (Z → A)",
     "created-desc": "Date added (Newest)",
     "created-asc": "Date added (Oldest)",
-    "accessed-desc": "Last accessed",
-    "year" : "TODO by year/sem"
+    "accessed-desc": "Last accessed by you"
 };
+
+// Splits text into segments, marking which parts match the query
+function getHighlightSegments(text, query) {
+    if (!query || !text) return [{ text, match: false }];
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
+    const parts = text.split(regex);
+    return parts.map(part => ({
+        text: part,
+        match: regex.test(part),
+    }));
+}
+
+function Highlighted({ text, query }) {
+    const segments = getHighlightSegments(text, query);
+    return (
+        <span>
+            {segments.map((seg, i) =>
+                seg.match
+                    ? <mark key={i} className="searchHighlight">{seg.text}</mark>
+                    : <span key={i}>{seg.text}</span>
+            )}
+        </span>
+    );
+}
 
 const CoursePage = ({ userId }) => {
     const navigate = useNavigate();
@@ -35,6 +61,15 @@ const CoursePage = ({ userId }) => {
     // Search
     const [query, setQuery] = useState("");
 
+    // Filters
+    const [showFilterPanel, setShowFilterPanel] = useState(false);
+    const [filterTypes, setFilterTypes] = useState(new Set()); // empty = all
+    const [filterSemesters, setFilterSemesters] = useState(new Set()); // empty = all
+    const [filterYearMin, setFilterYearMin] = useState(NUMERIC_YEARS[NUMERIC_YEARS.length - 1]);
+    const [filterYearMax, setFilterYearMax] = useState(NUMERIC_YEARS[0]);
+    const [filterIncludeUnknownYear, setFilterIncludeUnknownYear] = useState(true);
+    const filterPanelRef = useRef(null);
+
     // PDF upload modal
     const fileInputRef = useRef(null);
     const [pendingFile, setPendingFile] = useState(null);
@@ -46,6 +81,16 @@ const CoursePage = ({ userId }) => {
     const [uploading, setUploading] = useState(false);
 
     const [error, setError] = useState("");
+
+    const activeFilterCount = useMemo(() => {
+        let n = 0;
+        if (filterTypes.size > 0) n++;
+        if (filterSemesters.size > 0) n++;
+        const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
+        const yearMax = NUMERIC_YEARS[0];
+        if (filterYearMin !== yearMin || filterYearMax !== yearMax || !filterIncludeUnknownYear) n++;
+        return n;
+    }, [filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
 
     useEffect(() => {
         if (!courseId) return;
@@ -73,6 +118,18 @@ const CoursePage = ({ userId }) => {
         return () => window.removeEventListener("pointerdown", handlePointerDown);
     }, [showSortMenu]);
 
+    // Close filter panel on outside click
+    useEffect(() => {
+        if (!showFilterPanel) return;
+        function handlePointerDown(e) {
+            if (filterPanelRef.current && !filterPanelRef.current.contains(e.target)) {
+                setShowFilterPanel(false);
+            }
+        }
+        window.addEventListener("pointerdown", handlePointerDown);
+        return () => window.removeEventListener("pointerdown", handlePointerDown);
+    }, [showFilterPanel]);
+
     // Close modals on Escape
     useEffect(() => {
         function onKeyDown(e) {
@@ -80,6 +137,7 @@ const CoursePage = ({ userId }) => {
                 setShowPDFModal(false);
                 setShowLeaveModal(false);
                 setShowSortMenu(false);
+                setShowFilterPanel(false);
             }
         }
         window.addEventListener("keydown", onKeyDown);
@@ -108,9 +166,55 @@ const CoursePage = ({ userId }) => {
         }
 
         return [...items]
-            .filter(item => (item.libraryItem?.title ?? "").toLowerCase().includes(q))
+            .filter(item => {
+                // Text search: title + description
+                if (q) {
+                    const titleMatch = (item.libraryItem?.title ?? "").toLowerCase().includes(q);
+                    const descMatch = (item.description ?? "").toLowerCase().includes(q);
+                    if (!titleMatch && !descMatch) return false;
+                }
+
+                // Type filter
+                if (filterTypes.size > 0) {
+                    const type = item.libraryItem?.itemType ?? "PDF";
+                    if (!filterTypes.has(type)) return false;
+                }
+
+                // Semester filter
+                if (filterSemesters.size > 0) {
+                    const sem = item.semester ?? "Unknown";
+                    if (!filterSemesters.has(sem)) return false;
+                }
+
+                // Year filter
+                const itemYear = item.year ?? "Unknown";
+                if (itemYear === "Unknown") {
+                    if (!filterIncludeUnknownYear) return false;
+                } else {
+                    const y = parseInt(itemYear, 10);
+                    if (Number.isFinite(y) && (y < filterYearMin || y > filterYearMax)) return false;
+                }
+
+                return true;
+            })
             .sort(compareBySort);
-    }, [items, query, sortBy]);
+    }, [items, query, sortBy, filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
+
+    function toggleSet(setter, value) {
+        setter(prev => {
+            const next = new Set(prev);
+            next.has(value) ? next.delete(value) : next.add(value);
+            return next;
+        });
+    }
+
+    function clearFilters() {
+        setFilterTypes(new Set());
+        setFilterSemesters(new Set());
+        setFilterYearMin(NUMERIC_YEARS[NUMERIC_YEARS.length - 1]);
+        setFilterYearMax(NUMERIC_YEARS[0]);
+        setFilterIncludeUnknownYear(true);
+    }
 
     function handleFileChange(e) {
         const file = e.target.files[0];
@@ -152,6 +256,9 @@ const CoursePage = ({ userId }) => {
         }
     }
 
+    const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
+    const yearMax = NUMERIC_YEARS[0];
+
     return (
         <div className="coursePage">
             <div className="courseHeader">
@@ -182,10 +289,113 @@ const CoursePage = ({ userId }) => {
                 <div className="courseSearch">
                     <input
                         className="courseSearchInput"
-                        placeholder="Search course materials…"
+                        placeholder="Search titles and descriptions…"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                     />
+                </div>
+
+                {/* Filter button */}
+                <div className="filterWrap" ref={filterPanelRef}>
+                    <button
+                        type="button"
+                        className={`toolbarBtn--filter ${activeFilterCount > 0 ? "toolbarBtn--filterActive" : ""}`}
+                        onClick={() => setShowFilterPanel(p => !p)}
+                        aria-haspopup="true"
+                        aria-expanded={showFilterPanel}
+                        title="Filter"
+                    >
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M1 3h13M3 7h9M5.5 11h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+                        </svg>
+                        {activeFilterCount > 0 && (
+                            <span className="filterBadge">{activeFilterCount}</span>
+                        )}
+                    </button>
+
+                    {showFilterPanel && (
+                        <div className="filterPanel" role="dialog" aria-label="Filter options">
+                            <div className="filterPanelHeader">
+                                <span className="filterPanelTitle">Filter</span>
+                                {activeFilterCount > 0 && (
+                                    <button className="filterClearBtn" onClick={clearFilters}>Clear all</button>
+                                )}
+                            </div>
+
+                            {/* Type */}
+                            <div className="filterSection">
+                                <div className="filterSectionLabel">Type</div>
+                                <div className="filterChips">
+                                    {ITEM_TYPES.map(type => (
+                                        <button
+                                            key={type}
+                                            className={`filterChip ${filterTypes.has(type) ? "filterChipActive" : ""}`}
+                                            onClick={() => toggleSet(setFilterTypes, type)}
+                                        >
+                                            {type === "FLASHCARD_SET" ? "Flashcards" : type === "PRACTICE_TEST" ? "Practice Test" : type}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Semester */}
+                            <div className="filterSection">
+                                <div className="filterSectionLabel">Semester</div>
+                                <div className="filterChips">
+                                    {SEMESTERS.map(sem => (
+                                        <button
+                                            key={sem}
+                                            className={`filterChip ${filterSemesters.has(sem) ? "filterChipActive" : ""}`}
+                                            onClick={() => toggleSet(setFilterSemesters, sem)}
+                                        >
+                                            {sem}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Year */}
+                            <div className="filterSection">
+                                <div className="filterSectionLabel">Year</div>
+                                <div className="yearRangeRow">
+                                    <span className="yearRangeLabel">{filterYearMin}</span>
+                                    <div className="yearRangeSliders">
+                                        <input
+                                            type="range"
+                                            className="yearSlider"
+                                            min={yearMin}
+                                            max={yearMax}
+                                            value={filterYearMin}
+                                            onChange={e => {
+                                                const v = parseInt(e.target.value, 10);
+                                                setFilterYearMin(Math.min(v, filterYearMax));
+                                            }}
+                                        />
+                                        <input
+                                            type="range"
+                                            className="yearSlider"
+                                            min={yearMin}
+                                            max={yearMax}
+                                            value={filterYearMax}
+                                            onChange={e => {
+                                                const v = parseInt(e.target.value, 10);
+                                                setFilterYearMax(Math.max(v, filterYearMin));
+                                            }}
+                                        />
+                                    </div>
+                                    <span className="yearRangeLabel">{filterYearMax}</span>
+                                </div>
+                                <label className="filterCheckLabel">
+                                    <input
+                                        type="checkbox"
+                                        checked={filterIncludeUnknownYear}
+                                        onChange={e => setFilterIncludeUnknownYear(e.target.checked)}
+                                    />
+                                    Include unknown year
+                                </label>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="sortWrap" ref={sortMenuRef}>
@@ -223,7 +433,9 @@ const CoursePage = ({ userId }) => {
                     <div className="courseError">{itemsError}</div>
                 ) : filteredItems.length === 0 ? (
                     <div className="emptyState">
-                        {query ? "No items match your search." : "No content yet. Help out classmates by sharing your materials!"}
+                        {query || activeFilterCount > 0
+                            ? "No items match your search or filters."
+                            : "No content yet. Help out classmates by sharing your materials!"}
                     </div>
                 ) : (
                     <div className="courseItemsGrid">
@@ -237,7 +449,9 @@ const CoursePage = ({ userId }) => {
                                     }
                                 }}
                             >
-                                <div className="folderName">{cli.libraryItem?.title ?? "Untitled"}</div>
+                                <div className="folderName">
+                                    <Highlighted text={cli.libraryItem?.title ?? "Untitled"} query={query.trim()} />
+                                </div>
                                 <div className="folderMeta">
                                     <span className="itemTypeBadge">{cli.libraryItem?.itemType ?? "PDF"}</span>
                                     <div className="cliMeta">
@@ -247,23 +461,23 @@ const CoursePage = ({ userId }) => {
                                         {cli.year && cli.year !== "Unknown" && (
                                             <span className="cliTag">{cli.year}</span>
                                         )}
-                                    <button
-                                                className="downloadBtn"
-                                                title="Download PDF"
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
-                                                }}
-                                            >
-                                                ⭳
-                                            </button>
+                                        <button
+                                            className="downloadBtn"
+                                            title="Download PDF"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
+                                            }}
+                                        >
+                                            ⭳
+                                        </button>
                                     </div>
-
                                 </div>
                                 {cli.description && (
-                                    <div className="cliDescription">{cli.description}</div>
+                                    <div className="cliDescription">
+                                        <Highlighted text={cli.description} query={query.trim()} />
+                                    </div>
                                 )}
-
                             </div>
                         ))}
                     </div>
