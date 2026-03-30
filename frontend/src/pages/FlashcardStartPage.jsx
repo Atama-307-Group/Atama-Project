@@ -78,41 +78,31 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
 
 
       {/* Main content */}
-      <div className="start-content">
-        <h1>Study with Atama</h1>
-        <div className="action-buttons">
-          <button className="action-btn" onClick={() => navigate('/create')}>
-            Create New Set
-          </button>
-
-          {/* Changed from /study/term to match your PreLearn route */}
-          <button className="action-btn" onClick={() => navigate('/pre_learn')}>
-            Learn
-          </button>
-
-          {/* Replaced alert with actual navigation */}
-          <button className="action-btn" onClick={() => navigate('/pre_match')}>
-            Match
-          </button>
-
-          {/* Replaced alert with actual navigation */}
-          <button className="action-btn" onClick={() => navigate('/pre_test')}>
-            Practice Test
-          </button>
-
-          <button className="action-btn" onClick={() => navigate('/goals')}>
-            Goals
-          </button>
-
-          <button className="action-btn" onClick={() => navigate('/folders')}>
-            Library
-          </button>
-
-          <button className="action-btn" onClick={() => navigate('/university')}>
-            University
-          </button>
+      {currentUser ? (
+        // LOGGED IN: Dashboard
+        <div className="start-content">
+          <h1>Welcome back, {currentUser.username}!</h1>
+          <div className="action-buttons">
+            <button className="action-btn" onClick={() => navigate('/create')}>Create New Set</button>
+            <button className="action-btn" onClick={() => navigate('/pre_learn')}>Learn</button>
+            <button className="action-btn" onClick={() => navigate('/pre_match')}>Match</button>
+            <button className="action-btn" onClick={() => navigate('/pre_test')}>Practice Test</button>
+            <button className="action-btn" onClick={() => navigate('/goals')}>Goals</button>
+            <button className="action-btn" onClick={() => navigate('/folders')}>Library</button>
+            <button className="action-btn" onClick={() => navigate('/university')}>University</button>
+          </div>
         </div>
-      </div>
+      ) : (
+        // NOT LOGGED IN: Landing page
+        <div className="start-content landing">
+          <h1>Study smarter with Atama</h1>
+          <p className="tagline">Study flashcards and share course materials, all in one place.</p>
+          <div className="action-buttons">
+            <button className="action-btn primary" onClick={() => navigate('/signup')}>Get Started</button>
+            <button className="action-btn secondary" onClick={() => navigate('/login')}>Log In</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
