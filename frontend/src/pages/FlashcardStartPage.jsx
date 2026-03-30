@@ -8,7 +8,6 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -107,6 +106,10 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
 
           <button className="action-btn" onClick={() => navigate('/folders')}>
             Library
+          </button>
+
+          <button className="action-btn" onClick={() => navigate('/university')}>
+            University
           </button>
         </div>
       </div>

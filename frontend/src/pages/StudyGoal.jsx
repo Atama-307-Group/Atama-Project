@@ -154,7 +154,6 @@ const GoalsPage = ({ userId }) => {
         persistGoal(selectedDays, draftMinutes);
     }
 
-
     return (
         <div className="goalPage">
 

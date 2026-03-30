@@ -17,24 +17,19 @@ import java.util.*;
 @Transactional
 public class LibraryService {
 
+    // TODO Do we actually need this file???
     private final LibraryRepository libraryRepository;
 
-    public Library createLibrary(Library library) {
-        return libraryRepository.save(library);
+    public void createLibrary(Library library) {
+        libraryRepository.save(library);
     }
 
-    /*
-    Function to retrieve a Library based off of its ID.
-     */
     @Transactional(readOnly = true)
     public Library getLibraryById(UUID id) {
         return libraryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Library", "id", id));
     }
 
-    /*
-    Function to retrieve a Library based off of its User's ID.
-    */
     @Transactional(readOnly = true)
     public Library getLibraryByUserId(UUID userId) {
         return libraryRepository.findByUserId(userId)
