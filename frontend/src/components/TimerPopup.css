@@ -1,0 +1,179 @@
+.timer-popup {
+    position: fixed;
+    width: 280px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    cursor: move;
+    user-select: none;
+    z-index: 9999;
+    transition: box-shadow 0.2s ease;
+}
+
+.timer-popup:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.timer-popup.study-mode {
+    border-top: 4px solid #2b5c3f;
+}
+
+.timer-popup.break-mode {
+    border-top: 4px solid #2196F3;
+}
+
+.timer-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f5f5f5;
+    border-radius: 8px 8px 0 0;
+    cursor: move;
+}
+
+.timer-popup-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+}
+
+.timer-popup-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.timer-popup-close:hover {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.timer-popup-display {
+    padding: 24px 16px;
+    text-align: center;
+}
+
+.timer-popup-time {
+    font-size: 48px;
+    font-weight: 700;
+    color: #333;
+    font-family: 'Courier New', monospace;
+}
+
+.study-mode .timer-popup-time {
+    color: #2b5c3f;
+}
+
+.break-mode .timer-popup-time {
+    color: #2196F3;
+}
+
+.timer-popup-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 16px 16px 16px;
+    cursor: default;
+}
+
+.timer-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.timer-btn-primary {
+    background: #2b5c3f;
+    color: white;
+}
+
+.timer-btn-primary:hover {
+    background: #234a33;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(43, 92, 63, 0.3);
+}
+
+.timer-btn-primary:active {
+    transform: translateY(0);
+}
+
+.timer-btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.timer-btn-secondary:hover {
+    background: #d0d0d0;
+    transform: translateY(-1px);
+}
+
+.timer-btn-secondary:active {
+    transform: translateY(0);
+}
+
+.break-mode .timer-btn-primary {
+    background: #2196F3;
+}
+
+.break-mode .timer-btn-primary:hover {
+    background: #1976D2;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.timer-popup-settings {
+    padding: 0 16px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 12px;
+}
+
+.timer-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.timer-setting label {
+    color: #666;
+    font-weight: 500;
+}
+
+.timer-setting input {
+    width: 60px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.timer-setting input:focus {
+    border-color: #2b5c3f;
+}
+
+.timer-setting input:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}

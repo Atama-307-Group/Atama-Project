@@ -25,6 +25,8 @@ public class LibraryItemService {
     private final FolderRepository folderRepository;
     private final LibraryItemRepository libraryItemRepository;
     private final PDFRepository pdfRepository;
+    private final CourseRepository courseRepository;
+    private final CourseLibraryItemRepository courseLibraryItemRepository;
 
 //    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto) {
 //        item.setTitle(dto.getTitle());
@@ -87,7 +89,7 @@ public class LibraryItemService {
         return libraryItemRepository.save(item);
     }
 
-    public LibraryItem uploadPDF(MultipartFile file, UUID userId) throws IOException {
+    /*public LibraryItem uploadPDF(MultipartFile file, UUID userId) throws IOException {
         String uploadsDir = "uploads/";
         Files.createDirectories(Paths.get(uploadsDir));
 
@@ -106,6 +108,39 @@ public class LibraryItemService {
         pdf.setLibrary(library);
 
         return pdfRepository.save(pdf);
+    }*/
+    private PDF createPDF(MultipartFile file, String title, UUID userId) throws IOException {
+        String uploadsDir = "uploads/";
+        Files.createDirectories(Paths.get(uploadsDir));
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadsDir + fileName);
+        Files.write(filePath, file.getBytes());
+        PDF pdf = new PDF();
+        pdf.setTitle(title != null ? title : file.getOriginalFilename());
+        pdf.setFilePath(filePath.toString());
+        pdf.setItemType(LibraryItemType.PDF);
+        Library library = libraryRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Library not found"));
+        pdf.setLibrary(library);
+        return pdf;
+    }
+
+    public LibraryItem uploadPDF(MultipartFile file, String title, UUID userId) throws IOException {
+        return pdfRepository.save(createPDF(file, title, userId));
+    }
+
+    public LibraryItem uploadPDFToCourse(MultipartFile file, String title, String year, String semester, String description, UUID courseId, UUID userId) throws IOException {
+        PDF savedPdf = pdfRepository.save(createPDF(file, title, userId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+        CourseLibraryItem cli = new CourseLibraryItem();
+        cli.setCourse(course);
+        cli.setLibraryItem(savedPdf);
+        cli.setYear(year == null || year.equals("Unknown") ? null : year);
+        cli.setSemester(semester == null || semester.equals("Unknown") ? null : semester);
+        cli.setDescription(description);
+        courseLibraryItemRepository.save(cli);
+        return savedPdf;
     }
 
     public void recordAccess(UUID itemId) {

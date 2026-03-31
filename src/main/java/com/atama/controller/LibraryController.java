@@ -27,6 +27,7 @@ public class LibraryController {
         return ResponseEntity.ok(libraryService.getLibraryByUserId(userId));
     }
 
+
     @PatchMapping("/privacy")
     public void updatePrivacy(@RequestParam boolean isPrivate) {
         //UUID userId = getCurrentUserId(); // however you're extracting it
@@ -51,4 +52,5 @@ public class LibraryController {
                 .getPrincipal();
         return UUID.fromString(userId);
     }
+
 }

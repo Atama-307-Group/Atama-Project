@@ -1,0 +1,565 @@
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF } from "../api.js";
+import "./CoursePage.css";
+
+const YEARS = ["Unknown", ...Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - i))];
+const NUMERIC_YEARS = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
+const SEMESTERS = ["Unknown", "Fall", "Spring", "Summer", "Winter"];
+const ITEM_TYPES = ["PDF", "FLASHCARD_SET", "PRACTICE_TEST"];
+
+const SORT_LABELS = {
+    "alpha-asc": "Alphabetical (A → Z)",
+    "alpha-desc": "Alphabetical (Z → A)",
+    "created-desc": "Date added (Newest)",
+    "created-asc": "Date added (Oldest)",
+    "accessed-desc": "Last accessed by you"
+};
+
+// Splits text into segments, marking which parts match the query
+function getHighlightSegments(text, query) {
+    if (!query || !text) return [{ text, match: false }];
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
+    const parts = text.split(regex);
+    return parts.map(part => ({
+        text: part,
+        match: regex.test(part),
+    }));
+}
+
+function Highlighted({ text, query }) {
+    const segments = getHighlightSegments(text, query);
+    return (
+        <span>
+            {segments.map((seg, i) =>
+                seg.match
+                    ? <mark key={i} className="searchHighlight">{seg.text}</mark>
+                    : <span key={i}>{seg.text}</span>
+            )}
+        </span>
+    );
+}
+
+const CoursePage = ({ userId }) => {
+    const navigate = useNavigate();
+    const { courseId } = useParams();
+    const [course, setCourse] = useState(null);
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
+    const [leaving, setLeaving] = useState(false);
+
+    // Course library items
+    const [items, setItems] = useState([]);
+    const [itemsLoading, setItemsLoading] = useState(true);
+    const [itemsError, setItemsError] = useState("");
+
+    // Sorting
+    const [sortBy, setSortBy] = useState("alpha-asc");
+    const [showSortMenu, setShowSortMenu] = useState(false);
+    const sortMenuRef = useRef(null);
+
+    // Search
+    const [query, setQuery] = useState("");
+
+    // Filters
+    const [showFilterPanel, setShowFilterPanel] = useState(false);
+    const [filterTypes, setFilterTypes] = useState(new Set()); // empty = all
+    const [filterSemesters, setFilterSemesters] = useState(new Set()); // empty = all
+    const [filterYearMin, setFilterYearMin] = useState(NUMERIC_YEARS[NUMERIC_YEARS.length - 1]);
+    const [filterYearMax, setFilterYearMax] = useState(NUMERIC_YEARS[0]);
+    const [filterIncludeUnknownYear, setFilterIncludeUnknownYear] = useState(true);
+    const filterPanelRef = useRef(null);
+
+    // PDF upload modal
+    const fileInputRef = useRef(null);
+    const [pendingFile, setPendingFile] = useState(null);
+    const [showPDFModal, setShowPDFModal] = useState(false);
+    const [pdfTitle, setPdfTitle] = useState("");
+    const [pdfYear, setPdfYear] = useState("Unknown");
+    const [pdfSemester, setPdfSemester] = useState("Unknown");
+    const [pdfDescription, setPdfDescription] = useState("");
+    const [uploading, setUploading] = useState(false);
+
+    const [error, setError] = useState("");
+
+    const activeFilterCount = useMemo(() => {
+        let n = 0;
+        if (filterTypes.size > 0) n++;
+        if (filterSemesters.size > 0) n++;
+        const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
+        const yearMax = NUMERIC_YEARS[0];
+        if (filterYearMin !== yearMin || filterYearMax !== yearMax || !filterIncludeUnknownYear) n++;
+        return n;
+    }, [filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
+
+    useEffect(() => {
+        if (!courseId) return;
+        getCourse(courseId).then(setCourse).catch(console.error);
+    }, [courseId]);
+
+    useEffect(() => {
+        if (!courseId) return;
+        setItemsLoading(true);
+        getCourseItems(courseId)
+            .then(data => setItems(Array.isArray(data) ? data : []))
+            .catch(e => setItemsError(e.message ?? "Failed to load course items"))
+            .finally(() => setItemsLoading(false));
+    }, [courseId]);
+
+    // Close sort menu on outside click
+    useEffect(() => {
+        if (!showSortMenu) return;
+        function handlePointerDown(e) {
+            if (sortMenuRef.current && !sortMenuRef.current.contains(e.target)) {
+                setShowSortMenu(false);
+            }
+        }
+        window.addEventListener("pointerdown", handlePointerDown);
+        return () => window.removeEventListener("pointerdown", handlePointerDown);
+    }, [showSortMenu]);
+
+    // Close filter panel on outside click
+    useEffect(() => {
+        if (!showFilterPanel) return;
+        function handlePointerDown(e) {
+            if (filterPanelRef.current && !filterPanelRef.current.contains(e.target)) {
+                setShowFilterPanel(false);
+            }
+        }
+        window.addEventListener("pointerdown", handlePointerDown);
+        return () => window.removeEventListener("pointerdown", handlePointerDown);
+    }, [showFilterPanel]);
+
+    // Close modals on Escape
+    useEffect(() => {
+        function onKeyDown(e) {
+            if (e.key === "Escape") {
+                setShowPDFModal(false);
+                setShowLeaveModal(false);
+                setShowSortMenu(false);
+                setShowFilterPanel(false);
+            }
+        }
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, []);
+
+    const filteredItems = useMemo(() => {
+        const q = query.trim().toLowerCase();
+
+        function safeTime(x) {
+            const t = x ? new Date(x).getTime() : 0;
+            return Number.isFinite(t) ? t : 0;
+        }
+
+        function compareBySort(a, b) {
+            const titleA = a.libraryItem?.title ?? "";
+            const titleB = b.libraryItem?.title ?? "";
+            switch (sortBy) {
+                case "alpha-desc": return titleB.localeCompare(titleA);
+                case "created-asc": return safeTime(a.libraryItem?.createdAt) - safeTime(b.libraryItem?.createdAt);
+                case "created-desc": return safeTime(b.libraryItem?.createdAt) - safeTime(a.libraryItem?.createdAt);
+                case "accessed-desc": return safeTime(b.libraryItem?.lastAccessed) - safeTime(a.libraryItem?.lastAccessed);
+                case "alpha-asc":
+                default: return titleA.localeCompare(titleB);
+            }
+        }
+
+        return [...items]
+            .filter(item => {
+                // Text search: title + description
+                if (q) {
+                    const titleMatch = (item.libraryItem?.title ?? "").toLowerCase().includes(q);
+                    const descMatch = (item.description ?? "").toLowerCase().includes(q);
+                    if (!titleMatch && !descMatch) return false;
+                }
+
+                // Type filter
+                if (filterTypes.size > 0) {
+                    const type = item.libraryItem?.itemType ?? "PDF";
+                    if (!filterTypes.has(type)) return false;
+                }
+
+                // Semester filter
+                if (filterSemesters.size > 0) {
+                    const sem = item.semester ?? "Unknown";
+                    if (!filterSemesters.has(sem)) return false;
+                }
+
+                // Year filter
+                const itemYear = item.year ?? "Unknown";
+                if (itemYear === "Unknown") {
+                    if (!filterIncludeUnknownYear) return false;
+                } else {
+                    const y = parseInt(itemYear, 10);
+                    if (Number.isFinite(y) && (y < filterYearMin || y > filterYearMax)) return false;
+                }
+
+                return true;
+            })
+            .sort(compareBySort);
+    }, [items, query, sortBy, filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
+
+    function toggleSet(setter, value) {
+        setter(prev => {
+            const next = new Set(prev);
+            next.has(value) ? next.delete(value) : next.add(value);
+            return next;
+        });
+    }
+
+    function clearFilters() {
+        setFilterTypes(new Set());
+        setFilterSemesters(new Set());
+        setFilterYearMin(NUMERIC_YEARS[NUMERIC_YEARS.length - 1]);
+        setFilterYearMax(NUMERIC_YEARS[0]);
+        setFilterIncludeUnknownYear(true);
+    }
+
+    function handleFileChange(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const rawName = file.name.replace(/\.pdf$/i, "");
+        setPendingFile(file);
+        setPdfTitle(rawName);
+        setPdfYear("Unknown");
+        setPdfSemester("Unknown");
+        setPdfDescription("");
+        setShowPDFModal(true);
+        e.target.value = "";
+    }
+
+    async function handlePDFConfirm() {
+        if (!pendingFile) return;
+        setUploading(true);
+        try {
+            const newItem = await uploadPDFToCourse(pendingFile, pdfTitle, pdfYear, pdfSemester, pdfDescription || null, courseId);
+            setItems(prev => [newItem, ...prev]);
+            setShowPDFModal(false);
+            setPendingFile(null);
+        } catch (err) {
+            setError(err.message ?? "Failed to upload PDF");
+        } finally {
+            setUploading(false);
+        }
+    }
+
+    async function handleLeave() {
+        setLeaving(true);
+        try {
+            await unenrollFromCourse(userId, courseId);
+            navigate(-1);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLeaving(false);
+        }
+    }
+
+    const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
+    const yearMax = NUMERIC_YEARS[0];
+
+    return (
+        <div className="coursePage">
+            <div className="courseHeader">
+                <button className="backBtn" onClick={() => navigate(-1)}>← Back</button>
+                <h1 className="courseTitle">
+                    {course ? `${course.courseCode} — ${course.courseName}` : "Loading..."}
+                </h1>
+                <button className="leaveBtn" onClick={() => setShowLeaveModal(true)}>
+                    Leave Course
+                </button>
+            </div>
+
+            <div className="courseToolbar">
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/pdf"
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                />
+                <button className="toolbarBtn--upload" onClick={() => fileInputRef.current.click()}>
+                    + Upload PDF
+                </button>
+                <button className="toolbarBtn--library" onClick={() => {}}>
+                    + Add from Library
+                </button>
+
+                <div className="courseSearch">
+                    <input
+                        className="courseSearchInput"
+                        placeholder="Search titles and descriptions…"
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
+                    />
+                </div>
+
+                {/* Filter button */}
+                <div className="filterWrap" ref={filterPanelRef}>
+                    <button
+                        type="button"
+                        className={`toolbarBtn--filter ${activeFilterCount > 0 ? "toolbarBtn--filterActive" : ""}`}
+                        onClick={() => setShowFilterPanel(p => !p)}
+                        aria-haspopup="true"
+                        aria-expanded={showFilterPanel}
+                        title="Filter"
+                    >
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M1 3h13M3 7h9M5.5 11h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+                        </svg>
+                        {activeFilterCount > 0 && (
+                            <span className="filterBadge">{activeFilterCount}</span>
+                        )}
+                    </button>
+
+                    {showFilterPanel && (
+                        <div className="filterPanel" role="dialog" aria-label="Filter options">
+                            <div className="filterPanelHeader">
+                                <span className="filterPanelTitle">Filter</span>
+                                {activeFilterCount > 0 && (
+                                    <button className="filterClearBtn" onClick={clearFilters}>Clear all</button>
+                                )}
+                            </div>
+
+                            {/* Type */}
+                            <div className="filterSection">
+                                <div className="filterSectionLabel">Type</div>
+                                <div className="filterChips">
+                                    {ITEM_TYPES.map(type => (
+                                        <button
+                                            key={type}
+                                            className={`filterChip ${filterTypes.has(type) ? "filterChipActive" : ""}`}
+                                            onClick={() => toggleSet(setFilterTypes, type)}
+                                        >
+                                            {type === "FLASHCARD_SET" ? "Flashcards" : type === "PRACTICE_TEST" ? "Practice Test" : type}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Semester */}
+                            <div className="filterSection">
+                                <div className="filterSectionLabel">Semester</div>
+                                <div className="filterChips">
+                                    {SEMESTERS.map(sem => (
+                                        <button
+                                            key={sem}
+                                            className={`filterChip ${filterSemesters.has(sem) ? "filterChipActive" : ""}`}
+                                            onClick={() => toggleSet(setFilterSemesters, sem)}
+                                        >
+                                            {sem}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Year */}
+                            <div className="filterSection">
+                                <div className="filterSectionLabel">Year</div>
+                                <div className="yearRangeRow">
+                                    <span className="yearRangeLabel">{filterYearMin}</span>
+                                    <div className="yearRangeSliders">
+                                        <input
+                                            type="range"
+                                            className="yearSlider"
+                                            min={yearMin}
+                                            max={yearMax}
+                                            value={filterYearMin}
+                                            onChange={e => {
+                                                const v = parseInt(e.target.value, 10);
+                                                setFilterYearMin(Math.min(v, filterYearMax));
+                                            }}
+                                        />
+                                        <input
+                                            type="range"
+                                            className="yearSlider"
+                                            min={yearMin}
+                                            max={yearMax}
+                                            value={filterYearMax}
+                                            onChange={e => {
+                                                const v = parseInt(e.target.value, 10);
+                                                setFilterYearMax(Math.max(v, filterYearMin));
+                                            }}
+                                        />
+                                    </div>
+                                    <span className="yearRangeLabel">{filterYearMax}</span>
+                                </div>
+                                <label className="filterCheckLabel">
+                                    <input
+                                        type="checkbox"
+                                        checked={filterIncludeUnknownYear}
+                                        onChange={e => setFilterIncludeUnknownYear(e.target.checked)}
+                                    />
+                                    Include unknown year
+                                </label>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="sortWrap" ref={sortMenuRef}>
+                    <button
+                        type="button"
+                        className="toolbarBtn--sort"
+                        onClick={() => setShowSortMenu(p => !p)}
+                        aria-haspopup="true"
+                        aria-expanded={showSortMenu}
+                    >
+                        ⇅ {SORT_LABELS[sortBy]}
+                    </button>
+                    {showSortMenu && (
+                        <div className="dropdownMenu" role="menu">
+                            {Object.entries(SORT_LABELS).map(([key, label]) => (
+                                <button
+                                    key={key}
+                                    className={`menuItem ${sortBy === key ? "menuItemActive" : ""}`}
+                                    onClick={() => { setSortBy(key); setShowSortMenu(false); }}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {error && <div className="courseError">{error}</div>}
+
+            <div className="courseBody">
+                {itemsLoading ? (
+                    <div className="emptyState">Loading course materials…</div>
+                ) : itemsError ? (
+                    <div className="courseError">{itemsError}</div>
+                ) : filteredItems.length === 0 ? (
+                    <div className="emptyState">
+                        {query || activeFilterCount > 0
+                            ? "No items match your search or filters."
+                            : "No content yet. Help out classmates by sharing your materials!"}
+                    </div>
+                ) : (
+                    <div className="courseItemsGrid">
+                        {filteredItems.map(cli => (
+                            <div
+                                key={cli.id}
+                                className="itemCard"
+                                onClick={() => {
+                                    if (cli.libraryItem?.itemType === "PDF") {
+                                        openPDF(cli.libraryItem.id);
+                                    }
+                                }}
+                            >
+                                <div className="folderName">
+                                    <Highlighted text={cli.libraryItem?.title ?? "Untitled"} query={query.trim()} />
+                                </div>
+                                <div className="folderMeta">
+                                    <span className="itemTypeBadge">{cli.libraryItem?.itemType ?? "PDF"}</span>
+                                    <div className="cliMeta">
+                                        {cli.semester && cli.semester !== "Unknown" && (
+                                            <span className="cliTag">{cli.semester}</span>
+                                        )}
+                                        {cli.year && cli.year !== "Unknown" && (
+                                            <span className="cliTag">{cli.year}</span>
+                                        )}
+                                        <button
+                                            className="downloadBtn"
+                                            title="Download PDF"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
+                                            }}
+                                        >
+                                            ⭳
+                                        </button>
+                                    </div>
+                                </div>
+                                {cli.description && (
+                                    <div className="cliDescription">
+                                        <Highlighted text={cli.description} query={query.trim()} />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* PDF metadata modal */}
+            {showPDFModal && (
+                <div className="modalOverlay" onClick={() => setShowPDFModal(false)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Save PDF to Course</div>
+                        <div className="pdfForm">
+                            <label className="pdfLabel">
+                                Name
+                                <input
+                                    className="pdfInput"
+                                    type="text"
+                                    value={pdfTitle}
+                                    onChange={e => setPdfTitle(e.target.value)}
+                                />
+                            </label>
+                            <label className="pdfLabel">
+                                Year
+                                <select className="pdfSelect" value={pdfYear} onChange={e => setPdfYear(e.target.value)}>
+                                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                </select>
+                            </label>
+                            <label className="pdfLabel">
+                                Semester
+                                <select className="pdfSelect" value={pdfSemester} onChange={e => setPdfSemester(e.target.value)}>
+                                    {SEMESTERS.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </label>
+                            <label className="pdfLabel">
+                                Description
+                                <textarea
+                                    className="pdfTextarea"
+                                    value={pdfDescription}
+                                    onChange={e => setPdfDescription(e.target.value.slice(0, 255))}
+                                    placeholder="Add additional information here, e.g. professor(s)"
+                                    rows={3}
+                                    maxLength={255}
+                                />
+                            </label>
+                            <p className="pdfWarning">
+                                ⚠️ Ensure that you have uploaded the correct file. Ensure that all information is correct before saving.
+                            </p>
+                        </div>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={() => setShowPDFModal(false)}>
+                                Cancel
+                            </button>
+                            <button className="btn primary" onClick={handlePDFConfirm} disabled={uploading || !pdfTitle.trim()}>
+                                {uploading ? "Saving..." : "Save to Course"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Leave course modal */}
+            {showLeaveModal && (
+                <div className="modalOverlay" onClick={() => setShowLeaveModal(false)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Leave this course?</div>
+                        <p className="modalBody">
+                            Are you sure you want to leave <strong>{course?.courseCode} — {course?.courseName}</strong>?
+                            You can always re-enroll later.
+                        </p>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={() => setShowLeaveModal(false)}>
+                                Cancel
+                            </button>
+                            <button className="btn leaveConfirmBtn" onClick={handleLeave} disabled={leaving}>
+                                {leaving ? "Leaving..." : "Yes, leave"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default CoursePage;

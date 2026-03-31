@@ -74,9 +74,26 @@ public class LibraryItemController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<LibraryItemResponseDTO> uploadPDF(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<LibraryItemResponseDTO> uploadPDF(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "title", required = false) String title
+    ) throws IOException {
+        UUID userId = getAuthenticatedUserId();                         // ← yours
+        LibraryItem item = libraryItemService.uploadPDF(file, title, userId); // ← both
+        return ResponseEntity.ok(toResponse(item));
+    }
+
+    @PostMapping(value = "/upload/course", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<LibraryItemResponseDTO> uploadPDFToCourse(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "year", required = false) String year,
+            @RequestParam(value = "semester", required = false) String semester,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam("courseId") UUID courseId
+    ) throws IOException {
         UUID userId = getAuthenticatedUserId();
-        LibraryItem item = libraryItemService.uploadPDF(file, userId);
+        LibraryItem item = libraryItemService.uploadPDFToCourse(file, title, year, semester, description, courseId, userId);
         return ResponseEntity.ok(toResponse(item));
     }
 
@@ -108,10 +125,29 @@ public class LibraryItemController {
         return ResponseEntity.ok(toResponse(updated));
     }
 
+
     private UUID getAuthenticatedUserId() {
         String userId = (String) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
         return UUID.fromString(userId);
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> downloadPDF(@PathVariable UUID id) throws IOException {
+        LibraryItem item = libraryItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+
+        PDF pdf = (PDF) item;
+        Path filePath = Paths.get(pdf.getFilePath());
+        Resource resource = new UrlResource(filePath.toUri());
+
+        String filename = (item.getTitle() != null ? item.getTitle() : "document") + ".pdf";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
+
     }
 }
