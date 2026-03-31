@@ -227,19 +227,25 @@ export async function stopStudying(userId) {
 /* University & Courses ------------------------------------------- */
 
 export async function getUniversity(userId) {
-    const res = await fetch(`${API_BASE}/api/users/${userId}/university`);
+    const res = await fetch(`${API_BASE}/api/users/${userId}/university`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to fetch university");
     return res.json();
 }
 
 export async function getCourses(universityId) {
-    const res = await fetch(`${API_BASE}/api/universities/${universityId}/courses`);
+    const res = await fetch(`${API_BASE}/api/universities/${universityId}/courses`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to fetch courses");
     return res.json();
 }
 
 export async function getEnrolledCourses(userId) {
-    const res = await fetch(`${API_BASE}/api/users/${userId}/enrolled-courses`);
+    const res = await fetch(`${API_BASE}/api/users/${userId}/enrolled-courses`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to fetch enrolled courses");
     return res.json();
 }
@@ -249,6 +255,7 @@ export async function enrollInCourse(userId, courseId) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ courseId }),
+        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to enroll in course");
     return res.json();
@@ -263,6 +270,7 @@ export async function getCourse(courseId) {
 export async function unenrollFromAllCourses(userId) {
     const res = await fetch(`${API_BASE}/api/users/${userId}/unenroll-all`, {
         method: "DELETE",
+        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to unenroll from all courses");
 }
@@ -270,6 +278,7 @@ export async function unenrollFromAllCourses(userId) {
 export async function unenrollFromCourse(userId, courseId) {
     const res = await fetch(`${API_BASE}/api/users/${userId}/unenroll/${courseId}`, {
         method: "DELETE",
+        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to unenroll from course");
 }
@@ -300,6 +309,7 @@ export async function uploadPDFToCourse(file, title, year, semester, description
     const res = await fetch(`${API_BASE}/library-items/upload/course`, {
         method: "POST",
         body: formData,
+        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to upload PDF to course");
     return res.json();
@@ -414,7 +424,9 @@ export function downloadPDF(itemId, title) {
 }
 
 export async function getCourseItems(courseId) {
-    const res = await fetch(`${API_BASE}/course-library-items/course/${courseId}`);
+    const res = await fetch(`${API_BASE}/course-library-items/course/${courseId}`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to fetch course items");
     return res.json();
 }
