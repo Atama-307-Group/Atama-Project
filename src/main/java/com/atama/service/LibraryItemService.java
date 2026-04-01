@@ -34,9 +34,10 @@ public class LibraryItemService {
 ////        item.setItem_type(resolveItemType(item));
 //    }
 
-    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto) {
+    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto, UUID userId) {
         // TODO need to fix so that the user UUID is sent
-        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
 
         item.setTitle(dto.getTitle());
@@ -59,30 +60,15 @@ public class LibraryItemService {
         }
     }
 
-    // for when we start actually using id
-    /*public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto, Long userId) {
-        Library library = libraryRepository.findByOwnerId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Library not found for user"));
-
-        item.setLibrary(library);
-        item.setItem_type(resolveItemType(item));
-
-        if (dto.getFolderId() != null) {
-            Folder folder = folderRepository.findById(dto.getFolderId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Folder not found"));
-            // optionally verify folder belongs to same library
-            item.setFolder(folder);
-        }
-    }*/
-
     private LibraryItemType resolveItemType(LibraryItem item) {
         if (item instanceof FlashcardSet) return LibraryItemType.FLASHCARD_SET;
         if (item instanceof PDF) return LibraryItemType.PDF;
         throw new IllegalArgumentException("Unknown LibraryItem subtype: " + item.getClass());
     }
 
-    public List<LibraryItem> getAllItems() {
-        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+    public List<LibraryItem> getAllItems(UUID userId) {
+        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         return libraryItemRepository.findAllByLibraryId(library.getId());
     }
@@ -103,58 +89,50 @@ public class LibraryItemService {
         return libraryItemRepository.save(item);
     }
 
-//    public LibraryItem uploadPDF(MultipartFile file, String title, String semester, String year, String description, UUID courseId) throws IOException {
-//        String uploadsDir = "uploads/";
-//        Files.createDirectories(Paths.get(uploadsDir));
-//
-//        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-//        Path filePath = Paths.get(uploadsDir + fileName);
-//        Files.write(filePath, file.getBytes());
-//
-//        PDF pdf = new PDF();
-//
-//        pdf.setTitle(title != null ? title : file.getOriginalFilename());
-//        pdf.setFilePath(filePath.toString());
-//        pdf.setItemType(LibraryItemType.PDF);
-//        pdf.setDescription(description);
-//
-//        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
-//                .orElseThrow(() -> new RuntimeException("Library not found"));
-//        pdf.setLibrary(library);
-//
-//        return pdfRepository.save(pdf);
-//    }
-
-    private PDF createPDF(MultipartFile file, String title) throws IOException {
+    /*public LibraryItem uploadPDF(MultipartFile file, UUID userId) throws IOException {
         String uploadsDir = "uploads/";
         Files.createDirectories(Paths.get(uploadsDir));
+
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = Paths.get(uploadsDir + fileName);
         Files.write(filePath, file.getBytes());
 
         PDF pdf = new PDF();
-        pdf.setTitle(title != null ? title : file.getOriginalFilename());
+        pdf.setTitle(file.getOriginalFilename());
         pdf.setFilePath(filePath.toString());
         pdf.setItemType(LibraryItemType.PDF);
 
-        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         pdf.setLibrary(library);
 
+        return pdfRepository.save(pdf);
+    }*/
+    private PDF createPDF(MultipartFile file, String title, UUID userId) throws IOException {
+        String uploadsDir = "uploads/";
+        Files.createDirectories(Paths.get(uploadsDir));
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadsDir + fileName);
+        Files.write(filePath, file.getBytes());
+        PDF pdf = new PDF();
+        pdf.setTitle(title != null ? title : file.getOriginalFilename());
+        pdf.setFilePath(filePath.toString());
+        pdf.setItemType(LibraryItemType.PDF);
+        Library library = libraryRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Library not found"));
+        pdf.setLibrary(library);
         return pdf;
     }
 
-    public LibraryItem uploadPDF(MultipartFile file, String title) throws IOException {
-        PDF pdf = createPDF(file, title);
-        return pdfRepository.save(pdf);
+    public LibraryItem uploadPDF(MultipartFile file, String title, UUID userId) throws IOException {
+        return pdfRepository.save(createPDF(file, title, userId));
     }
 
-    public LibraryItem uploadPDFToCourse(MultipartFile file, String title, String year, String semester, String description, UUID courseId) throws IOException {
-        PDF savedPdf = pdfRepository.save(createPDF(file, title));
-
+    public LibraryItem uploadPDFToCourse(MultipartFile file, String title, String year, String semester, String description, UUID courseId, UUID userId) throws IOException {
+        PDF savedPdf = pdfRepository.save(createPDF(file, title, userId));
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
-
         CourseLibraryItem cli = new CourseLibraryItem();
         cli.setCourse(course);
         cli.setLibraryItem(savedPdf);
@@ -162,7 +140,6 @@ public class LibraryItemService {
         cli.setSemester(semester == null || semester.equals("Unknown") ? null : semester);
         cli.setDescription(description);
         courseLibraryItemRepository.save(cli);
-
         return savedPdf;
     }
 

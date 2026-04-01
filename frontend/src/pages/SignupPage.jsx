@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { registerUser, sendVerificationCode, registerVerifiedUser } from '../api.js';
 import './SignupPage.css';
 
 const SignupPage = () => {
     const navigate = useNavigate();
-    const [signupType, setSignupType] = useState('regular'); // 'regular' or 'purdue'
+    const [signupType, setSignupType] = useState('regular');
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -15,7 +16,6 @@ const SignupPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
 
-    // Verification step state (Purdue flow)
     const [verificationStep, setVerificationStep] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
 
@@ -33,7 +33,6 @@ const SignupPage = () => {
         setVerificationCode('');
     };
 
-    // Regular signup
     const handleRegularSubmit = async (e) => {
         e.preventDefault();
         if (formData.password !== formData.confirmPassword) {
@@ -43,18 +42,11 @@ const SignupPage = () => {
         setStatus({ loading: true, error: '', success: '' });
 
         try {
-            const { confirmPassword, ...submitData } = formData;
-            const response = await fetch('/api/users/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(submitData)
+            await registerUser({
+                username: formData.username,
+                email: formData.email,
+                password: formData.password
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Registration failed.');
-            }
-
             setStatus({ loading: false, error: '', success: 'Account created successfully! Redirecting to login...' });
             setFormData({ username: '', email: '', password: '', confirmPassword: '' });
             setTimeout(() => navigate('/login'), 1500);
@@ -63,7 +55,6 @@ const SignupPage = () => {
         }
     };
 
-    // Purdue step 1: send verification code
     const handleSendVerification = async (e) => {
         e.preventDefault();
         if (formData.password !== formData.confirmPassword) {
@@ -77,17 +68,7 @@ const SignupPage = () => {
         setStatus({ loading: true, error: '', success: '' });
 
         try {
-            const response = await fetch('/api/users/send-verification', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: formData.email })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to send verification code.');
-            }
-
+            await sendVerificationCode(formData.email);
             setVerificationStep(true);
             setStatus({ loading: false, error: '', success: 'Verification code sent to ' + formData.email });
         } catch (err) {
@@ -95,28 +76,17 @@ const SignupPage = () => {
         }
     };
 
-    // Purdue step 2: verify code + register
     const handleVerifiedRegister = async (e) => {
         e.preventDefault();
         setStatus({ loading: true, error: '', success: '' });
 
         try {
-            const response = await fetch('/api/users/register-verified', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: formData.username,
-                    email: formData.email,
-                    password: formData.password,
-                    code: verificationCode
-                })
+            await registerVerifiedUser({
+                username: formData.username,
+                email: formData.email,
+                password: formData.password,
+                code: verificationCode
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Verification failed.');
-            }
-
             setStatus({ loading: false, error: '', success: 'Purdue account verified and created! Redirecting to login...' });
             setTimeout(() => navigate('/login'), 1500);
         } catch (err) {
@@ -131,7 +101,6 @@ const SignupPage = () => {
             <div className="signup-card">
                 <h2 className="signup-title">Create Account</h2>
 
-                {/* Toggle */}
                 <div className="signup-toggle">
                     <button
                         className={`toggle-btn ${signupType === 'regular' ? 'active' : ''}`}
@@ -156,7 +125,6 @@ const SignupPage = () => {
                 {status.error && <div className="alert error">{status.error}</div>}
                 {status.success && <div className="alert success">{status.success}</div>}
 
-                {/* Verification code step (Purdue only) */}
                 {verificationStep && signupType === 'purdue' ? (
                     <form onSubmit={handleVerifiedRegister} className="signup-form">
                         <div className="verification-info">
@@ -187,7 +155,6 @@ const SignupPage = () => {
                         </p>
                     </form>
                 ) : (
-                    /* Main signup form */
                     <form
                         onSubmit={signupType === 'purdue' ? handleSendVerification : handleRegularSubmit}
                         className="signup-form"

@@ -1,15 +1,20 @@
 package com.atama.controller;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.dto.response.LoginResult;
 import com.atama.model.Course;
 import com.atama.model.User;
+import com.atama.service.JwtService;
 import com.atama.service.PasswordResetService;
 import com.atama.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,26 +26,46 @@ public class UserController {
 
     private final UserService userService;
     private final PasswordResetService passwordResetService;
+    private final JwtService jwtService;
     private final com.atama.service.EmailVerificationService emailVerificationService;
 
+
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> request) {
-        String identifier = request.get("identifier"); // username or email
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> request,
+                                       HttpServletResponse response) {
+        String identifier = request.get("identifier");
         String password = request.get("password");
 
         try {
-            User user = userService.loginUser(identifier, password);
-            java.util.Map<String, Object> response = new java.util.HashMap<>();
-            response.put("id", user.getId().toString());
-            response.put("username", user.getUsername());
-            response.put("email", user.getEmail());
-            response.put("profilePictureUrl", user.getProfilePictureUrl());
-            response.put("verified", user.isVerified());
-            return ResponseEntity.ok(response);
+            LoginResult result = userService.loginUser(identifier, password);
+            User user = result.user(); // returns more info now, and uses JWT token
+            response.addCookie(jwtService.createAuthCookie(result.token()));
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("id", user.getId().toString());
+            responseBody.put("username", user.getUsername());
+            responseBody.put("email", user.getEmail());
+            responseBody.put("profilePictureUrl", user.getProfilePictureUrl());
+            responseBody.put("verified", user.isVerified());
+
+            return ResponseEntity.ok(responseBody);
+
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", e.getMessage()));
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // tells the browser to delete it immediately
+        response.addCookie(cookie);
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully."));
     }
 
     @PostMapping("/register")

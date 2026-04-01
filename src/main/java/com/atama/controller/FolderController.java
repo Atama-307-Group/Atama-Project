@@ -12,6 +12,7 @@ import com.atama.repository.FolderRepository;
 import com.atama.repository.LibraryItemRepository;
 import com.atama.service.FolderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,8 +49,8 @@ public class FolderController {
 
     @PostMapping
     public ResponseEntity<FolderResponse> createFolder(@RequestBody CreateFolderRequest request) {
-
-        Folder saved = folderService.createFolder(request);
+        UUID userId = getAuthenticatedUserId();
+        Folder saved = folderService.createFolder(request, userId);
         return ResponseEntity.ok(toResponse(saved));
     }
 
@@ -86,8 +87,9 @@ public class FolderController {
     // Get all Folders
     @GetMapping
     public ResponseEntity<List<FolderResponse>> getAllFolders() {
+        UUID userId = getAuthenticatedUserId();
         return ResponseEntity.ok(
-                folderService.getAllFolders().stream()
+                folderService.getAllFolders(userId).stream()
                         .map(FolderController::toResponse)
                         .toList()
         );
@@ -121,5 +123,12 @@ public class FolderController {
     ) {
         Folder updated = folderService.setFolderPrivacy(id, request.isPublic());
         return ResponseEntity.ok(toResponse(updated));
+    }
+
+    private UUID getAuthenticatedUserId() {
+        String userId = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return UUID.fromString(userId);
     }
 }
