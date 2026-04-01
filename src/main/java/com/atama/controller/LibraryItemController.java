@@ -11,6 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,8 +47,9 @@ public class LibraryItemController {
 
     @GetMapping
     public ResponseEntity<List<LibraryItemResponseDTO>> getAllLibraryItems() {
+        UUID userId = getAuthenticatedUserId();
         return ResponseEntity.ok(
-                libraryItemService.getAllItems().stream()
+                libraryItemService.getAllItems(userId).stream()
                         .map(LibraryItemController::toResponse)
                         .toList()
         );
@@ -76,7 +78,8 @@ public class LibraryItemController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "title", required = false) String title
     ) throws IOException {
-        LibraryItem item = libraryItemService.uploadPDF(file, title);
+        UUID userId = getAuthenticatedUserId();                         // ← yours
+        LibraryItem item = libraryItemService.uploadPDF(file, title, userId); // ← both
         return ResponseEntity.ok(toResponse(item));
     }
 
@@ -89,7 +92,8 @@ public class LibraryItemController {
             @RequestParam(value = "description", required = false) String description,
             @RequestParam("courseId") UUID courseId
     ) throws IOException {
-        LibraryItem item = libraryItemService.uploadPDFToCourse(file, title, year, semester, description, courseId);
+        UUID userId = getAuthenticatedUserId();
+        LibraryItem item = libraryItemService.uploadPDFToCourse(file, title, year, semester, description, courseId, userId);
         return ResponseEntity.ok(toResponse(item));
     }
 
@@ -121,6 +125,14 @@ public class LibraryItemController {
         return ResponseEntity.ok(toResponse(updated));
     }
 
+
+    private UUID getAuthenticatedUserId() {
+        String userId = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return UUID.fromString(userId);
+    }
+
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> downloadPDF(@PathVariable UUID id) throws IOException {
         LibraryItem item = libraryItemRepository.findById(id)
@@ -136,5 +148,6 @@ public class LibraryItemController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
+
     }
 }
