@@ -95,7 +95,7 @@ const FlashcardStartPage = ({ currentUser, onLogout }) => {
       ) : (
         // NOT LOGGED IN: Landing page
         <div className="start-content landing">
-          <h1>Study smarter with Atama</h1>
+          <h1>Study smarter with Atama</h1>:x
           <p className="tagline">Study flashcards and share course materials, all in one place.</p>
           <div className="action-buttons">
             <button className="action-btn primary" onClick={() => navigate('/signup')}>Get Started</button>
