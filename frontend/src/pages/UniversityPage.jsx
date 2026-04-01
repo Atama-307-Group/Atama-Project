@@ -24,13 +24,15 @@ const UniversityPage = ({ userId }) => {
     const searchInputRef = useRef(null);
 
     useEffect(() => {
-        if (!userId) return;
-        getUniversity(userId)
+        getUniversity()
             .then(uni => {
+                console.log("uni:", uni);
                 setUniversity(uni);
                 return Promise.all([getCourses(uni.id), getEnrolledCourses(userId)]);
             })
             .then(([allCourses, enrolled]) => {
+                        console.log("courses:", allCourses); // check this isn't empty
+                        console.log("enrolled:", enrolled);
                 setCourses(allCourses);
                 setEnrolledIds(new Set(enrolled.map(c => c.id)));
             })

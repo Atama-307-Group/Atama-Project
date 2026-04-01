@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -240,9 +241,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}/enrolled-courses")
-    public ResponseEntity<List<Course>> getEnrolledCourses(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getEnrolledCourses(id));
+    private UUID getAuthenticatedUserId() {
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return UUID.fromString(userId);
+    }
+
+    @GetMapping("/enrolled-courses")
+    public ResponseEntity<List<Course>> getEnrolledCourses() {
+        UUID userId = getAuthenticatedUserId();
+        return ResponseEntity.ok(userService.getEnrolledCourses(userId));
     }
 
     @PostMapping("/{id}/enroll")

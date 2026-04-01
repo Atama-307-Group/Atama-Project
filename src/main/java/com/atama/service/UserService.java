@@ -162,12 +162,14 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public List<Course> getEnrolledCourses(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         return user.getEnrolledCourses();
     }
 
+    @Transactional(readOnly = true)
     public void enrollInCourse(UUID userId, UUID courseId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -180,6 +182,7 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public void unenrollFromCourse(UUID userId, UUID courseId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
