@@ -1,5 +1,6 @@
 package com.atama.controller;
 
+import com.atama.dto.response.LibraryResponseDTO;
 import com.atama.model.Library;
 import com.atama.service.LibraryService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,11 @@ public class LibraryController {
     public ResponseEntity<Library> getMyLibrary() {
         UUID userId = getAuthenticatedUserId();
         return ResponseEntity.ok(libraryService.getLibraryByUserId(userId));
+    }
+    @GetMapping("/me/contents")
+    public ResponseEntity<LibraryResponseDTO> getMyLibraryContents() {
+        UUID userId = getAuthenticatedUserId();
+        return ResponseEntity.ok(libraryService.getLibraryContents(userId));
     }
 
     @PatchMapping("/privacy")

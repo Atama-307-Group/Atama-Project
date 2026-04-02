@@ -112,6 +112,14 @@ export async function getLibraryItems() {
     return res.json();
 }
 
+export async function getLibraryContents() {
+    const res = await fetch(`${API_BASE}/api/libraries/me/contents`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load library");
+    return res.json();
+}
+
 export async function moveItemToFolder(itemId, folderId) {
     const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
         method: "PATCH",

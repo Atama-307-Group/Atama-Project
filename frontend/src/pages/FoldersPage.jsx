@@ -1,7 +1,20 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {
-    createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy,
-    getLibraryItems, moveItemToFolder, removeItemFromFolder, uploadPDF, recordAccess, openPDF, toggleItemStarred
+    createFolder,
+    getFolders,
+    renameFolder,
+    deleteFolder,
+    setFolderStarred,
+    getFolderItems,
+    setFolderPrivacy,
+    getLibraryItems,
+    moveItemToFolder,
+    removeItemFromFolder,
+    uploadPDF,
+    recordAccess,
+    openPDF,
+    toggleItemStarred,
+    getLibraryContents
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
@@ -61,7 +74,7 @@ const FoldersPage = () => {
 
     const fileInputRef = useRef(null); // PDF Uploads
 
-    async function loadFolders() {
+    /*async function loadFolders() {
         setError("");
         setLoading(true);
         try {
@@ -79,7 +92,7 @@ const FoldersPage = () => {
     // Load the folders
     useEffect(() => {
         loadFolders();
-    }, []);
+    }, []);*/
 
     // Close overflow menu when clicking outside
     useEffect(() => {
@@ -161,7 +174,7 @@ const FoldersPage = () => {
     }, [selectedFolderId]);
 
     // Loading library items
-    async function loadLibItems() {
+    /*async function loadLibItems() {
         try {
             const data = await getLibraryItems();
             setLibItems(Array.isArray(data) ? data : []);
@@ -172,6 +185,24 @@ const FoldersPage = () => {
 
     useEffect(() => {
         loadLibItems();
+    }, []);*/
+
+    async function loadLibrary() {
+        setError("");
+        setLoading(true);
+        try {
+            const data = await getLibraryContents();
+            setFolders(Array.isArray(data.folders) ? data.folders : []);
+            setLibItems(Array.isArray(data.looseItems) ? data.looseItems : []);
+        } catch (err) {
+            setError(err.message ?? "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        loadLibrary();
     }, []);
 
     const filteredFolderItems = useMemo(() => {
@@ -397,7 +428,7 @@ const FoldersPage = () => {
         setConfirmDeleteId(id);
     }
 
-    async function confirmDelete() {
+    /*async function confirmDelete() {
         const id = confirmDeleteId;
         setConfirmDeleteId(null);
 
@@ -418,6 +449,20 @@ const FoldersPage = () => {
                 setItems([]);
                 setSelectedFolderId(null);
             }
+        } catch (err) {
+            setError(err.message ?? "Failed to delete folder");
+        }
+    }*/
+    async function confirmDelete() {
+        const id = confirmDeleteId;
+        setConfirmDeleteId(null);
+        try {
+            await deleteFolder(id);
+            if (selectedFolderId === id) {
+                setItems([]);
+                setSelectedFolderId(null);
+            }
+            await loadLibrary(); // re-syncs both folders and loose items in one shot
         } catch (err) {
             setError(err.message ?? "Failed to delete folder");
         }
@@ -635,7 +680,7 @@ const FoldersPage = () => {
                     {selectedFolderId == null ? (
                         loading ? (
                             <div className="emptyState">Gathering your library …</div>
-                        ) : filtered.length === 0 ? (
+                        ) : filtered.length === 0 && filteredItems.length === 0 ? (
                             <div className="emptyState">No items found.</div>
                         ) : (
                             <div className="folderGrid">
@@ -651,7 +696,7 @@ const FoldersPage = () => {
                                                 setLibItems(prev => prev.filter(i => !selectedItemIds.has(i.id)));
                                                 setSelectedItemIds(new Set());
                                             } else {
-                                                await recordAccess(selectedItemIds.id)
+                                                //await recordAccess(selectedItemIds.id)
                                                 setSelectedFolderId(f.id);
                                             }
                                         }}
