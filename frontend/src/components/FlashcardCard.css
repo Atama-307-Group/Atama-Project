@@ -1,8 +1,10 @@
 .flashcard-card {
-    border: 1px solid rgba(51,81,69,0.22);
+    border: 1px solid #c3d4cc;
     border-radius: 14px;
     padding: 16px;
     background: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .flashcard-card-header {
@@ -17,7 +19,7 @@
     font-size: 1.1em;
     min-width: 24px;
     text-align: center;
-    color: var(--pine);
+    color: #2b5c3f;
 }
 
 .flashcard-card-type {
@@ -25,8 +27,8 @@
     font-weight: 600;
     padding: 4px 10px;
     border-radius: 6px;
-    border: 1px solid rgba(51,81,69,0.22);
-    color: var(--pine);
+    border: 1px solid #c3d4cc;
+    color: #2b5c3f;
     text-transform: capitalize;
 }
 
@@ -34,28 +36,34 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .flashcard-card-field {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .flashcard-card-label {
     font-size: 0.85em;
     font-weight: 600;
-    color: #aaa;
+    color: #4a6b57;
 }
 
 .flashcard-card-value {
     padding: 10px 12px;
     font-size: 1em;
-    border: 1px solid rgba(51,81,69,0.22);
+    border: 1px solid #c3d4cc;
     border-radius: 6px;
     background: transparent;
-    color: var(--deep);
+    color: #1a3c27;
     min-height: 40px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .flashcard-card-list {
@@ -64,14 +72,16 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    box-sizing: border-box;
 }
 
 .flashcard-card-list li {
     padding: 8px 12px;
-    border: 1px solid rgba(51,81,69,0.22);
+    border: 1px solid #c3d4cc;
     border-radius: 6px;
-    color: var(--deep);
+    color: #1a3c27;
     list-style-position: outside;
+    box-sizing: border-box;
 }
 
 .flashcard-card-tags {
@@ -83,8 +93,8 @@
 .flashcard-card-tag {
     padding: 4px 12px;
     border-radius: 20px;
-    border: 1px solid rgba(51,81,69,0.30);
+    border: 1px solid #c3d4cc;
     font-size: 0.9em;
-    color: var(--pine);
-    background: rgba(119,191,163,0.08);
+    color: #2b5c3f;
+    background: rgba(43,92,63,0.06);
 }

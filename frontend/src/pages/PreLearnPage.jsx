@@ -20,31 +20,38 @@ const PreLearnPage = ({ flashcards }) => {
     };
 
     return (
-        <div style={{ maxWidth: '500px', margin: '50px auto', fontFamily: 'sans-serif' }}>
-            <h2>Learn Settings</h2>
-            <h3>Front of Card:</h3>
-            <div>
-                <label>
-                    <input type="radio" value="term" checked={frontChoice === 'term'}
-                           onChange={() => setFrontChoice('term')} /> Term
-                </label>
-                <br />
-                <label>
-                    <input type="radio" value="definition" checked={frontChoice === 'definition'}
-                           onChange={() => setFrontChoice('definition')} /> Definition
-                </label>
-            </div>
-            <h3>Other Options:</h3>
-            <div style={{ marginTop: '20px' }}>
-                <label>
-                    <input type="checkbox" checked={favoritesOnly}
-                           onChange={() => setFavoritesOnly(!favoritesOnly)} /> Favorited cards only
-                </label>
-            </div>
-            <div style={{ marginTop: '30px' }}>
-                <button onClick={handleStart} style={{ padding: '10px 20px', fontSize: '16px' }}>
-                    Start Learning
-                </button>
+        <div style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+        }}>
+            <div style={{ maxWidth: '500px', width: '100%', fontFamily: 'sans-serif', textAlign: 'center' }}>
+                <h2>Learn Settings</h2>
+                <h3>Front of Card:</h3>
+                <div>
+                    <label>
+                        <input type="radio" value="term" checked={frontChoice === 'term'}
+                               onChange={() => setFrontChoice('term')} /> Term
+                    </label>
+                    <br />
+                    <label>
+                        <input type="radio" value="definition" checked={frontChoice === 'definition'}
+                               onChange={() => setFrontChoice('definition')} /> Definition
+                    </label>
+                </div>
+                <h3>Other Options:</h3>
+                <div style={{ marginTop: '20px' }}>
+                    <label>
+                        <input type="checkbox" checked={favoritesOnly}
+                               onChange={() => setFavoritesOnly(!favoritesOnly)} /> Favorited cards only
+                    </label>
+                </div>
+                <div style={{ marginTop: '30px' }}>
+                    <button onClick={handleStart} style={{ padding: '10px 20px', fontSize: '16px', borderRadius: '5px'}}>
+                        Start Learning
+                    </button>
+                </div>
             </div>
         </div>
     );

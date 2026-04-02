@@ -31,6 +31,9 @@
     border: 1px solid rgba(0, 0, 0, 0.06);
     align-self: center;
     display: block;
+
+    height: auto;
+    overflow: visible;
 }
 
 /* ===== Form Elements ===== */
@@ -379,4 +382,38 @@
 .toggleSwitch input:disabled+.toggleSlider {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* ===== Calendar (Streak) ===== */
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 12px;
+    width: 100%;
+    padding-bottom: 8px;
+}
+
+.calendarDay {
+    border-radius: 6px;
+    padding: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+    background: #f2f2f2;
+    box-sizing: border-box;
+}
+
+.calendarDay.studied {
+    background: #6ecf8d;
+    color: white;
+    font-weight: bold;
+}
+
+.calendarHeader {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: #2f3e3b;
 }

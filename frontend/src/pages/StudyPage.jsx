@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StudyPage.css';
-import { useEffect } from "react";
 import { startStudying, stopStudying } from "../api.js";
 
 const StudyPage = ({ onToggleFavorite, userId }) => {
@@ -16,6 +15,25 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
     const [isFlipped, setIsFlipped] = useState(false);
     const [flippedCards, setFlippedCards] = useState(new Set());
     const [cards, setCards] = useState(initialFlashcards);
+    const hasStoppedRef = useRef(false);
+
+    useEffect(() => {
+            console.log("StudyPage userId:", userId);
+            if (!userId) return;
+
+            startStudying(userId).catch(console.error);
+
+            return () => {
+                stopStudying(userId).catch(console.error);
+            };
+        }, [userId]);
+
+    // Stops studying when user closes the tab
+        useEffect(() => {
+            const handleUnload = () => stopStudying(userId).catch(console.error);
+            window.addEventListener("beforeunload", handleUnload);
+            return () => window.removeEventListener("beforeunload", handleUnload);
+        }, [userId]);
 
     // 2. SAFETY CHECK: If no cards found, prevent crashes
     if (!cards || cards.length === 0) {
@@ -60,10 +78,17 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         setCurrentIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
     };
 
-    const handleDone = () => {
-        navigate('/post_learn', {
-            state: { studiedCount: flippedCards.size, totalCount: cards.length }
-        });
+    const handleDone = async () => {
+        try {
+            await stopStudying(userId); // make sure streak updates
+            navigate('/post_learn', {
+                state: { studiedCount: flippedCards.size, totalCount: cards.length }
+            });
+
+        } catch (err) {
+            console.error("Failed to finish session:", err);
+            alert("Could not finish session. Please try again.");
+        }
     };
 
     const handleToggleFavorite = (e) => {
@@ -81,30 +106,11 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         setCurrentIndex(0);
     }
 
-    useEffect(() => {
-        console.log("StudyPage userId:", userId);
-        if (!userId) return;
-
-        startStudying(userId).catch(console.error);
-
-        return () => {
-            // This cleanup runs when the user navigates away
-            stopStudying(userId).catch(console.error);
-        };
-    }, [userId]);
-
-// Stops studying when user closes the tab
-    useEffect(() => {
-        const handleUnload = () => stopStudying(userId).catch(console.error);
-        window.addEventListener("beforeunload", handleUnload);
-        return () => window.removeEventListener("beforeunload", handleUnload);
-    }, [userId]);
-
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
             <h2>Learn</h2>
 
-            <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div style={{ position: 'relative', width: '400px', maxWidth: '90%', margin: '0 auto' }}>
                 {/* ⭐ Favorite Star */}
                 <button
                     onClick={handleToggleFavorite}
@@ -125,10 +131,46 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
                     {currentCard.favorite ? '★' : '☆'}
                 </button>
 
-                <div className="card-container" onClick={handleFlip}>
-                    <div className={`card ${isFlipped ? 'flipped' : ''}`}>
-                        <div className="front">{frontContent}</div>
-                        <div className="back">{backContent}</div>
+                {/* Perspective wrapper — must be separate from the flipping element */}
+                <div style={{ perspective: '1000px', width: '100%', marginBottom: '20px' }}>
+                    <div
+                        onClick={handleFlip}
+                        style={{
+                            width: '100%',
+                            height: '200px',
+                            position: 'relative',
+                            transformStyle: 'preserve-3d',
+                            WebkitTransformStyle: 'preserve-3d',
+                            transition: 'transform 0.6s',
+                            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        <div style={{
+                            position: 'absolute', top: 0, left: 0,
+                            width: '100%', height: '100%',
+                            backfaceVisibility: 'hidden',
+                            WebkitBackfaceVisibility: 'hidden',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            padding: '20px', boxSizing: 'border-box',
+                            border: '2px solid #333', borderRadius: '10px',
+                            backgroundColor: 'white',
+                        }}>
+                            {frontContent}
+                        </div>
+                        <div style={{
+                            position: 'absolute', top: 0, left: 0,
+                            width: '100%', height: '100%',
+                            backfaceVisibility: 'hidden',
+                            WebkitBackfaceVisibility: 'hidden',
+                            transform: 'rotateY(180deg)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            padding: '20px', boxSizing: 'border-box',
+                            border: '2px solid #333', borderRadius: '10px',
+                            backgroundColor: 'white',
+                        }}>
+                            {backContent}
+                        </div>
                     </div>
                 </div>
             </div>

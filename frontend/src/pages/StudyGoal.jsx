@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import { getGoal, updateGoal } from "../api.js"; // adjust path as needed
+import { getGoal, updateGoal, getStreak } from "../api.js"; // adjust path as needed
 import { useNavigate } from "react-router-dom";
 import "./studyGoal.css";
 
@@ -47,6 +47,11 @@ const GoalsPage = ({ userId }) => {
     // Optional progress preview
     const [progress, setProgress] = useState(0);
 
+    // Streak
+    const [streak, setStreak] = useState(0);
+    const [studyDates, setStudyDates] = useState([]);
+    const [bestStreak, setBestStreak] = useState(0);
+
     // Track when a save is in flight so polls don't overwrite fresh local state
     const pendingSaveRef = useRef(false);
 
@@ -70,6 +75,36 @@ const GoalsPage = ({ userId }) => {
         if (target <= 0) return 0;
         return Math.min(100, (progress / target) * 100);
     }, [progress, effectiveMinutes]);
+
+    const calendarDays = useMemo(() => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+
+        const lastDay = new Date(year, month + 1, 0);
+
+        const days = [];
+
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+            const date = new Date(year, month, i)
+                .toLocaleDateString("sv-SE")
+
+            days.push({
+                day: i,
+                studied: studyDates.includes(date)
+            });
+        }
+
+        return days;
+    }, [studyDates]);
+
+    const monthLabel = useMemo(() => {
+        const today = new Date();
+        return today.toLocaleString("default", {
+            month: "long",
+            year: "numeric"
+        });
+    }, []);
 
     const goalMet = percent >= 100;
 
@@ -105,8 +140,24 @@ const GoalsPage = ({ userId }) => {
 
         loadGoal();
 
+        const loadStreak = () => {
+            getStreak(userId)
+                .then(data => {
+                    console.log("getStreak response:", data);
+                    setStreak(data.currentStreak);
+                    setBestStreak(data.bestStreak || 0);
+                    setStudyDates(data.studyDates || []);
+                })
+                .catch(console.error);
+        };
+
+        loadStreak();
+
         // Then poll every 60 seconds to keep progress bar updated
-        const interval = setInterval(loadGoal, 60000);
+        const interval = setInterval(() => {
+            loadGoal();
+            loadStreak();
+        }, 60000);
         return () => clearInterval(interval);
     }, [userId]);
     function toggleDay(dayKey) {
@@ -168,7 +219,6 @@ const GoalsPage = ({ userId }) => {
         setIsEditingGoal(false);
         persistGoal(selectedDays, draftMinutes);
     }
-
 
     return (
         <div className="goalPage">
@@ -426,6 +476,35 @@ const GoalsPage = ({ userId }) => {
                                 }}>Cancel</button>
                             </>
                         )}
+                    </div>
+                </div>
+
+                {/* Card 4: Study Streak */}
+                <div className="card">
+                    <div className="sectionTitle">
+                        🏆 Best: {bestStreak} day{bestStreak !== 1 ? "s" : ""}
+                    </div>
+                    <div className="sectionTitle">
+                        🔥 Streak: {streak} day{streak !== 1 ? "s" : ""}
+                    </div>
+
+                    <div className="calendarHeader">
+                        {monthLabel}
+                    </div>
+
+                    <div className="calendar">
+                        {calendarDays.map((d, i) => (
+                            <div
+                                key={i}
+                                className={`calendarDay ${d.studied ? "studied" : ""}`}
+                            >
+                                {d.day}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="hint">
+                        Days highlighted indicate when you studied.
                     </div>
                 </div>
             </div>

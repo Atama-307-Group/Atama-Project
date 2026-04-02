@@ -10,6 +10,9 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,6 +51,18 @@ public class Goal {
     private boolean notifyByEmail = false;
 
     private LocalTime notificationTime;
+
+    // Streak fields
+    private int currentStreak = 0;
+
+    private java.time.LocalDate lastStudyDate;
+
+    private int bestStreak = 0;
+
+    @ElementCollection(fetch = FetchType.EAGER) // Eager ensures dates are loaded for the streak calculation
+    @CollectionTable(name = "goal_study_dates", joinColumns = @JoinColumn(name = "goal_id"))
+    @Column(name = "study_date")
+    private List<LocalDate> studyDates = new ArrayList<>();
 
     // Mark when User starts studying
     public void startStudying() {

@@ -16,8 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class FlashcardSet extends LibraryItem {
     private String description;
-    private String university;
-    private String course;
+    private String university;      // TODO should be university object
+    private String course;      // TODO should be course object
 
     @OneToMany(mappedBy = "flashcardSet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Flashcard> flashcards = new ArrayList<>();
@@ -29,9 +29,4 @@ public class FlashcardSet extends LibraryItem {
 
     @Column(nullable = false) // TODO: should be false or in library item
     private UUID ownerId;
-
-    public void removeFlashcard(Flashcard flashcard) {
-        flashcards.remove(flashcard);
-        flashcard.setFlashcardSet(null);
-    }
 }

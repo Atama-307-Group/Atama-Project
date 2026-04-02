@@ -48,4 +48,21 @@ public class GoalController {
         goalService.stopStudying(userId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/users/{userId}/streak")
+    public ResponseEntity<StreakResponse> getStreak(@PathVariable UUID userId) {
+        Goal goal = goalService.getGoalByUserId(userId);
+        if (goal == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Convert study dates to strings if your Goal model stores a list of dates
+        java.util.List<String> studyDates = goal.getStudyDates() != null
+                ? goal.getStudyDates().stream().map(java.time.LocalDate::toString).toList()
+                : java.util.Collections.emptyList();
+
+        return ResponseEntity.ok(new StreakResponse(goal.getCurrentStreak(), goal.getBestStreak(), studyDates));
+    }
+
+    public record StreakResponse(int currentStreak, int bestStreak, java.util.List<String> studyDates) {}
 }

@@ -10,6 +10,7 @@ import com.atama.service.FlashcardSetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,10 +29,9 @@ public class FlashcardSetController {
     @PostMapping
     public ResponseEntity<FlashcardSetResponseDTO> createFlashcardSet(
             @RequestBody FlashcardSetRequestDTO request) {
-
-        FlashcardSetResponseDTO saved = flashcardSetService.createFlashcardSet(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(saved); // hope this is correct
+        UUID userId = getAuthenticatedUserId();
+        FlashcardSetResponseDTO saved = flashcardSetService.createFlashcardSet(request, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @GetMapping("/{id}")
@@ -39,9 +39,15 @@ public class FlashcardSetController {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
     }
 
-    @GetMapping("/owner/{ownerId}")
+    /*@GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<FlashcardSetResponseDTO>> getFlashcardSetsByOwner(@PathVariable UUID ownerId) {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(ownerId));
+    }*/
+
+    @GetMapping("/my-sets")
+    public ResponseEntity<List<FlashcardSetResponseDTO>> getMyFlashcardSets() {
+        UUID userId = getAuthenticatedUserId();
+        return ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(userId));
     }
 
     @GetMapping("/{id}/flashcards")
@@ -110,5 +116,12 @@ public class FlashcardSetController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to process file: " + e.getMessage()));
         }
+    }
+
+    private UUID getAuthenticatedUserId() {
+        String userId = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return UUID.fromString(userId);
     }
 }
