@@ -59,8 +59,8 @@ public class GoalController {
                 ? goal.getStudyDates().stream().map(java.time.LocalDate::toString).toList()
                 : java.util.Collections.emptyList();
 
-        return ResponseEntity.ok(new StreakResponse(goal.getCurrentStreak(), studyDates));
+        return ResponseEntity.ok(new StreakResponse(goal.getCurrentStreak(), goal.getBestStreak(), studyDates));
     }
 
-    public record StreakResponse(int currentStreak, java.util.List<String> studyDates) {}
+    public record StreakResponse(int currentStreak, int bestStreak, java.util.List<String> studyDates) {}
 }

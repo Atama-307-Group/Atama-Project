@@ -40,6 +40,7 @@ const GoalsPage = ({ userId }) => {
     // Streak
     const [streak, setStreak] = useState(0);
     const [studyDates, setStudyDates] = useState([]);
+    const [bestStreak, setBestStreak] = useState(0);
 
     // Track when a save is in flight so polls don't overwrite fresh local state
     const pendingSaveRef = useRef(false);
@@ -83,9 +84,6 @@ const GoalsPage = ({ userId }) => {
                 studied: studyDates.includes(date)
             });
         }
-
-        console.log("studyDates from backend:", studyDates);
-        console.log("sample calendar date:", new Date(today.getFullYear(), today.getMonth(), today.getDate()).toLocaleDateString("sv-SE"));
 
         return days;
     }, [studyDates]);
@@ -131,6 +129,7 @@ const GoalsPage = ({ userId }) => {
                 .then(data => {
                     console.log("getStreak response:", data);
                     setStreak(data.currentStreak);
+                    setBestStreak(data.bestStreak || 0);
                     setStudyDates(data.studyDates || []);
                 })
                 .catch(console.error);
@@ -361,6 +360,9 @@ const GoalsPage = ({ userId }) => {
                 </div>
                 {/* Card 3: Study Streak */}
                 <div className="card">
+                    <div className="sectionTitle">
+                        🏆 Best: {bestStreak} day{bestStreak !== 1 ? "s" : ""}
+                    </div>
                     <div className="sectionTitle">
                         🔥 Streak: {streak} day{streak !== 1 ? "s" : ""}
                     </div>
