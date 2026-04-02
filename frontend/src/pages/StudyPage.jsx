@@ -104,7 +104,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
             <h2>Learn</h2>
 
-            <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div style={{ position: 'relative', width: '400px', maxWidth: '90%', margin: '0 auto' }}>
                 {/* ⭐ Favorite Star */}
                 <button
                     onClick={handleToggleFavorite}
@@ -125,10 +125,46 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
                     {currentCard.favorite ? '★' : '☆'}
                 </button>
 
-                <div className="card-container" onClick={handleFlip}>
-                    <div className={`card ${isFlipped ? 'flipped' : ''}`}>
-                        <div className="front">{frontContent}</div>
-                        <div className="back">{backContent}</div>
+                {/* Perspective wrapper — must be separate from the flipping element */}
+                <div style={{ perspective: '1000px', width: '100%', marginBottom: '20px' }}>
+                    <div
+                        onClick={handleFlip}
+                        style={{
+                            width: '100%',
+                            height: '200px',
+                            position: 'relative',
+                            transformStyle: 'preserve-3d',
+                            WebkitTransformStyle: 'preserve-3d',
+                            transition: 'transform 0.6s',
+                            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        <div style={{
+                            position: 'absolute', top: 0, left: 0,
+                            width: '100%', height: '100%',
+                            backfaceVisibility: 'hidden',
+                            WebkitBackfaceVisibility: 'hidden',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            padding: '20px', boxSizing: 'border-box',
+                            border: '2px solid #333', borderRadius: '10px',
+                            backgroundColor: 'white',
+                        }}>
+                            {frontContent}
+                        </div>
+                        <div style={{
+                            position: 'absolute', top: 0, left: 0,
+                            width: '100%', height: '100%',
+                            backfaceVisibility: 'hidden',
+                            WebkitBackfaceVisibility: 'hidden',
+                            transform: 'rotateY(180deg)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            padding: '20px', boxSizing: 'border-box',
+                            border: '2px solid #333', borderRadius: '10px',
+                            backgroundColor: 'white',
+                        }}>
+                            {backContent}
+                        </div>
                     </div>
                 </div>
             </div>
