@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FlashcardInput from '../components/FlashcardInput.jsx';
+import TextImportModal from '../components/TextImportModal.jsx';
 import { createFlashcardSet, recordAccess } from '../api.js';
 import './CreateFlashcardSetPage.css';
 
@@ -13,6 +14,7 @@ const CreateFlashcardSetPage = () => {
   const [cards, setCards] = useState([newNormalCard(), newNormalCard()]);
   const [university, setUniversity] = useState('');
   const [course, setCourse] = useState('');
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const handleCardChange = (index, updatedCard) => {
     const updated = cards.map((card, i) => (i === index ? updatedCard : card));
@@ -26,6 +28,16 @@ const CreateFlashcardSetPage = () => {
   const removeCard = (index) => {
     setCards(cards.filter((_, i) => i !== index));
   };
+
+  const handleImport = (importedCards) => {
+      setCards((prev) => {
+        // Drop any unfilled placeholder cards before merging
+        const existing = prev.filter(
+          (c) => c.type !== 'NORMAL' || c.term?.trim() || c.definition?.trim()
+        );
+        return [...existing, ...importedCards];
+      });
+    };
 
   const handleSave = async () => {
     const trimmedTitle = title.trim();
@@ -103,6 +115,14 @@ const CreateFlashcardSetPage = () => {
       <h1>Create a New Flashcard Set</h1>
       {/* TODO: add fields for university and class */}
 
+      <button
+        className="create-set-upload-btn"
+        onClick={() => setShowImportModal(true)}
+        title="Import cards from pasted text"
+      >
+        ⬆ Upload
+      </button>
+
       <input
         type="text"
         className="create-set-title"
@@ -156,6 +176,13 @@ const CreateFlashcardSetPage = () => {
           Create Set
         </button>
       </div>
+
+      {showImportModal && (
+          <TextImportModal
+            onClose={() => setShowImportModal(false)}
+            onImport={handleImport}
+          />
+        )}
     </div>
   );
 };
