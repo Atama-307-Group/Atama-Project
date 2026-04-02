@@ -22,10 +22,11 @@ import PostLearnPage from "./pages/PostLearnPage.jsx";
 import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
-import GoalsPage from "./pages/StudyGoal.jsx"
+import GoalsPage from "./pages/StudyGoal.jsx";
 import UniversityPage from './pages/UniversityPage.jsx';
 import SharedSetPage from "./pages/SharedSetPage.jsx";
 import CoursePage from './pages/CoursePage.jsx';
+import PickSetPage from './pages/PickSetPage.jsx';
 
 
 function App() {
@@ -34,44 +35,7 @@ function App() {
     const [currentUser, setCurrentUser] = useState(() => {
         const saved = localStorage.getItem('currentUser');
         return saved ? JSON.parse(saved) : null;
-    })
-
-    const [flashcards, setFlashcards] = useState([
-        { id: 1, type: 'REGULAR', term: 'Mitosis', definition: 'Cell division producing two identical daughter cells', favorite: false },
-        { id: 2, type: 'REGULAR', term: 'Osmosis', definition: 'Movement of water through a semipermeable membrane', favorite: false },
-        { id: 3, type: 'REGULAR', term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into glucose', favorite: false },
-        { id: 4, type: 'REGULAR', term: 'Homeostasis', definition: 'Maintaining a stable internal environment', favorite: false },
-        { id: 5, type: 'REGULAR', term: 'Meiosis', definition: 'Cell division producing four genetically unique gametes', favorite: false },
-        { id: 6, type: 'REGULAR', term: 'DNA', definition: 'Molecule carrying genetic instructions for life', favorite: false },
-
-        {
-            id: 7,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'This app is called __ and is a project for CS __.',
-            correctAnswers: ['Atama', '307'],
-            favorite: true
-        },
-        {
-            id: 8,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'Water freezes at __°C and boils at __°C at sea level.',
-            correctAnswers: ['0', '100'],
-            favorite: true
-        },
-        {
-            id: 9,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'The chemical symbol for Gold is __ and for Silver is __.',
-            correctAnswers: ['Au', 'Ag'],
-            favorite: true
-        }
-    ]);
-
-    const handleToggleFavorite = (id) => {
-        setFlashcards(prev =>
-            prev.map(card => card.id === id ? { ...card, favorite: !card.favorite } : card)
-        );
-    };
+    });
 
     const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
         const user = { id, username, email, profilePictureUrl, verified };
@@ -89,158 +53,119 @@ function App() {
             {currentUser && <TimerPopup />}
 
             {currentUser && (
-            <button 
-                onClick={openPopup}
-                style={{
-                    position: 'fixed',
-                    bottom: '24px',
-                    right: '24px',
-                    padding: '12px 24px',
-                    background: '#2b5c3f',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(43, 92, 63, 0.3)',
-                    zIndex: 1000,
-                    transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 16px rgba(43, 92, 63, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 12px rgba(43, 92, 63, 0.3)';
-                }}
-            >
-                ⏱
-            </button>
-             )}
+                <button
+                    onClick={openPopup}
+                    style={{
+                        position: 'fixed',
+                        bottom: '24px',
+                        right: '24px',
+                        padding: '12px 24px',
+                        background: '#2b5c3f',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(43, 92, 63, 0.3)',
+                        zIndex: 1000,
+                        transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 6px 16px rgba(43, 92, 63, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(43, 92, 63, 0.3)';
+                    }}
+                >
+                    ⏱
+                </button>
+            )}
 
             <Routes>
 
-            {/* Home / Dashboard */}
-            <Route
-                path="/"
-                element={
-                    <StartPage
-                        currentUser={currentUser}
-                        onLogout={handleLogout}
-                    />
-                }
-            />
+                {/* Home / Dashboard */}
+                <Route
+                    path="/"
+                    element={
+                        <StartPage
+                            currentUser={currentUser}
+                            onLogout={handleLogout}
+                        />
+                    }
+                />
 
-            {/* Auth Routes */}
-            <Route
-                path="/login"
-                element={
-                    <LoginPage
-                        onLoginSuccess={handleLoginSuccess}
-                    />
-                }
-            />
+                {/* Auth Routes */}
+                <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            <Route
-                path="/signup"
-                element={<SignupPage />}
-            />
+                {/* Profile & Account Management */}
+                <Route
+                    path="/profile"
+                    element={currentUser ? <ProfilePage currentUser={currentUser} /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/change-password"
+                    element={currentUser ? <ChangePasswordPage currentUser={currentUser} /> : <Navigate to="/login" />}
+                />
 
-            {/* Forgot / Reset Password */}
-            <Route
-                path="/forgot-password"
-                element={<ForgotPasswordPage />}
-            />
+                {/* Create Flashcard Set */}
+                <Route
+                    path="/create"
+                    element={<CreateFlashcardSetPage />}
+                />
 
-            <Route
-                path="/reset-password"
-                element={<ResetPasswordPage />}
-            />
+                {/* Pick a set to study */}
+                <Route
+                    path="/pick-set"
+                    element={currentUser ? <PickSetPage /> : <Navigate to="/login" />}
+                />
 
-            {/* Profile & Account Management */}
-            <Route
-                path="/profile"
-                element={
-                    currentUser
-                        ? <ProfilePage currentUser={currentUser} />
-                        : <Navigate to="/login" />
-                }
-            />
+                {/* Study & Learning Flow — flashcards passed via router state */}
+                <Route path="/pre_learn" element={<PreLearnPage />} />
+                <Route path="/study" element={<StudyPage onToggleFavorite={() => {}} userId={currentUser?.id} />} />
+                <Route path="/post_learn" element={<PostLearnPage />} />
 
-            <Route
-                path="/change-password"
-                element={
-                    currentUser
-                        ? <ChangePasswordPage currentUser={currentUser} />
-                        : <Navigate to="/login" />
-                }
-            />
+                {/* Match Flow */}
+                <Route path="/pre_match" element={<PreMatchPage />} />
+                <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
+                <Route path="/post_match" element={<PostMatchPage />} />
 
-            {/* Create Flashcard Set */}
-            <Route
-                path="/create"
-                element={
-                    // currentUser
-                    //     ? <CreateFlashcardSetPage />
-                    //     : <Navigate to="/login" />
-                    <CreateFlashcardSetPage onSave={setFlashcards} />
-                }
-            />
+                {/* Test Flow */}
+                <Route path="/pre_test" element={<PreTestPage />} />
+                <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
+                <Route path="/post_test" element={<PostTestPage />} />
 
-            {/* Study & Learning Flow */}
-            <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
-            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id}/>} />
-            <Route path="/post_learn" element={<PostLearnPage />} />
+                <Route path="/sets/:id" element={<FlashcardSetPage />} />
+                <Route path="/shared/:token" element={<SharedSetPage />} />
 
-            {/* Match Flow */}
-            <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
-            <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
-            <Route path="/post_match" element={<PostMatchPage />} />
+                {/* Personal Library */}
+                <Route
+                    path="/folders"
+                    element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+                />
 
-            {/* Test Flow */}
-            <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
-            <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
-            <Route path="/post_test" element={<PostTestPage />} />
+                {/* Study Goals */}
+                <Route
+                    path="/goals"
+                    element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
 
-            <Route
-                path="/sets/:id"
-                element={<FlashcardSetPage />}
-            />
-            <Route path="/shared/:token" element={<SharedSetPage />} />
+                {/* University */}
+                <Route
+                    path="/university"
+                    element={currentUser ? <UniversityPage userId={currentUser?.id} /> : <Navigate to="/login" />}
+                />
 
-            {/* Personal Library Page */}
-            <Route
-                path="/folders"
-                element={<FoldersPage />}
-                element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
-            />
+                {/* Course */}
+                <Route path="/course/:courseId" element={<CoursePage userId={currentUser?.id} />} />
 
-            {/* Study Goals Page */}
-            <Route
-                path="/goals"
-                element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
-            />
-
-            {/* University Page */}
-            <Route
-                path="/university"
-                element={<UniversityPage userId={currentUser?.id} />}
-                element={currentUser ? <UniversityPage /> : <Navigate to="/login" />}
-            />
-
-            {/* Course Page */}
-            <Route
-                path="/course/:courseId"
-                element={<CoursePage userId={currentUser?.id} />}
-            />
-
-            {/* Catch-all */}
-            <Route
-                path="*"
-                element={<Navigate to="/" />}
-            />
+                {/* Catch-all */}
+                <Route path="*" element={<Navigate to="/" />} />
 
             </Routes>
         </>

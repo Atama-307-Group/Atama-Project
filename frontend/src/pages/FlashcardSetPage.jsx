@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {generateSharedLink, getFlashcardSetById, updateFlashcardSetMeta, updateFlashcard} from "../api.js";
@@ -16,9 +15,7 @@ const FlashcardSetPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // editingId: the card id (or index) currently being edited
     const [editingId, setEditingId] = useState(null);
-    // editDraft: the working copy of the card being edited
     const [editDraft, setEditDraft] = useState(null);
 
     const [editingMeta, setEditingMeta] = useState(false);
@@ -26,8 +23,6 @@ const FlashcardSetPage = () => {
     const [shareStatus, setShareStatus] = useState(null);
     const [shareUrl, setShareUrl] = useState('');
     const [downloadStatus, setDownloadStatus] = useState(null);
-
-    //Downloading
     const [showDownloadOptions, setShowDownloadOptions] = useState(false);
 
     useEffect(() => {
@@ -61,16 +56,6 @@ const FlashcardSetPage = () => {
         setEditingId(null);
         setEditDraft(null);
     };
-    /*const saveCard = async (index) => {
-
-        // Optimistically update local state
-        setSetData((prev) => ({
-            ...prev,
-            flashcards: prev.flashcards.map((c, i) => i === index ? editDraft : c),
-        }));
-        setEditingId(null);
-        setEditDraft(null);
-    };*/
 
     const startEditingMeta = () => {
         setMetaDraft({ title: setData.title, description: setData.description ?? '', university: setData.university ?? '',
@@ -78,38 +63,27 @@ const FlashcardSetPage = () => {
         setEditingMeta(true);
     };
 
-    const cancelEditingMeta = () => {
-        setEditingMeta(false);
-    };
+    const cancelEditingMeta = () => setEditingMeta(false);
 
     const saveMeta = async () => {
         const updated = await updateFlashcardSetMeta(id, metaDraft);
         setSetData((prev) => ({ ...prev, title: updated.title, description: updated.description, university: updated.university, course: updated.course }));
         setEditingMeta(false);
     };
-    /*const saveMeta = async () => {
-        setSetData((prev) => ({ ...prev, ...metaDraft }));
-        setEditingMeta(false);
-    };*/
+
     const downloadSet = (format) => {
         try {
             const content = generateFileContent(setData.flashcards, format);
             if (!content) throw new Error("No content generated");
-
             const filename = `${setData.title.replace(/\s+/g, '_')}.${format}`;
             const blob = new Blob([content], { type: 'text/plain' });
-
-            // Create download link
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = filename;
             document.body.appendChild(link);
             link.click();
-
-            // Cleanup
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
-
             setDownloadStatus('Flashcard set downloaded!');
             setTimeout(() => setDownloadStatus(null), 3000);
         } catch (err) {
@@ -133,6 +107,17 @@ const FlashcardSetPage = () => {
         }
     };
 
+    // Navigate to pre-page with this set's flashcards already loaded
+    const handleStudyMode = (mode) => {
+        const destinations = {
+            learn: '/pre_learn',
+            match: '/pre_match',
+            test: '/pre_test',
+        };
+        navigate(destinations[mode], {
+            state: { flashcards: setData.flashcards, setTitle: setData.title }
+        });
+    };
 
     if (loading) return <div className="set-page-loading">Loading...</div>;
     if (error)   return <div className="set-page-error">{error}</div>;
@@ -170,7 +155,6 @@ const FlashcardSetPage = () => {
                         onChange={(e) => setMetaDraft((d) => ({ ...d, course: e.target.value }))}
                         placeholder="Course (optional)"
                     />
-
                     <div className="set-page-edit-actions">
                         <button className="set-page-cancel-btn" onClick={cancelEditingMeta}>Cancel</button>
                         <button className="set-page-save-btn" disabled={!metaDraft.title.trim()} onClick={saveMeta}>Save</button>
@@ -181,38 +165,35 @@ const FlashcardSetPage = () => {
                     <h1>{setData.title}</h1>
                     {setData.description && <p className="set-page-description">{setData.description}</p>}
                     {setData.university && <p className="set-page-meta-sub">{setData.university}{setData.course ? ` · ${setData.course}` : ''}</p>}
+
+                    {/* Study mode buttons */}
+                    <div className="set-page-study-actions">
+                        <button className="set-page-study-btn" onClick={() => handleStudyMode('learn')}>📖 Learn</button>
+                        <button className="set-page-study-btn" onClick={() => handleStudyMode('match')}>🔀 Match</button>
+                        <button className="set-page-study-btn" onClick={() => handleStudyMode('test')}>📝 Practice Test</button>
+                    </div>
+
                     <div>
                         <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
                         <div className="download-container" style={{position: 'relative', display: 'inline-block'}}>
-                            <button className="set-page-edit-btn"
-                                    onClick={() => setShowDownloadOptions(!showDownloadOptions)}>
+                            <button className="set-page-edit-btn" onClick={() => setShowDownloadOptions(!showDownloadOptions)}>
                                 Download
                             </button>
-
                             {showDownloadOptions && (
                                 <div className="download-dropdown">
-                                    <button onClick={() => {
-                                        downloadSet('csv');
-                                        setShowDownloadOptions(false);
-                                    }}>CSV file
-                                    </button>
-                                    <button onClick={() => {
-                                        downloadSet('txt');
-                                        setShowDownloadOptions(false);
-                                    }}>TXT file
-                                    </button>
+                                    <button onClick={() => { downloadSet('csv'); setShowDownloadOptions(false); }}>CSV file</button>
+                                    <button onClick={() => { downloadSet('txt'); setShowDownloadOptions(false); }}>TXT file</button>
                                 </div>
                             )}
                         </div>
                     </div>
+
                     {shareStatus && (
                         <div className={`set-page-toast ${shareStatus.includes('failed') ? 'error' : 'success'}`}>
                             {shareStatus}
                             {shareUrl && !shareStatus.includes('failed') && (
-                                <a href={shareUrl} target="_blank" rel="noreferrer" className="set-page-toast-link">
-                                    {shareUrl}
-                                </a>
+                                <a href={shareUrl} target="_blank" rel="noreferrer" className="set-page-toast-link">{shareUrl}</a>
                             )}
                         </div>
                     )}
@@ -221,9 +202,7 @@ const FlashcardSetPage = () => {
                             {downloadStatus}
                         </div>
                     )}
-
                 </div>
-
             )}
 
             <h2>Cards ({setData.flashcards?.length ?? 0})</h2>
@@ -244,23 +223,14 @@ const FlashcardSetPage = () => {
                                     canRemove={false}
                                 />
                                 <div className="set-page-edit-actions">
-                                    <button className="set-page-cancel-btn" onClick={cancelEditing}>
-                                        Cancel
-                                    </button>
-                                    <button className="set-page-save-btn" onClick={() => saveCard(index)}>
-                                        Save
-                                    </button>
+                                    <button className="set-page-cancel-btn" onClick={cancelEditing}>Cancel</button>
+                                    <button className="set-page-save-btn" onClick={() => saveCard(index)}>Save</button>
                                 </div>
                             </div>
                         ) : (
                             <div key={cardKey} className="set-page-card-wrap">
                                 <FlashcardCard index={index} card={card} />
-                                <button
-                                    className="set-page-edit-btn"
-                                    onClick={() => startEditing(card, index)}
-                                >
-                                    Edit
-                                </button>
+                                <button className="set-page-edit-btn" onClick={() => startEditing(card, index)}>Edit</button>
                             </div>
                         );
                     })}
@@ -272,26 +242,19 @@ const FlashcardSetPage = () => {
     );
 };
 
-//Helper for conversion
 const generateFileContent = (cards, format) => {
     if (!cards) return "";
-
     if (format === 'csv') {
         const header = "Term,Definition\n";
-        const rows = cards
-            .map(c => {
-                const term = (c.term || "").replace(/"/g, '""');
-                const def = (c.definition || "").replace(/"/g, '""');
-                return `"${term}","${def}"`;
-            })
-            .join("\n");
+        const rows = cards.map(c => {
+            const term = (c.term || "").replace(/"/g, '""');
+            const def = (c.definition || "").replace(/"/g, '""');
+            return `"${term}","${def}"`;
+        }).join("\n");
         return header + rows;
     }
-
     if (format === 'txt') {
-        return cards
-            .map(c => `${c.term || "Untitled"} : ${c.definition || "No definition"}`)
-            .join("\n");
+        return cards.map(c => `${c.term || "Untitled"} : ${c.definition || "No definition"}`).join("\n");
     }
     return "";
 };
