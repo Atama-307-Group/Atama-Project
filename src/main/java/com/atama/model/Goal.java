@@ -45,6 +45,8 @@ public class Goal {
 
     private java.time.LocalDate lastStudyDate;
 
+    private int bestStreak = 0;
+
     @ElementCollection(fetch = FetchType.EAGER) // Eager ensures dates are loaded for the streak calculation
     @CollectionTable(name = "goal_study_dates", joinColumns = @JoinColumn(name = "goal_id"))
     @Column(name = "study_date")

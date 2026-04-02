@@ -97,6 +97,10 @@ public class GoalService {
             goal.setCurrentStreak(1);
         }
 
+        if (goal.getCurrentStreak() > goal.getBestStreak()) {
+            goal.setBestStreak(goal.getCurrentStreak());
+        }
+
         goal.setLastStudyDate(today);
         if (!goal.getStudyDates().contains(today)) {
             goal.getStudyDates().add(today);
