@@ -1,10 +1,14 @@
 package com.atama.service;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.dto.response.LoginResult;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.Library;
 import com.atama.model.University;
 import com.atama.model.User;
+import com.atama.model.Course;
+import com.atama.repository.CourseRepository;
+import com.atama.repository.LibraryRepository;
 import com.atama.repository.UniversityRepository;
 import com.atama.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -22,9 +27,13 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
     private final LibraryService libraryService;
+    private final JwtService jwtService;
+
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final CourseRepository courseRepository;
 
     public User registerUser(UserRegistrationRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -55,13 +64,24 @@ public class UserService {
         // Create a Library for the new user and persist it
         Library library = new Library();
         library.setUser(savedUser);
-        libraryService.createLibrary(library);
+        libraryRepository.save(library);
 
         return savedUser;
     }
 
-    public User loginUser(String identifier, String password) {
-        // Try finding by username first, then by email
+//    public User loginUser(String identifier, String password) {
+//        // Try finding by username first, then by email
+//        User user = userRepository.findByUsername(identifier)
+//                .orElseGet(() -> userRepository.findByEmail(identifier)
+//                        .orElseThrow(() -> new IllegalArgumentException("Invalid username/email or password.")));
+//
+//        if (!passwordEncoder.matches(password, user.getPassword())) {
+//            throw new IllegalArgumentException("Invalid username/email or password.");
+//        }
+//
+//        return user;
+//    }
+    public LoginResult loginUser(String identifier, String password) {
         User user = userRepository.findByUsername(identifier)
                 .orElseGet(() -> userRepository.findByEmail(identifier)
                         .orElseThrow(() -> new IllegalArgumentException("Invalid username/email or password.")));
@@ -70,7 +90,8 @@ public class UserService {
             throw new IllegalArgumentException("Invalid username/email or password.");
         }
 
-        return user;
+        String token = jwtService.generateToken(user.getId(), user.getUsername());
+        return new LoginResult(user, token);
     }
 
     public User createUser(User user) {
@@ -140,4 +161,44 @@ public class UserService {
         user.setProfilePictureUrl(profilePictureUrl);
         userRepository.save(user);
     }
+
+    public List<Course> getEnrolledCourses(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        return user.getEnrolledCourses();
+    }
+
+    public void enrollInCourse(UUID userId, UUID courseId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+
+        if (!user.getEnrolledCourses().contains(course)) {
+            user.getEnrolledCourses().add(course);
+            userRepository.save(user);
+        }
+    }
+
+    public void unenrollFromCourse(UUID userId, UUID courseId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+
+        user.getEnrolledCourses().remove(course);
+        userRepository.save(user);
+    }
+
+    public void unenrollFromAllCourses(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        // Clear all courses
+        user.getEnrolledCourses().clear();
+
+        // Save the user — Hibernate deletes all join table entries
+        userRepository.save(user);
+    }
+
 }
