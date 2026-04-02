@@ -432,3 +432,14 @@ export async function getCourseItems(courseId) {
     if (!res.ok) throw new Error("Failed to fetch course items");
     return res.json();
 }
+
+export async function addLibraryItemToCourse(libraryItemId, courseId, year, semester, description) {
+    const res = await fetch(`${API_BASE}/course-library-items`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ libraryItemId, courseId, year, semester, description }),
+    });
+    if (!res.ok) throw new Error("Failed to add item to course");
+    return res.json();
+}
