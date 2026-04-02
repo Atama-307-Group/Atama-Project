@@ -88,10 +88,15 @@ public class FolderService {
     }
 
     // Get all Folders TODO maybe fix this later??
-    public List<Folder> getAllFolders(UUID userId) {
+    /*public List<Folder> getAllFolders(UUID userId) {
         Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         return library.getFolders();
+    }*/
+    public List<Folder> getAllFolders(UUID userId) {
+        Library library = libraryRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Library not found"));
+        return folderRepository.findAllByLibraryIdWithItems(library.getId());
     }
     public FolderItemsResponse getFolderItems(UUID folderId) {
         Folder folder = folderRepository.findById(folderId)

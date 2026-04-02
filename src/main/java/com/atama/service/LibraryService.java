@@ -1,10 +1,14 @@
 package com.atama.service;
 
+import com.atama.dto.response.FolderResponse;
+import com.atama.dto.response.LibraryItemResponseDTO;
+import com.atama.dto.response.LibraryResponseDTO;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.Folder;
 import com.atama.model.Library;
 import com.atama.model.LibraryItem;
 import com.atama.model.LibrarySortType;
+import com.atama.repository.LibraryItemRepository;
 import com.atama.repository.LibraryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,7 @@ public class LibraryService {
 
     // TODO Do we actually need this file???
     private final LibraryRepository libraryRepository;
+    private final LibraryItemRepository libraryItemRepository;
 
     public void createLibrary(Library library) {
         libraryRepository.save(library);
@@ -123,5 +128,40 @@ public class LibraryService {
                 );
 
         library.setPrivate(makePrivate);    // Toggle the privacy
+    }
+    @Transactional(readOnly = true)
+    public LibraryResponseDTO getLibraryContents(UUID userId) {
+        Library library = libraryRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Library", "userId", userId));
+
+        List<FolderResponse> folders = library.getFolders().stream()
+                .map(f -> new FolderResponse(
+                        f.getId(),
+                        f.getName(),
+                        f.isStarred(),
+                        f.isPublic(),
+                        f.getCreatedAt(),
+                        f.getLastAccessed(),
+                        f.getItems(),
+                        library.getId()
+                ))
+                .toList();
+
+        List<LibraryItemResponseDTO> looseItems = libraryItemRepository
+                .findLooseItemsByLibraryId(library.getId())
+                .stream()
+                .map(i -> new LibraryItemResponseDTO(
+                        i.getId(),
+                        i.getTitle(),
+                        i.getCreatedAt(),
+                        i.getUpdatedAt(),
+                        i.getLastAccessed(),
+                        i.isStarred(),
+                        i.getItemType(),
+                        null
+                ))
+                .toList();
+
+        return new LibraryResponseDTO(library.getId(), folders, looseItems);
     }
 }
