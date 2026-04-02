@@ -3,8 +3,8 @@ package com.atama.controller;
 import com.atama.model.University;
 import com.atama.service.UniversityService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,9 +20,15 @@ public class UniversityController {
         this.universityService = universityService;
     }
 
-    @GetMapping("/{userId}/university")
-    public ResponseEntity<?> getUniversity(@PathVariable UUID userId) {
+    @GetMapping("/university")
+    public ResponseEntity<?> getUniversity() {
+        UUID userId = getAuthenticatedUserId();
         University university = universityService.getUniversityByUserId(userId);
         return ResponseEntity.ok(university);
+    }
+
+    private UUID getAuthenticatedUserId() {
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return UUID.fromString(userId);
     }
 }

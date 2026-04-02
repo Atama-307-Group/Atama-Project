@@ -86,8 +86,9 @@ function App() {
 
     return (
         <>
-            <TimerPopup />
-            
+            {currentUser && <TimerPopup />}
+
+            {currentUser && (
             <button 
                 onClick={openPopup}
                 style={{
@@ -115,8 +116,9 @@ function App() {
                     e.target.style.boxShadow = '0 4px 12px rgba(43, 92, 63, 0.3)';
                 }}
             >
-                Study Timer
+                ⏱
             </button>
+             )}
 
             <Routes>
 
@@ -212,21 +214,21 @@ function App() {
             <Route
                 path="/folders"
                 element={<FoldersPage />}
-                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+                element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 
             {/* Study Goals Page */}
             <Route
                 path="/goals"
                 element={<GoalsPage userId={currentUser?.id} />}
-                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+                element={currentUser ? <GoalsPage /> : <Navigate to="/login" />}
             />
 
             {/* University Page */}
             <Route
                 path="/university"
                 element={<UniversityPage userId={currentUser?.id} />}
-                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+                element={currentUser ? <UniversityPage /> : <Navigate to="/login" />}
             />
 
             {/* Course Page */}

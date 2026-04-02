@@ -226,8 +226,8 @@ export async function stopStudying(userId) {
 
 /* University & Courses ------------------------------------------- */
 
-export async function getUniversity(userId) {
-    const res = await fetch(`${API_BASE}/api/users/${userId}/university`, {
+export async function getUniversity() {
+    const res = await fetch(`${API_BASE}/api/users/university`, {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to fetch university");
@@ -242,8 +242,8 @@ export async function getCourses(universityId) {
     return res.json();
 }
 
-export async function getEnrolledCourses(userId) {
-    const res = await fetch(`${API_BASE}/api/users/${userId}/enrolled-courses`, {
+export async function getEnrolledCourses() {
+    const res = await fetch(`${API_BASE}/api/users/enrolled-courses`, {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to fetch enrolled courses");
@@ -262,7 +262,9 @@ export async function enrollInCourse(userId, courseId) {
 }
 
 export async function getCourse(courseId) {
-    const res = await fetch(`${API_BASE}/api/universities/course/${courseId}`);
+    const res = await fetch(`${API_BASE}/api/universities/course/${courseId}`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to fetch course");
     return res.json();
 }
@@ -434,5 +436,16 @@ export async function getCourseItems(courseId) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to fetch course items");
+    return res.json();
+}
+
+export async function addLibraryItemToCourse(libraryItemId, courseId, year, semester, description) {
+    const res = await fetch(`${API_BASE}/course-library-items`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ libraryItemId, courseId, year, semester, description }),
+    });
+    if (!res.ok) throw new Error("Failed to add item to course");
     return res.json();
 }

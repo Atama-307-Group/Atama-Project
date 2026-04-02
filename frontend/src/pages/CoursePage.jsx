@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF } from "../api.js";
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems, addLibraryItemToCourse } from "../api.js";
 import "./CoursePage.css";
 
 const YEARS = ["Unknown", ...Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - i))];
@@ -92,6 +92,20 @@ const CoursePage = ({ userId }) => {
         return n;
     }, [filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
 
+    // Add from personal library
+    const [showLibraryModal, setShowLibraryModal] = useState(false);
+    const [libraryItems, setLibraryItems] = useState([]);
+    const [libraryLoading, setLibraryLoading] = useState(false);
+    const [libraryError, setLibraryError] = useState("");
+    const [librarySearch, setLibrarySearch] = useState("");
+    const [selectedLibraryItem, setSelectedLibraryItem] = useState(null);
+
+    const [showLibMetaModal, setShowLibMetaModal] = useState(false);
+    const [libMetaYear, setLibMetaYear] = useState("Unknown");
+    const [libMetaSemester, setLibMetaSemester] = useState("Unknown");
+    const [libMetaDescription, setLibMetaDescription] = useState("");
+    const [libMetaAdding, setLibMetaAdding] = useState(false);
+
     useEffect(() => {
         if (!courseId) return;
         getCourse(courseId).then(setCourse).catch(console.error);
@@ -138,11 +152,27 @@ const CoursePage = ({ userId }) => {
                 setShowLeaveModal(false);
                 setShowSortMenu(false);
                 setShowFilterPanel(false);
+                setShowLibraryModal(false);
+                setShowLibMetaModal(false);
             }
         }
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
+
+    const addedLibraryItemIds = useMemo(
+        () => new Set(items.map(cli => cli.libraryItem?.id).filter(Boolean)),
+        [items]
+    );
+
+    const filteredLibraryItems = useMemo(() => {
+        const q = librarySearch.trim().toLowerCase();
+        if (!q) return libraryItems;
+        return libraryItems.filter(li =>
+            (li.title ?? "").toLowerCase().includes(q) ||
+            (li.description ?? "").toLowerCase().includes(q)
+        );
+    }, [libraryItems, librarySearch]);
 
     const filteredItems = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -256,6 +286,58 @@ const CoursePage = ({ userId }) => {
         }
     }
 
+    async function handleOpenLibraryModal() {
+        setShowLibraryModal(true);
+        setLibrarySearch("");
+        setSelectedLibraryItem(null);
+        setLibraryError("");
+        setLibraryLoading(true);
+        try {
+            const data = await getLibraryItems();
+            setLibraryItems(Array.isArray(data) ? data : []);
+        } catch (e) {
+            setLibraryError(e.message ?? "Failed to load library items");
+        } finally {
+            setLibraryLoading(false);
+        }
+    }
+
+    function handleLibraryNext() {
+        if (!selectedLibraryItem) return;
+        setLibMetaYear("Unknown");
+        setLibMetaSemester("Unknown");
+        setLibMetaDescription("");
+        setShowLibraryModal(false);
+        setShowLibMetaModal(true);
+    }
+
+    async function handleLibMetaConfirm() {
+        if (!selectedLibraryItem) return;
+        setLibMetaAdding(true);
+        try {
+            const newItem = await addLibraryItemToCourse(
+                selectedLibraryItem.id,
+                courseId,
+                libMetaYear,
+                libMetaSemester,
+                libMetaDescription || null,
+            );
+            setItems(prev => [newItem, ...prev]);
+            setShowLibMetaModal(false);
+            setSelectedLibraryItem(null);
+        } catch (err) {
+            setError(err.message ?? "Failed to add item to course");
+            setShowLibMetaModal(false);
+        } finally {
+            setLibMetaAdding(false);
+        }
+    }
+
+    function handleLibMetaBack() {
+        setShowLibMetaModal(false);
+        setShowLibraryModal(true);
+    }
+
     const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
     const yearMax = NUMERIC_YEARS[0];
 
@@ -282,7 +364,7 @@ const CoursePage = ({ userId }) => {
                 <button className="toolbarBtn--upload" onClick={() => fileInputRef.current.click()}>
                     + Upload PDF
                 </button>
-                <button className="toolbarBtn--library" onClick={() => {}}>
+                <button className="toolbarBtn--library" onClick={handleOpenLibraryModal}>
                     + Add from Library
                 </button>
 
@@ -558,6 +640,116 @@ const CoursePage = ({ userId }) => {
                     </div>
                 </div>
             )}
+
+        {/* Library picker modal */}
+        {showLibraryModal && (
+            <div className="modalOverlay" onClick={() => setShowLibraryModal(false)}>
+                <div className="modal modalLarge" onClick={e => e.stopPropagation()}>
+                    <div className="modalTitle">Add from Library</div>
+                    <input
+                        className="pdfInput"
+                        placeholder="Search your library…"
+                        value={librarySearch}
+                        onChange={e => setLibrarySearch(e.target.value)}
+                        style={{ marginBottom: "12px" }}
+                    />
+                    {libraryLoading ? (
+                        <div className="emptyState">Loading your library…</div>
+                    ) : libraryError ? (
+                        <div className="courseError">{libraryError}</div>
+                    ) : filteredLibraryItems.length === 0 ? (
+                        <div className="emptyState">No library items found.</div>
+                    ) : (
+                        <div className="libraryPickerList">
+                            {filteredLibraryItems.map(li => {
+                                const alreadyAdded = addedLibraryItemIds.has(li.id);
+                                const isSelected = selectedLibraryItem?.id === li.id;
+                                return (
+                                    <div
+                                        key={li.id}
+                                        className={`libraryPickerItem
+                                            ${isSelected ? "libraryPickerItem--selected" : ""}
+                                            ${alreadyAdded ? "libraryPickerItem--disabled" : ""}
+                                        `}
+                                        onClick={() => {
+                                            if (alreadyAdded) return;
+                                            setSelectedLibraryItem(prev => prev?.id === li.id ? null : li);
+                                        }}
+                                    >
+                                        <div className="libraryPickerItemTitle">
+                                            <Highlighted text={li.title ?? "Untitled"} query={librarySearch.trim()} />
+                                            {alreadyAdded && <span className="alreadyAddedBadge">Already added</span>}
+                                        </div>
+                                        <div className="libraryPickerItemMeta">
+                                            <span className="itemTypeBadge">{li.itemType ?? "PDF"}</span>
+                                            {li.description && (
+                                                <span className="libraryPickerItemDesc">
+                                                    <Highlighted text={li.description} query={librarySearch.trim()} />
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                    <div className="modalActions">
+                        <button className="btn cancelBtn" onClick={() => setShowLibraryModal(false)}>
+                            Cancel
+                        </button>
+                        <button
+                            className="btn primary"
+                            onClick={handleLibraryNext}
+                            disabled={!selectedLibraryItem}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Library item metadata modal */}
+        {showLibMetaModal && (
+            <div className="modalOverlay" onClick={() => setShowLibMetaModal(false)}>
+                <div className="modal" onClick={e => e.stopPropagation()}>
+                    <div className="modalTitle">Add to Course</div>
+                    <div className="pdfForm">
+                        <label className="pdfLabel">
+                            Year
+                            <select className="pdfSelect" value={libMetaYear} onChange={e => setLibMetaYear(e.target.value)}>
+                                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                            </select>
+                        </label>
+                        <label className="pdfLabel">
+                            Semester
+                            <select className="pdfSelect" value={libMetaSemester} onChange={e => setLibMetaSemester(e.target.value)}>
+                                {SEMESTERS.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                        </label>
+                        <label className="pdfLabel">
+                            Description
+                            <textarea
+                                className="pdfTextarea"
+                                value={libMetaDescription}
+                                onChange={e => setLibMetaDescription(e.target.value.slice(0, 255))}
+                                placeholder="Add additional information here, e.g. professor(s)"
+                                rows={3}
+                                maxLength={255}
+                            />
+                        </label>
+                    </div>
+                    <div className="modalActions">
+                        <button className="btn cancelBtn" onClick={handleLibMetaBack}>
+                            ← Back
+                        </button>
+                        <button className="btn primary" onClick={handleLibMetaConfirm} disabled={libMetaAdding}>
+                            {libMetaAdding ? "Adding..." : "Add to Course"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
         </div>
     );
 };
