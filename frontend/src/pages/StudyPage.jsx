@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StudyPage.css';
-import { useEffect } from "react";
 import { startStudying, stopStudying } from "../api.js";
 
 const StudyPage = ({ onToggleFavorite, userId }) => {
@@ -16,6 +15,25 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
     const [isFlipped, setIsFlipped] = useState(false);
     const [flippedCards, setFlippedCards] = useState(new Set());
     const [cards, setCards] = useState(initialFlashcards);
+    const hasStoppedRef = useRef(false);
+
+    useEffect(() => {
+            console.log("StudyPage userId:", userId);
+            if (!userId) return;
+
+            startStudying(userId).catch(console.error);
+
+            return () => {
+                stopStudying(userId).catch(console.error);
+            };
+        }, [userId]);
+
+    // Stops studying when user closes the tab
+        useEffect(() => {
+            const handleUnload = () => stopStudying(userId).catch(console.error);
+            window.addEventListener("beforeunload", handleUnload);
+            return () => window.removeEventListener("beforeunload", handleUnload);
+        }, [userId]);
 
     // 2. SAFETY CHECK: If no cards found, prevent crashes
     if (!cards || cards.length === 0) {
@@ -60,10 +78,17 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         setCurrentIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1));
     };
 
-    const handleDone = () => {
-        navigate('/post_learn', {
-            state: { studiedCount: flippedCards.size, totalCount: cards.length }
-        });
+    const handleDone = async () => {
+        try {
+            await stopStudying(userId); // make sure streak updates
+            navigate('/post_learn', {
+                state: { studiedCount: flippedCards.size, totalCount: cards.length }
+            });
+
+        } catch (err) {
+            console.error("Failed to finish session:", err);
+            alert("Could not finish session. Please try again.");
+        }
     };
 
     const handleToggleFavorite = (e) => {
@@ -80,25 +105,6 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         setIsFlipped(false);
         setCurrentIndex(0);
     }
-
-    useEffect(() => {
-        console.log("StudyPage userId:", userId);
-        if (!userId) return;
-
-        startStudying(userId).catch(console.error);
-
-        return () => {
-            // This cleanup runs when the user navigates away
-            stopStudying(userId).catch(console.error);
-        };
-    }, [userId]);
-
-// Stops studying when user closes the tab
-    useEffect(() => {
-        const handleUnload = () => stopStudying(userId).catch(console.error);
-        window.addEventListener("beforeunload", handleUnload);
-        return () => window.removeEventListener("beforeunload", handleUnload);
-    }, [userId]);
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>

@@ -196,12 +196,12 @@ function App() {
 
             {/* Match Flow */}
             <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
-            <Route path="/match" element={<MatchPage />} />
+            <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
             <Route path="/post_match" element={<PostMatchPage />} />
 
             {/* Test Flow */}
             <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
-            <Route path="/practice_test" element={<PracticeTestPage />} />
+            <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
             <Route path="/post_test" element={<PostTestPage />} />
 
             <Route
@@ -220,8 +220,7 @@ function App() {
             {/* Study Goals Page */}
             <Route
                 path="/goals"
-                element={<GoalsPage userId={currentUser?.id} />}
-                element={currentUser ? <GoalsPage /> : <Navigate to="/login" />}
+                element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
             />
 
             {/* University Page */}

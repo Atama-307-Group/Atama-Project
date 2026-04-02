@@ -336,6 +336,14 @@ export function openPDF(itemId) {
     window.open(`${API_BASE}/library-items/${itemId}/file`, "_blank");
 }
 
+export async function getStreak(userId) {
+    const res = await fetch(`${API_BASE}/goals/users/${userId}/streak`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch streak");
+    return res.json();
+}
+
 export async function logoutUser() {
     const res = await fetch(`${API_BASE}/api/users/logout`, {
         method: "POST",

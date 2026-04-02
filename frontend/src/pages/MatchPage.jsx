@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { startStudying, stopStudying } from "../api.js"
 
-const MatchPage = () => {
+const MatchPage = ({ userId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const flashcards = location.state?.selectedCards || [];
+  const hasStoppedRef = useRef(false);
 
   const [cards, setCards] = useState([]);
   const [first, setFirst] = useState(null);
@@ -12,6 +14,20 @@ const MatchPage = () => {
   const [attempts, setAttempts] = useState(0);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+
+    useEffect(() => {
+      if (!userId) return;
+      startStudying(userId).catch(console.error);
+      return () => {
+        if (!hasStoppedRef.current) stopStudying(userId).catch(console.error);
+      };
+    }, [userId]);
+
+    useEffect(() => {
+      const handleUnload = () => stopStudying(userId).catch(console.error);
+      window.addEventListener("beforeunload", handleUnload);
+      return () => window.removeEventListener("beforeunload", handleUnload);
+    }, [userId]);
 
   useEffect(() => {
     if (flashcards.length === 0) return;
@@ -65,6 +81,10 @@ const MatchPage = () => {
   useEffect(() => {
     if (cards.length > 0 && cards.every(c => c.matched)) {
       clearInterval(timerRef.current);
+      if (!hasStoppedRef.current) {
+        hasStoppedRef.current = true;
+        stopStudying(userId).catch(console.error);
+      }
       navigate('/post_match', { state: { attempts, time: time.toFixed(1) } });
     }
   }, [cards, attempts, time, navigate]);
