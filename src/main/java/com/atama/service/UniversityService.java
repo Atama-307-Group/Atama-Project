@@ -5,6 +5,7 @@ import com.atama.model.User;
 import com.atama.repository.UniversityRepository;
 import com.atama.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ public class UniversityService {
         this.userRepository = userRepository;
     }
 
-
+    @Transactional(readOnly = true)
     public University getUniversityByUserId(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
