@@ -39,10 +39,14 @@ public class FlashcardSetController {
         return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
     }
 
-    /*@GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<FlashcardSetResponseDTO>> getFlashcardSetsByOwner(@PathVariable UUID ownerId) {
-        return ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(ownerId));
-    }*/
+    /*
+     * @GetMapping("/owner/{ownerId}")
+     * public ResponseEntity<List<FlashcardSetResponseDTO>>
+     * getFlashcardSetsByOwner(@PathVariable UUID ownerId) {
+     * return
+     * ResponseEntity.ok(flashcardSetService.getFlashcardSetsByOwner(ownerId));
+     * }
+     */
 
     @GetMapping("/my-sets")
     public ResponseEntity<List<FlashcardSetResponseDTO>> getMyFlashcardSets() {
@@ -107,7 +111,8 @@ public class FlashcardSetController {
             request.setCourse(course != null ? course.trim() : "");
             request.setFlashcards(flashcards);
 
-            FlashcardSetResponseDTO saved = flashcardSetService.createFlashcardSet(request);
+            UUID userId = getAuthenticatedUserId();
+            FlashcardSetResponseDTO saved = flashcardSetService.createFlashcardSet(request, userId);
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
 
         } catch (IllegalArgumentException e) {
