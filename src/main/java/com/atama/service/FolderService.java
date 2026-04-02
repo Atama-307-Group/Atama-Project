@@ -28,8 +28,9 @@ public class FolderService {
     }
 
     // TODO need to fix so that the user UUID is sent
-    public Folder createFolder(CreateFolderRequest request) {
-        Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+    public Folder createFolder(CreateFolderRequest request, UUID userId) {
+        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
+        Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
 
         Folder folder = new Folder();
@@ -87,10 +88,11 @@ public class FolderService {
     }
 
     // Get all Folders TODO maybe fix this later??
-    public List<Folder> getAllFolders() {
-        return folderRepository.findAll();
+    public List<Folder> getAllFolders(UUID userId) {
+        Library library = libraryRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Library not found"));
+        return library.getFolders();
     }
-
     public FolderItemsResponse getFolderItems(UUID folderId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new IllegalArgumentException("Folder not found"));
