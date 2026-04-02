@@ -41,6 +41,7 @@ public class LibraryItemController {
                 i.getLastAccessed(),
                 i.isStarred(),
                 i.getItemType(),
+                i.isPublic(),
                 i.getFolder() != null ? i.getFolder().getId() : null
         );
     }
