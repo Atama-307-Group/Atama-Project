@@ -143,7 +143,7 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
                 </svg>
               </div>
               <p className="study-card-title">Library</p>
-              <p className="study-card-sub">Your saved sets</p>
+              <p className="study-card-sub">Your study materials</p>
             </div>
             <div className="study-card" onClick={() => navigate('/university')}>
               <div className="study-icon study-icon--green">
