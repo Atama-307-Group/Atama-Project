@@ -84,6 +84,9 @@ const GoalsPage = ({ userId }) => {
             });
         }
 
+        console.log("studyDates from backend:", studyDates);
+        console.log("sample calendar date:", new Date(today.getFullYear(), today.getMonth(), today.getDate()).toLocaleDateString("sv-SE"));
+
         return days;
     }, [studyDates]);
 

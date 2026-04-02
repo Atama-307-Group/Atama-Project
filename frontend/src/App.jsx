@@ -220,8 +220,7 @@ function App() {
             {/* Study Goals Page */}
             <Route
                 path="/goals"
-                element={<GoalsPage userId={currentUser?.id} />}
-                element={currentUser ? <GoalsPage /> : <Navigate to="/login" />}
+                element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
             />
 
             {/* University Page */}
