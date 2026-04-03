@@ -1,0 +1,149 @@
+/* ===== Desktop Notification Toasts ===== */
+
+.desktopNotifContainer {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    max-width: 380px;
+    width: 100%;
+}
+
+.desktopNotif {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.06);
+    pointer-events: auto;
+    animation: desktopNotifSlideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    cursor: default;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.desktopNotif:hover {
+    transform: translateX(-4px);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes desktopNotifSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Icon circle */
+
+.desktopNotifIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e8f7f2, #d0f0e4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* Text content */
+
+.desktopNotifBody {
+    flex: 1;
+    min-width: 0;
+}
+
+.desktopNotifAppName {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #7a9590;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.desktopNotifTitle {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2d2a;
+    line-height: 1.25;
+    margin-bottom: 3px;
+}
+
+.desktopNotifText {
+    font-size: 0.84rem;
+    color: #4a665e;
+    line-height: 1.4;
+}
+
+/* Close button */
+
+.desktopNotifClose {
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    color: #aac4bc;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    margin-top: -2px;
+}
+
+.desktopNotifClose:hover {
+    background: rgba(220, 80, 60, 0.08);
+    color: #c0392b;
+}
+
+/* Dark mode support (if the page background is dark) */
+@media (prefers-color-scheme: dark) {
+    .desktopNotif {
+        background: rgba(30, 40, 36, 0.96);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .desktopNotifTitle {
+        color: #e8f7f2;
+    }
+
+    .desktopNotifText {
+        color: #a8c5bc;
+    }
+
+    .desktopNotifAppName {
+        color: #6b9a8e;
+    }
+
+    .desktopNotifIcon {
+        background: linear-gradient(135deg, #2d4a42, #1f3b34);
+    }
+
+    .desktopNotifClose {
+        color: #5a7a70;
+    }
+
+    .desktopNotifClose:hover {
+        background: rgba(220, 80, 60, 0.15);
+        color: #e74c3c;
+    }
+}

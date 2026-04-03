@@ -9,11 +9,13 @@ import lombok.Setter;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -28,7 +30,7 @@ public class Goal {
     @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
-    private Set<DayOfWeek> selectedDaysOfWeek;  // Which days the User wants to study
+    private Set<DayOfWeek> selectedDaysOfWeek; // Which days the User wants to study
 
     // For tracking the User's study time
     private Instant studyStartTime;
@@ -41,6 +43,16 @@ public class Goal {
 
     private java.time.LocalDate lastResetDate;
 
+    // Notification preferences
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean notifyByDesktop = false;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean notifyByEmail = false;
+
+    private LocalTime notificationTime;
+
+    // Streak fields
     private int currentStreak = 0;
 
     private java.time.LocalDate lastStudyDate;

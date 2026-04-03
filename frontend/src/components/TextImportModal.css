@@ -355,3 +355,92 @@
 .tim-btn--import:hover {
   background: #226138;
 }
+/* ─── Tabs ─────────────────────────────────────────────────────────────────── */
+.tim-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid #e8e8e8;
+  margin-bottom: 1rem;
+}
+
+.tim-tab-btn {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #888;
+  padding: 0.5rem 0.25rem;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tim-tab-btn:hover {
+  color: #444;
+}
+
+.tim-tab-btn--active {
+  color: #111;
+}
+
+.tim-tab-btn--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #2f3e3b;
+  border-radius: 2px 2px 0 0;
+}
+
+/* ─── File Upload Zone (inside modal) ──────────────────────────────────────── */
+.tim-file-upload-zone {
+  border: 2px dashed #a4b49c;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: #fcfbf9;
+  margin: 10px 0;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.tim-file-upload-zone.drag-active {
+  border-color: #2f3e3b;
+  background-color: #e8eee6;
+}
+
+.tim-file-upload-zone p {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.tim-file-upload-btn {
+  display: inline-block;
+  background-color: #2f3e3b;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.tim-file-upload-btn:hover {
+  background-color: #435854;
+}
+
+.tim-upload-loading {
+  margin-top: 10px;
+  color: #2f3e3b;
+  font-weight: bold;
+  font-size: 0.85rem;
+}

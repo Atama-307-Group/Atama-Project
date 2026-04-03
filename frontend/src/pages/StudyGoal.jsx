@@ -24,7 +24,7 @@ const JAVA_TO_DAY_KEY = Object.fromEntries(
 
 const GoalsPage = ({ userId }) => {
     const navigate = useNavigate();
-    const [selectedDays, setSelectedDays] = useState(["M","T","W","Th","F","Sa","Su"]);
+    const [selectedDays, setSelectedDays] = useState(["M", "T", "W", "Th", "F", "Sa", "Su"]);
     const [minutesPerDay, setMinutesPerDay] = useState(15);
 
     // Edit mode + draft settings (separate per card)
@@ -33,6 +33,16 @@ const GoalsPage = ({ userId }) => {
 
     const [isEditingGoal, setIsEditingGoal] = useState(false);
     const [draftMinutes, setDraftMinutes] = useState(minutesPerDay);
+
+    // Notification preferences
+    const [notifyDesktop, setNotifyDesktop] = useState(false);
+    const [notifyEmail, setNotifyEmail] = useState(false);
+    const [notifTime, setNotifTime] = useState("09:00");
+
+    const [isEditingNotif, setIsEditingNotif] = useState(false);
+    const [draftNotifyDesktop, setDraftNotifyDesktop] = useState(false);
+    const [draftNotifyEmail, setDraftNotifyEmail] = useState(false);
+    const [draftNotifTime, setDraftNotifTime] = useState("09:00");
 
     // Optional progress preview
     const [progress, setProgress] = useState(0);
@@ -103,16 +113,21 @@ const GoalsPage = ({ userId }) => {
 
         const loadGoal = () => {
             getGoal(userId).then(goal => {
-                // Only overwrite goal settings if there's no pending save in flight.
-                // This prevents a stale poll response from clobbering a goal the
-                // user just changed (race condition: save fires, poll returns old
-                // value before the backend has committed the update).
+                // If there's no goal yet, just rely on defaults
+                if (!goal) return;
+
                 if (!pendingSaveRef.current) {
                     if (goal.selectedDaysOfWeek) {
                         setSelectedDays(goal.selectedDaysOfWeek.map(d => JAVA_TO_DAY_KEY[d]).filter(Boolean));
                     }
                     if (goal.minutesPerDay) {
                         setMinutesPerDay(goal.minutesPerDay);
+                    }
+                    setNotifyDesktop(!!goal.notifyByDesktop);
+                    setNotifyEmail(!!goal.notifyByEmail);
+                    if (goal.notificationTime) {
+                        // notificationTime comes as "HH:MM:SS" or "HH:MM" from backend
+                        setNotifTime(goal.notificationTime.substring(0, 5));
                     }
                 }
                 // Always update progress — this is the value we want live
@@ -165,17 +180,19 @@ const GoalsPage = ({ userId }) => {
         setIsEditingSchedule(false);
     }
 
-    async function persistGoal(days, minutes) {
+    async function persistGoal(days, minutes, extraFields = {}) {
         if (!userId) return;
         pendingSaveRef.current = true;
         try {
             await updateGoal(userId, {
                 selectedDaysOfWeek: days.map(d => DAY_KEY_TO_JAVA[d]),
                 minutesPerDay: minutes,
+                ...extraFields,
             });
+        } catch (error) {
+            console.error("Save error:", error);
+            alert("Failed to save: " + error.message);
         } finally {
-            // Clear the flag after a short buffer so any in-flight poll that
-            // started just before the save completes doesn't stomp our state
             setTimeout(() => { pendingSaveRef.current = false; }, 3000);
         }
     }
@@ -227,6 +244,15 @@ const GoalsPage = ({ userId }) => {
             </button>
 
             <h1>Study Schedule and Goal</h1>
+
+            <button
+                type="button"
+                className="goalBtnPrimary"
+                onClick={() => navigate('/countdowns')}
+                style={{ marginBottom: '20px', padding: '12px 24px', fontSize: '1rem' }}
+            >
+                📅 View Exam Countdowns
+            </button>
 
             <div className="stack">
                 {/* Card 1: Study Schedule */}
@@ -323,9 +349,9 @@ const GoalsPage = ({ userId }) => {
                     {/* Progress */}
                     <div className="section">
                         <div className="progressRow">
-              <span>
-                {progress} / {effectiveMinutes} min (today)
-              </span>
+                            <span>
+                                {progress} / {effectiveMinutes} min (today)
+                            </span>
                             <span>{Math.round(percent)}%</span>
                         </div>
 
@@ -358,7 +384,104 @@ const GoalsPage = ({ userId }) => {
                         )}
                     </div>
                 </div>
-                {/* Card 3: Study Streak */}
+
+                {/* Card 3: Notifications */}
+                <div className="card">
+                    <div className="sectionTitle">Study Reminders</div>
+
+                    <div className="section">
+                        <div className="notifToggleRow">
+                            <label className="notifToggleLabel">
+                                <span className="notifToggleIcon">🖥️</span> Desktop notifications
+                                <label className="toggleSwitch">
+                                    <input
+                                        type="checkbox"
+                                        checked={isEditingNotif ? draftNotifyDesktop : notifyDesktop}
+                                        onChange={(e) => isEditingNotif && setDraftNotifyDesktop(e.target.checked)}
+                                        disabled={!isEditingNotif}
+                                    />
+                                    <span className="toggleSlider" />
+                                </label>
+                            </label>
+                        </div>
+
+                        <div className="notifToggleRow">
+                            <label className="notifToggleLabel">
+                                <span className="notifToggleIcon">✉️</span> Email notifications
+                                <label className="toggleSwitch">
+                                    <input
+                                        type="checkbox"
+                                        checked={isEditingNotif ? draftNotifyEmail : notifyEmail}
+                                        onChange={(e) => isEditingNotif && setDraftNotifyEmail(e.target.checked)}
+                                        disabled={!isEditingNotif}
+                                    />
+                                    <span className="toggleSlider" />
+                                </label>
+                            </label>
+                        </div>
+
+                        <div className="fieldRow" style={{ marginTop: 14 }}>
+                            <label className="fieldLabel" htmlFor="notifTimeInput">
+                                Reminder time:
+                            </label>
+                            <input
+                                id="notifTimeInput"
+                                type="time"
+                                className="goalSelect"
+                                value={isEditingNotif ? draftNotifTime : notifTime}
+                                onChange={(e) => isEditingNotif && setDraftNotifTime(e.target.value)}
+                                disabled={!isEditingNotif}
+                                title={isEditingNotif ? "Set reminder time" : "Click Edit to change"}
+                            />
+                        </div>
+
+                        {(isEditingNotif ? (draftNotifyDesktop || draftNotifyEmail) : (notifyDesktop || notifyEmail)) && (
+                            <div className="summary" style={{ marginTop: 10 }}>
+                                Reminder at <strong>{isEditingNotif ? draftNotifTime : notifTime}</strong> via{" "}
+                                {(() => {
+                                    const d = isEditingNotif ? draftNotifyDesktop : notifyDesktop;
+                                    const e = isEditingNotif ? draftNotifyEmail : notifyEmail;
+                                    if (d && e) return "desktop & email";
+                                    if (d) return "desktop";
+                                    return "email";
+                                })()}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="bottomActions">
+                        {!isEditingNotif ? (
+                            <button type="button" className="goalBtnPrimary" onClick={() => {
+                                setDraftNotifyDesktop(notifyDesktop);
+                                setDraftNotifyEmail(notifyEmail);
+                                setDraftNotifTime(notifTime);
+                                setIsEditingNotif(true);
+                            }}>Edit</button>
+                        ) : (
+                            <>
+                                <button type="button" className="goalBtnPrimary" onClick={() => {
+                                    setNotifyDesktop(draftNotifyDesktop);
+                                    setNotifyEmail(draftNotifyEmail);
+                                    setNotifTime(draftNotifTime);
+                                    setIsEditingNotif(false);
+                                    persistGoal(selectedDays, minutesPerDay, {
+                                        notifyByDesktop: draftNotifyDesktop,
+                                        notifyByEmail: draftNotifyEmail,
+                                        notificationTime: draftNotifTime + ":00",
+                                    });
+                                }}>Save</button>
+                                <button type="button" className="goalBtnSecondary" onClick={() => {
+                                    setDraftNotifyDesktop(notifyDesktop);
+                                    setDraftNotifyEmail(notifyEmail);
+                                    setDraftNotifTime(notifTime);
+                                    setIsEditingNotif(false);
+                                }}>Cancel</button>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Card 4: Study Streak */}
                 <div className="card">
                     <div className="sectionTitle">
                         🏆 Best: {bestStreak} day{bestStreak !== 1 ? "s" : ""}
