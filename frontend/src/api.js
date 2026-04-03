@@ -170,6 +170,31 @@ export async function resolveSharedLink(token) {
     return res.json();
 }
 
+export async function saveSet(id) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/save`, { method: 'POST', credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to save set');
+}
+
+export async function unsaveSet(id) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/save`, { method: 'DELETE', credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to unsave set');
+}
+
+export async function getSavedSets() {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/saved`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch saved sets');
+    return res.json();
+}
+export async function updateSetPrivacy(id, isPublic) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/privacy`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic }),
+    });
+    if (!res.ok) throw new Error('Failed to update privacy');
+    return res.json();
+}
 /* Goals ------------------------------------------- */
 
 export async function getGoal(userId) {

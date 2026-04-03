@@ -7,6 +7,9 @@ import {
     updateFlashcard,
     getSetProgress,
     getSetStats,
+    saveSet,
+    unsaveSet,
+    updateSetPrivacy,
     getMyReview,
     upsertReview,
     deleteReview,
@@ -222,6 +225,21 @@ const FlashcardSetPage = ({ currentUser }) => {
         finally { setTimeout(() => setShareStatus(null), 3000); }
     };
 
+    const handleSaveToggle = async () => {
+        if (setData.isSaved) {
+            await unsaveSet(id);
+            setSetData(prev => ({ ...prev, isSaved: false }));
+        } else {
+            await saveSet(id);
+            setSetData(prev => ({ ...prev, isSaved: true }));
+        }
+    };
+
+    const handlePrivacyToggle = async () => {
+        const updated = await updateSetPrivacy(id, !setData.isPublic);
+        setSetData(prev => ({ ...prev, isPublic: updated.isPublic }));
+    };
+
     const handleStudyMode = (mode) => {
         const destinations = { learn: '/pre_learn', match: '/pre_match', test: '/pre_test' };
         navigate(destinations[mode], { state: { flashcards: setData.flashcards, setTitle: setData.title, setId: id } });
@@ -289,7 +307,14 @@ const FlashcardSetPage = ({ currentUser }) => {
                     </div>
 
                     <div>
-                        <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
+                        {setData.isOwner && (
+                            <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
+                        )}
+                        {!setData.isOwner && (
+                            <button className="set-page-edit-btn" onClick={handleSaveToggle}>
+                                {setData.isSaved ? '✓ Saved' : '+ Save to Library'}
+                            </button>
+                        )}
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
                         <div className="download-container" style={{ position: 'relative', display: 'inline-block' }}>
                             <button className="set-page-edit-btn" onClick={() => setShowDownloadOptions(!showDownloadOptions)}>Download</button>
@@ -298,6 +323,11 @@ const FlashcardSetPage = ({ currentUser }) => {
                                     <button onClick={() => { downloadSet('csv'); setShowDownloadOptions(false); }}>CSV file</button>
                                     <button onClick={() => { downloadSet('txt'); setShowDownloadOptions(false); }}>TXT file</button>
                                 </div>
+                            )}
+                            {setData.isOwner && (
+                                <button className="set-page-edit-btn" onClick={handlePrivacyToggle}>
+                                    {setData.isPublic ? '🔒 Make Private' : '🔓 Make Public'}
+                                </button>
                             )}
                         </div>
                         {!isOwner && (
@@ -336,7 +366,9 @@ const FlashcardSetPage = ({ currentUser }) => {
                         ) : (
                             <div key={cardKey} className="set-page-card-wrap">
                                 <FlashcardCard index={index} card={card} knowledgeLevel={level} />
-                                <button className="set-page-edit-btn" onClick={() => startEditing(card, index)}>Edit</button>
+                                {setData.isOwner && (
+                                    <button className="set-page-edit-btn" onClick={() => startEditing(card, index)}>Edit</button>
+                                )}
                             </div>
                         );
                     })}

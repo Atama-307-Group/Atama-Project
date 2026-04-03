@@ -33,9 +33,12 @@ public class FlashcardSetResponseDTO extends LibraryItemResponseDTO {
     private String course;
     private UUID ownerId;
     private List<FlashcardResponseDTO> flashcards = new ArrayList<>();
-
+    private Boolean isOwner;
+    private Boolean isSaved;
+    private Boolean isPublic;
     // Review aggregate — populated by service layer, not mapper
     private Double averageRating;       // null if no reviews yet
     private List<ReviewTag> topTags = new ArrayList<>();
     private int reviewCount;
 }
+
