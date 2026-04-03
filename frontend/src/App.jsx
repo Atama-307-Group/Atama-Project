@@ -145,7 +145,7 @@ function App() {
                 <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
                 <Route path="/post_test" element={<PostTestPage />} />
 
-                <Route path="/sets/:id" element={<FlashcardSetPage />} />
+                <Route path="/sets/:id" element={<FlashcardSetPage currentUser={currentUser} />} />
                 <Route path="/shared/:token" element={<SharedSetPage />} />
 
                 {/* Personal Library */}
