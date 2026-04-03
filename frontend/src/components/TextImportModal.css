@@ -13,8 +13,13 @@
 }
 
 @keyframes timFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* ─── Modal shell ──────────────────────────────────────────────────────────── */
@@ -34,8 +39,15 @@
 }
 
 @keyframes timSlideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* ─── Header ───────────────────────────────────────────────────────────────── */
@@ -52,7 +64,7 @@
   flex-shrink: 0;
 }
 
-.tim-header > div:nth-child(2) {
+.tim-header>div:nth-child(2) {
   flex: 1;
 }
 
@@ -82,6 +94,7 @@
   transition: color 0.15s, background 0.15s;
   flex-shrink: 0;
 }
+
 .tim-close:hover {
   color: #333;
   background: #f0f0f0;
@@ -142,12 +155,14 @@
   transition: border-color 0.15s, box-shadow 0.15s;
   background: #fafafa;
 }
+
 .tim-textarea:focus {
   outline: none;
   border-color: #4f6ef7;
   box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
   background: #fff;
 }
+
 .tim-textarea::placeholder {
   color: #bbb;
 }
@@ -171,10 +186,12 @@
   flex-direction: column;
   gap: 0.15rem;
 }
+
 .tim-delim-btn:hover {
   border-color: #aaa;
   background: #efefef;
 }
+
 .tim-delim-btn--active {
   background: #eef1ff;
   border-color: #4f6ef7;
@@ -186,6 +203,7 @@
   font-weight: 600;
   color: #222;
 }
+
 .tim-delim-btn--active .tim-delim-name {
   color: #3a56d4;
 }
@@ -198,6 +216,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .tim-delim-btn--active .tim-delim-example {
   color: #7b93e8;
 }
@@ -218,11 +237,27 @@
 }
 
 @keyframes timShake {
-  0%, 100% { transform: translateX(0); }
-  20%       { transform: translateX(-5px); }
-  40%       { transform: translateX(5px); }
-  60%       { transform: translateX(-3px); }
-  80%       { transform: translateX(3px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-5px);
+  }
+
+  40% {
+    transform: translateX(5px);
+  }
+
+  60% {
+    transform: translateX(-3px);
+  }
+
+  80% {
+    transform: translateX(3px);
+  }
 }
 
 .tim-error-icon {
@@ -278,6 +313,7 @@
   font-size: 0.83rem;
   border-bottom: 1px solid #eaf5ec;
 }
+
 .tim-preview-row:last-child {
   border-bottom: none;
 }
@@ -335,6 +371,7 @@
   background: #f0f0f0;
   color: #555;
 }
+
 .tim-btn--ghost:hover {
   background: #e4e4e4;
   color: #222;
@@ -344,6 +381,7 @@
   background: #111;
   color: #fff;
 }
+
 .tim-btn--parse:hover {
   background: #333;
 }
@@ -352,9 +390,11 @@
   background: #2d7d46;
   color: #fff;
 }
+
 .tim-btn--import:hover {
   background: #226138;
 }
+
 /* ─── Tabs ─────────────────────────────────────────────────────────────────── */
 .tim-tabs {
   display: flex;
@@ -443,4 +483,21 @@
   color: #2f3e3b;
   font-weight: bold;
   font-size: 0.85rem;
+}
+
+/* ─── Simulated Progress Bar ────────────────────────────────────────────────── */
+.tim-progress-bar-container {
+  width: 100%;
+  max-width: 300px;
+  height: 6px;
+  background-color: #cbd5e1;
+  border-radius: 4px;
+  margin: 15px auto 0;
+  overflow: hidden;
+}
+
+.tim-progress-bar-fill {
+  height: 100%;
+  background-color: #2d7d46;
+  transition: width 0.4s ease-out;
 }

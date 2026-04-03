@@ -12,8 +12,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.Loader;
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class FileUploadService {
+
+    private final GeminiService geminiService;
 
     /**
      * Parses a CSV or TXT file into a list of NormalFlashcardRequestDTOs.
@@ -32,8 +40,12 @@ public class FileUploadService {
         }
 
         String lowerName = originalFilename.toLowerCase();
-        if (!lowerName.endsWith(".csv") && !lowerName.endsWith(".txt")) {
-            throw new IllegalArgumentException("Only CSV and TXT files are supported");
+        if (!lowerName.endsWith(".csv") && !lowerName.endsWith(".txt") && !lowerName.endsWith(".pdf")) {
+            throw new IllegalArgumentException("Only CSV, TXT, and PDF files are supported");
+        }
+
+        if (lowerName.endsWith(".pdf")) {
+            return parsePdfWithGemini(file);
         }
 
         String delimiter = lowerName.endsWith(".csv") ? "," : "\t";
@@ -137,5 +149,16 @@ public class FileUploadService {
         String c2 = col2.toLowerCase();
         return (c1.equals("term") || c1.equals("front") || c1.equals("question") || c1.equals("word"))
                 && (c2.equals("definition") || c2.equals("back") || c2.equals("answer") || c2.equals("meaning"));
+    }
+
+    private List<FlashcardRequestDTO> parsePdfWithGemini(MultipartFile file) throws IOException {
+        try (PDDocument document = Loader.loadPDF(file.getBytes())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            String text = stripper.getText(document);
+            if (text == null || text.trim().isEmpty()) {
+                throw new IllegalArgumentException("No text could be extracted from the PDF.");
+            }
+            return geminiService.generateFlashcardsFromText(text);
+        }
     }
 }
