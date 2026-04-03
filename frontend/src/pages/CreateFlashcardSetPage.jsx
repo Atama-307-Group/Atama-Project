@@ -17,6 +17,8 @@ const CreateFlashcardSetPage = () => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
+
 
   const handleFileUpload = async (file) => {
     const fileName = file.name.toLowerCase();
@@ -122,6 +124,7 @@ const CreateFlashcardSetPage = () => {
         university: university.trim(),
         course: course.trim(),
         flashcards: cleanedCards,
+        isPublic,
       });
       recordAccess(saved.id);
       navigate(`/sets/${saved.id}`);
@@ -176,7 +179,16 @@ const CreateFlashcardSetPage = () => {
         value={course}
         onChange={(e) => setCourse(e.target.value)}
       />
-
+      <div className="create-set-privacy">
+        <label>
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={e => setIsPublic(e.target.checked)}
+          />
+          {" "}Make this set public
+        </label>
+      </div>
       <div className="create-set-cards">
         {cards.map((card, index) => (
           <FlashcardInput

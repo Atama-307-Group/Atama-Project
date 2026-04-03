@@ -29,6 +29,8 @@ import SharedSetPage from "./pages/SharedSetPage.jsx";
 import CoursePage from './pages/CoursePage.jsx';
 import ExamReminderBanner from "./components/ExamReminderBanner.jsx";
 import DesktopNotification from "./components/DesktopNotification.jsx";
+import PickSetPage from './pages/PickSetPage.jsx';
+import SearchPage from "./pages/SearchPage.jsx";
 
 function App() {
     const { openPopup } = useTimer();
@@ -36,44 +38,7 @@ function App() {
     const [currentUser, setCurrentUser] = useState(() => {
         const saved = localStorage.getItem('currentUser');
         return saved ? JSON.parse(saved) : null;
-    })
-
-    const [flashcards, setFlashcards] = useState([
-        { id: 1, type: 'REGULAR', term: 'Mitosis', definition: 'Cell division producing two identical daughter cells', favorite: false },
-        { id: 2, type: 'REGULAR', term: 'Osmosis', definition: 'Movement of water through a semipermeable membrane', favorite: false },
-        { id: 3, type: 'REGULAR', term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into glucose', favorite: false },
-        { id: 4, type: 'REGULAR', term: 'Homeostasis', definition: 'Maintaining a stable internal environment', favorite: false },
-        { id: 5, type: 'REGULAR', term: 'Meiosis', definition: 'Cell division producing four genetically unique gametes', favorite: false },
-        { id: 6, type: 'REGULAR', term: 'DNA', definition: 'Molecule carrying genetic instructions for life', favorite: false },
-
-        {
-            id: 7,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'This app is called __ and is a project for CS __.',
-            correctAnswers: ['Atama', '307'],
-            favorite: true
-        },
-        {
-            id: 8,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'Water freezes at __°C and boils at __°C at sea level.',
-            correctAnswers: ['0', '100'],
-            favorite: true
-        },
-        {
-            id: 9,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'The chemical symbol for Gold is __ and for Silver is __.',
-            correctAnswers: ['Au', 'Ag'],
-            favorite: true
-        }
-    ]);
-
-    const handleToggleFavorite = (id) => {
-        setFlashcards(prev =>
-            prev.map(card => card.id === id ? { ...card, favorite: !card.favorite } : card)
-        );
-    };
+    });
 
     const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
         const user = { id, username, email, profilePictureUrl, verified };
@@ -138,83 +103,52 @@ function App() {
                 />
 
                 {/* Auth Routes */}
-                <Route
-                    path="/login"
-                    element={
-                        <LoginPage
-                            onLoginSuccess={handleLoginSuccess}
-                        />
-                    }
-                />
-
-                <Route
-                    path="/signup"
-                    element={<SignupPage />}
-                />
-
-                {/* Forgot / Reset Password */}
-                <Route
-                    path="/forgot-password"
-                    element={<ForgotPasswordPage />}
-                />
-
-                <Route
-                    path="/reset-password"
-                    element={<ResetPasswordPage />}
-                />
+                <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                 {/* Profile & Account Management */}
                 <Route
                     path="/profile"
-                    element={
-                        currentUser
-                            ? <ProfilePage currentUser={currentUser} />
-                            : <Navigate to="/login" />
-                    }
+                    element={currentUser ? <ProfilePage currentUser={currentUser} /> : <Navigate to="/login" />}
                 />
-
                 <Route
                     path="/change-password"
-                    element={
-                        currentUser
-                            ? <ChangePasswordPage currentUser={currentUser} />
-                            : <Navigate to="/login" />
-                    }
+                    element={currentUser ? <ChangePasswordPage currentUser={currentUser} /> : <Navigate to="/login" />}
                 />
 
                 {/* Create Flashcard Set */}
                 <Route
                     path="/create"
-                    element={
-                        // currentUser
-                        //     ? <CreateFlashcardSetPage />
-                        //     : <Navigate to="/login" />
-                        <CreateFlashcardSetPage onSave={setFlashcards} />
-                    }
+                    element={currentUser ? <CreateFlashcardSetPage /> : <Navigate to="/login" />}
                 />
 
-                {/* Study & Learning Flow */}
-                <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
-                <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id} />} />
+                {/* Pick a set to study */}
+                <Route
+                    path="/pick-set"
+                    element={currentUser ? <PickSetPage /> : <Navigate to="/login" />}
+                />
+
+                {/* Study & Learning Flow — flashcards passed via router state */}
+                <Route path="/pre_learn" element={<PreLearnPage />} />
+                <Route path="/study" element={<StudyPage onToggleFavorite={() => {}} userId={currentUser?.id} />} />
                 <Route path="/post_learn" element={<PostLearnPage />} />
 
                 {/* Match Flow */}
-                <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
+                <Route path="/pre_match" element={<PreMatchPage />} />
                 <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
                 <Route path="/post_match" element={<PostMatchPage />} />
 
                 {/* Test Flow */}
-                <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
+                <Route path="/pre_test" element={<PreTestPage />} />
                 <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
                 <Route path="/post_test" element={<PostTestPage />} />
 
-                <Route
-                    path="/sets/:id"
-                    element={<FlashcardSetPage />}
-                />
+                <Route path="/sets/:id" element={<FlashcardSetPage />} />
                 <Route path="/shared/:token" element={<SharedSetPage />} />
 
-                {/* Personal Library Page */}
+                {/* Personal Library */}
                 <Route
                     path="/folders"
                     element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
@@ -242,6 +176,13 @@ function App() {
                 <Route
                     path="/countdowns"
                     element={<CountdownPage userId={currentUser?.id} />}
+                />
+
+
+                {/* Search Page */}
+                <Route
+                    path="/search"
+                    element={<SearchPage />}
                 />
 
                 {/* Catch-all */}

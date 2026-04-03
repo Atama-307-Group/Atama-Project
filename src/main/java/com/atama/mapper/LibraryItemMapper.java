@@ -10,6 +10,7 @@ public class LibraryItemMapper {
 
     public void applyRequestDTO(LibraryItemRequestDTO dto, LibraryItem entity) {
         entity.setTitle(dto.getTitle());
+        entity.setPublic(dto.isPublic());
         // folder and library are typically resolved via service layer, not set here
     }
 
@@ -21,6 +22,7 @@ public class LibraryItemMapper {
         dto.setLastAccessed(entity.getLastAccessed());
         dto.setStarred(entity.isStarred());
         dto.setItemType(entity.getItemType());
+        dto.setPublic(entity.isPublic());
         if (entity.getFolder() != null) {
             dto.setFolderId(entity.getFolder().getId());
         }

@@ -1,6 +1,7 @@
 package com.atama.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,4 +59,8 @@ public abstract class LibraryItem {
     @OneToMany(mappedBy = "libraryItem")
     @JsonIgnore
     private List<CourseLibraryItem> courseAssignments;
+
+    @JsonProperty("isPublic")
+    @Column(name = "is_public", nullable = false)
+    private boolean isPublic = true;
 }
