@@ -187,7 +187,9 @@ const FlashcardSetPage = () => {
                     </div>
 
                     <div>
-                        <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
+                        {setData.isOwner && (
+                            <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
+                        )}
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
                         <div className="download-container" style={{ position: 'relative', display: 'inline-block' }}>
                             <button className="set-page-edit-btn" onClick={() => setShowDownloadOptions(!showDownloadOptions)}>Download</button>
@@ -237,7 +239,9 @@ const FlashcardSetPage = () => {
                                 className="set-page-card-wrap"
                             >
                                 <FlashcardCard index={index} card={card} knowledgeLevel={level} />
-                                <button className="set-page-edit-btn" onClick={() => startEditing(card, index)}>Edit</button>
+                                {setData.isOwner && (
+                                    <button className="set-page-edit-btn" onClick={() => startEditing(card, index)}>Edit</button>
+                                )}
                             </div>
                         );
                     })}

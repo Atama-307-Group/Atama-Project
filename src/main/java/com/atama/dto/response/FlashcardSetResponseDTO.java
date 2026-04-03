@@ -33,4 +33,5 @@ public class FlashcardSetResponseDTO extends LibraryItemResponseDTO {
     private String course;
     private UUID ownerId;
     private List<FlashcardResponseDTO> flashcards = new ArrayList<>();
+    private Boolean isOwner;
 }

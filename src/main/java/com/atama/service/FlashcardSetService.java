@@ -35,13 +35,21 @@ public class FlashcardSetService {
         return mapper.toResponseDTO(saved);
     }
 
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     public FlashcardSetResponseDTO getFlashcardSetById(UUID id) {
         FlashcardSet entity = flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
         return mapper.toResponseDTO(entity);
-    }
+    }*/
+    @Transactional(readOnly = true)
+    public FlashcardSetResponseDTO getFlashcardSetById(UUID id, UUID requesterId) {
+        FlashcardSet entity = flashcardSetRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
 
+        FlashcardSetResponseDTO dto = mapper.toResponseDTO(entity);
+        dto.setIsOwner(requesterId != null && requesterId.equals(entity.getOwnerId()));
+        return dto;
+    }
     @Transactional(readOnly = true)
     public List<FlashcardSetResponseDTO> getFlashcardSetsByOwner(UUID ownerId) {
         return flashcardSetRepository.findByOwnerId(ownerId)
