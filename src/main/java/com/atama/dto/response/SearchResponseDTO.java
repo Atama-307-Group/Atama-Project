@@ -1,9 +1,11 @@
 package com.atama.dto.response;
 
+import lombok.AllArgsConstructor;
+
 import java.util.List;
 
 public record SearchResponseDTO(
         List<FolderResponse> folders,
-        List<LibraryItemResponseDTO> flashcardSets,
+        List<FlashcardSetSearchDTO> flashcardSets,
         List<LibraryItemResponseDTO> pdfs
 ) {}

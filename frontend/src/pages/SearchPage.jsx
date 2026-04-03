@@ -59,6 +59,29 @@ const SearchPage = () => {
                                      onClick={() => navigate(`/sets/${item.id}`)}
                                      style={{ cursor: "pointer" }}>
                                     <p className="recent-title">🃏 {item.title}</p>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
+                                        {item.averageRating != null ? (
+                                            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f59e0b' }}>
+                                                ★ {item.averageRating.toFixed(1)}
+                                            </span>
+                                        ) : (
+                                            <span style={{ fontSize: '0.8rem', color: '#aaa' }}>★ No reviews</span>
+                                        )}
+                                        {(item.topTags ?? []).map(tag => {
+                                            const isPos = ['WELL_ORGANIZED','COVERS_EXAM_CONTENT','EASY_TO_STUDY','COVERS_LECTURE_CONTENT'].includes(tag);
+                                            return (
+                                                <span key={tag} style={{
+                                                    fontSize: '0.72rem', fontWeight: 600, padding: '2px 8px',
+                                                    borderRadius: '99px', border: '1px solid',
+                                                    background: isPos ? '#dcfce7' : '#fde8e8',
+                                                    borderColor: isPos ? '#86efac' : '#f5b8b8',
+                                                    color: isPos ? '#15803d' : '#b91c1c',
+                                                }}>
+                                                    {tag.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             ))}
                         </section>

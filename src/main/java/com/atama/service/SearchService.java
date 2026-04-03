@@ -1,5 +1,6 @@
 package com.atama.service;
 
+import com.atama.dto.response.FlashcardSetSearchDTO;
 import com.atama.dto.response.FolderResponse;
 import com.atama.dto.response.LibraryItemResponseDTO;
 import com.atama.dto.response.SearchResponseDTO;
@@ -19,6 +20,7 @@ public class SearchService {
 
     private final FolderRepository folderRepository;
     private final LibraryItemRepository libraryItemRepository;
+    private final FlashcardSetReviewService reviewService;
 
     @Transactional(readOnly = true)
     public SearchResponseDTO search(String q, UUID userId) {
@@ -36,14 +38,18 @@ public class SearchService {
                 ))
                 .toList();
 
-        List<LibraryItemResponseDTO> flashcardSets = libraryItemRepository
+        List<FlashcardSetSearchDTO> flashcardSets = libraryItemRepository
                 .searchByType(q, LibraryItemType.FLASHCARD_SET, userId)
                 .stream()
-                .map(i -> new LibraryItemResponseDTO(
-                        i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
-                        i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
-                        i.getFolder() != null ? i.getFolder().getId() : null
-                ))
+                .map(i -> {
+                    FlashcardSetReviewService.ReviewAggregate agg = reviewService.getAggregate(i.getId());
+                    return new FlashcardSetSearchDTO(
+                            i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
+                            i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
+                            i.getFolder() != null ? i.getFolder().getId() : null,
+                            agg.averageStars(), agg.topTags()
+                    );
+                })
                 .toList();
 
         List<LibraryItemResponseDTO> pdfs = libraryItemRepository

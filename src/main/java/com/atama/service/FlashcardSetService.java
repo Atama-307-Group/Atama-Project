@@ -24,6 +24,7 @@ public class FlashcardSetService {
     private final FlashcardSetMapper mapper;
     private final FlashcardMapper flashcardMapper;
     private final LibraryItemService libraryItemService;
+    private final FlashcardSetReviewService reviewService;
 
     // TODO: the services should return the DTO not the entity
     public FlashcardSetResponseDTO createFlashcardSet(FlashcardSetRequestDTO dto, UUID userId) {
@@ -39,7 +40,14 @@ public class FlashcardSetService {
     public FlashcardSetResponseDTO getFlashcardSetById(UUID id) {
         FlashcardSet entity = flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
-        return mapper.toResponseDTO(entity);
+        FlashcardSetResponseDTO dto = mapper.toResponseDTO(entity);
+
+        FlashcardSetReviewService.ReviewAggregate agg = reviewService.getAggregate(id);
+        dto.setAverageRating(agg.averageStars());
+        dto.setTopTags(agg.topTags());
+        dto.setReviewCount(agg.reviewCount());
+
+        return dto;
     }
 
     @Transactional(readOnly = true)

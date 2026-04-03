@@ -1,10 +1,10 @@
 package com.atama.dto.response;
 
-
 import com.atama.dto.request.DragDropFlashcardRequestDTO;
 import com.atama.dto.request.FillBlankFlashcardRequestDTO;
 import com.atama.dto.request.NormalFlashcardRequestDTO;
 import com.atama.dto.request.StepsFlashcardRequestDTO;
+import com.atama.model.ReviewTag;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
@@ -33,4 +33,9 @@ public class FlashcardSetResponseDTO extends LibraryItemResponseDTO {
     private String course;
     private UUID ownerId;
     private List<FlashcardResponseDTO> flashcards = new ArrayList<>();
+
+    // Review aggregate — populated by service layer, not mapper
+    private Double averageRating;       // null if no reviews yet
+    private List<ReviewTag> topTags = new ArrayList<>();
+    private int reviewCount;
 }
