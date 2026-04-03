@@ -24,8 +24,9 @@ public class StreakReminderService {
     public void sendStreakReminders() {
         LocalDate today = LocalDate.now();
         List<Goal> allGoals = goalRepository.findAll();
+        List<Goal> uniqueGoals = allGoals.stream().distinct().toList();
 
-        for (Goal goal : allGoals) {
+        for (Goal goal : uniqueGoals) {
             // Skip users who already studied today
             if (goal.getStudyDates() != null && goal.getStudyDates().contains(today)) {
                 continue;
@@ -37,7 +38,8 @@ public class StreakReminderService {
             }
 
             User user = goal.getUser();
-            if (user == null || user.getEmail() == null) continue;
+            if (user == null || user.getEmail() == null)
+                continue;
 
             try {
                 SimpleMailMessage message = new SimpleMailMessage();
@@ -46,9 +48,9 @@ public class StreakReminderService {
                 message.setText(
                         "Hi " + user.getUsername() + ",\n\n" +
                                 "You're on a " + goal.getCurrentStreak() + "-day streak — don't lose it!\n\n" +
-                                "You haven't studied yet today. Head over to Atama before midnight to keep your streak alive.\n\n" +
-                                "— Atama Team"
-                );
+                                "You haven't studied yet today. Head over to Atama before midnight to keep your streak alive.\n\n"
+                                +
+                                "— Atama Team");
                 mailSender.send(message);
                 System.out.println("Streak reminder sent to " + user.getEmail());
             } catch (Exception e) {

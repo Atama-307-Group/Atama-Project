@@ -34,7 +34,7 @@ public class StudyReminderService {
 
         System.out.println("[StudyReminder] Checking at " + now + " on " + today);
 
-        List<Goal> goals = goalRepository.findByNotifyByEmailTrueWithUser();
+        List<Goal> goals = goalRepository.findByNotifyByEmailTrueWithUser().stream().distinct().toList();
         System.out.println("[StudyReminder] Found " + goals.size() + " goal(s) with email enabled");
 
         for (Goal goal : goals) {

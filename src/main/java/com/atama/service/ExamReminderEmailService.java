@@ -32,7 +32,8 @@ public class ExamReminderEmailService {
 
         System.out.println("[ExamReminder] Checking at " + now);
 
-        List<ExamCountdown> countdowns = countdownRepository.findByNotifyByEmailTrueAndEmailReminderSentFalse();
+        List<ExamCountdown> countdowns = countdownRepository.findByNotifyByEmailTrueAndEmailReminderSentFalse().stream()
+                .distinct().toList();
         System.out.println("[ExamReminder] Found " + countdowns.size() + " countdown(s) with email enabled & unsent");
 
         for (ExamCountdown countdown : countdowns) {
