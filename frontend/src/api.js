@@ -310,7 +310,7 @@ export async function getCourses(universityId) {
     return res.json();
 }
 
-export async function getEnrolledCourses() {
+export async function getEnrolledCourses(userId) {
     const res = await fetch(`${API_BASE}/api/users/enrolled-courses`, {
         credentials: "include",
     });
@@ -585,4 +585,32 @@ export async function searchLibrary(q) {
     });
     if (!res.ok) throw new Error("Search failed");
     return res.json();
+}
+
+export async function getMyReview(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/reviews/mine`, {
+        credentials: "include",
+    });
+    if (res.status === 204) return null; // no review yet
+    if (!res.ok) throw new Error("Failed to fetch review");
+    return res.json();
+}
+
+export async function upsertReview(setId, stars, tags) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/reviews`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stars, tags }),
+    });
+    if (!res.ok) throw new Error("Failed to submit review");
+    return res.json();
+}
+
+export async function deleteReview(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/reviews/mine`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to delete review");
 }

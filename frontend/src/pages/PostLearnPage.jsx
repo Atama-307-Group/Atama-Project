@@ -15,7 +15,7 @@ const PostLearnPage = () => {
                 <strong>{totalCount}</strong> cards.
             </p>
             <button className="restart-button" onClick={() => navigate('/')}>
-                Back to Flashcards
+                Back to Home
             </button>
         </div>
     );

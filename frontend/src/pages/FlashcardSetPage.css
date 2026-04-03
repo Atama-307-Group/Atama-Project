@@ -597,3 +597,69 @@
 }
 .set-page-stat-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #999; }
 .set-page-stat-value { font-size: 1rem; font-weight: 700; color: #111; }
+
+/* Study buttons */
+.set-page-study-actions { display: flex; gap: 0.75rem; margin: 1rem 0 1.25rem; flex-wrap: wrap; }
+.set-page-study-btn { padding: 0.55rem 1.2rem; border: none; border-radius: 8px; background: #2b5c3f; color: white; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.set-page-study-btn:hover { background: #1e4530; transform: translateY(-1px); }
+.set-page-study-btn--stats { background: #4f6ef7; }
+.set-page-study-btn--stats:hover { background: #3a56d4; }
+
+/* Progress bar */
+.set-page-progress-bar-wrap { margin-bottom: 1.5rem; }
+.set-page-progress-bar-labels { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+.set-page-progress-bar-track { height: 10px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+.set-page-progress-bar-fill { height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e); border-radius: 99px; transition: width 0.5s ease; }
+
+/* Rating row */
+.set-page-rating-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.set-page-avg-rating { font-size: 0.95rem; font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 0.3rem; }
+.set-page-avg-rating--none { color: #aaa; font-weight: 500; }
+.set-page-review-count { font-size: 0.78rem; font-weight: 400; color: #999; }
+.set-page-top-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.set-page-top-tag { font-size: 0.75rem; font-weight: 600; padding: 3px 9px; border-radius: 99px; border: 1px solid transparent; }
+.set-page-top-tag--pos { background: #dcfce7; border-color: #86efac; color: #15803d; }
+.set-page-top-tag--neg { background: #fde8e8; border-color: #f5b8b8; color: #b91c1c; }
+
+/* Stats modal */
+.set-page-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.set-page-modal { background: #fff; border-radius: 16px; padding: 2rem; width: 100%; max-width: 480px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalSlideUp 0.2s ease; max-height: 90vh; overflow-y: auto; }
+@keyframes modalSlideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.set-page-modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1rem; color: #aaa; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+.set-page-modal-close:hover { background: #f0f0f0; color: #333; }
+.set-page-modal-title { margin: 0 0 1.25rem; font-size: 1.2rem; font-weight: 700; color: #111; }
+.set-page-modal-progress-wrap { margin-bottom: 1.5rem; }
+.set-page-modal-progress-track { height: 12px; background: #e5e7eb; border-radius: 99px; overflow: hidden; margin-bottom: 6px; }
+.set-page-modal-progress-fill { height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e); border-radius: 99px; transition: width 0.5s ease; }
+.set-page-modal-progress-label { font-size: 0.85rem; font-weight: 600; color: #22c55e; margin: 0; }
+.set-page-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.set-page-stat-item { background: #f8f8f8; border-radius: 10px; padding: 0.875rem 1rem; display: flex; flex-direction: column; gap: 4px; }
+.set-page-stat-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #999; }
+.set-page-stat-value { font-size: 1rem; font-weight: 700; color: #111; }
+
+/* Review modal */
+.review-section { margin-bottom: 1.25rem; }
+.review-section-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #555; margin: 0 0 0.6rem; }
+.review-tag-hint { font-size: 0.75rem; font-weight: 400; color: #aaa; text-transform: none; letter-spacing: 0; }
+
+/* Star picker */
+.review-stars { display: flex; gap: 6px; }
+.review-star { background: none; border: none; font-size: 2rem; cursor: pointer; color: #d1d5db; transition: color 0.12s, transform 0.1s; line-height: 1; padding: 0; }
+.review-star:hover, .review-star--filled { color: #f59e0b; }
+.review-star:hover { transform: scale(1.15); }
+
+/* Tag grid */
+.review-tag-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.review-tag-btn { padding: 5px 12px; border-radius: 99px; border: 1.5px solid transparent; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.12s; }
+.review-tag-btn--pos { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+.review-tag-btn--pos:hover:not(.review-tag-btn--disabled) { background: #dcfce7; }
+.review-tag-btn--neg { background: #fff5f5; border-color: #fecaca; color: #b91c1c; }
+.review-tag-btn--neg:hover:not(.review-tag-btn--disabled) { background: #fde8e8; }
+.review-tag-btn--selected.review-tag-btn--pos { background: #dcfce7; border-color: #4ade80; }
+.review-tag-btn--selected.review-tag-btn--neg { background: #fde8e8; border-color: #f87171; }
+.review-tag-btn--disabled { opacity: 0.4; cursor: not-allowed; }
+
+.review-error { color: #b91c1c; font-size: 0.85rem; margin: 0.5rem 0 0; }
+
+.review-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.review-delete-btn { color: #b91c1c !important; border-color: #fca5a5 !important; margin-right: auto; }

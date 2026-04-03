@@ -543,16 +543,18 @@ const CoursePage = ({ userId }) => {
                                         {cli.year && cli.year !== "Unknown" && (
                                             <span className="cliTag">{cli.year}</span>
                                         )}
-                                        <button
-                                            className="downloadBtn"
-                                            title="Download PDF"
-                                            onClick={e => {
-                                                e.stopPropagation();
-                                                downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
-                                            }}
-                                        >
-                                            ⭳
-                                        </button>
+                                        {cli.libraryItem?.itemType === "PDF" && (
+                                            <button
+                                                className="downloadBtn"
+                                                title="Download PDF"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
+                                                }}
+                                            >
+                                                ⭳
+                                            </button>
+                                            )}
                                     </div>
                                 </div>
                                 {cli.description && (
@@ -599,13 +601,13 @@ const CoursePage = ({ userId }) => {
                                     className="pdfTextarea"
                                     value={pdfDescription}
                                     onChange={e => setPdfDescription(e.target.value.slice(0, 255))}
-                                    placeholder="Add additional information here, e.g. professor(s)"
+                                    placeholder="Add additional information here; e.g. professor(s), contains answers, etc."
                                     rows={3}
                                     maxLength={255}
                                 />
                             </label>
                             <p className="pdfWarning">
-                                ⚠️ Ensure that you have uploaded the correct file. Ensure that all information is correct before saving.
+                                ⚠️ Ensure that you have uploaded the correct file and that all information is correct!
                             </p>
                         </div>
                         <div className="modalActions">
@@ -688,6 +690,7 @@ const CoursePage = ({ userId }) => {
                                                 </span>
                                             )}
                                         </div>
+
                                     </div>
                                 );
                             })}
@@ -738,6 +741,9 @@ const CoursePage = ({ userId }) => {
                                 maxLength={255}
                             />
                         </label>
+                        <p className="pdfWarning">
+                            ⚠️ Ensure that you have uploaded the correct file and that all information is correct!
+                        </p>
                     </div>
                     <div className="modalActions">
                         <button className="btn cancelBtn" onClick={handleLibMetaBack}>
