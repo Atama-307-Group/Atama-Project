@@ -34,6 +34,7 @@ public class FlashcardSetMapper {
         dto.setUniversity(entity.getUniversity());
         dto.setCourse(entity.getCourse());
         dto.setOwnerId(entity.getOwnerId());
+        dto.setIsPublic(entity.isPublic());
         dto.setFlashcards(
                 entity.getFlashcards().stream()
                         .map(flashcardMapper::toResponseDTO)

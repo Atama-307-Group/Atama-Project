@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -126,6 +127,31 @@ public class FlashcardSetController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to process file: " + e.getMessage()));
         }
+    }
+
+    @PostMapping("/{id}/save")
+    public ResponseEntity<Void> saveSet(@PathVariable UUID id) {
+        flashcardSetService.saveSet(id, getAuthenticatedUserId());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/save")
+    public ResponseEntity<Void> unsaveSet(@PathVariable UUID id) {
+        flashcardSetService.unsaveSet(id, getAuthenticatedUserId());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/saved")
+    public ResponseEntity<List<FlashcardSetResponseDTO>> getSavedSets() {
+        return ResponseEntity.ok(flashcardSetService.getSavedSets(getAuthenticatedUserId()));
+    }
+
+    @PatchMapping("/{id}/privacy")
+    public ResponseEntity<FlashcardSetResponseDTO> updatePrivacy(
+            @PathVariable UUID id,
+            @RequestBody Map<String, Boolean> body) throws AccessDeniedException {
+        boolean isPublic = body.get("isPublic");
+        return ResponseEntity.ok(flashcardSetService.updatePrivacy(id, isPublic, getAuthenticatedUserId()));
     }
 
     private UUID getAuthenticatedUserId() {
