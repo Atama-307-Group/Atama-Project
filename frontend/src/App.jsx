@@ -226,25 +226,22 @@ function App() {
             <Route
                 path="/create"
                 element={
-                    // currentUser
-                    //     ? <CreateFlashcardSetPage />
-                    //     : <Navigate to="/login" />
-                    <CreateFlashcardSetPage onSave={setFlashcards} />
+                    currentUser ? <CreateFlashcardSetPage /> : <Navigate to="/login" />
+                    //<CreateFlashcardSetPage onSave={setFlashcards} />
                 }
             />
 
             {/* Study & Learning Flow */}
-            <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
-            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id}/>} />
-            <Route path="/post_learn" element={<PostLearnPage />} />
+            <Route path="/pre_learn" element={<PreLearnPage />} />
+                <Route path="/study" element={<StudyPage onToggleFavorite={() => {}} userId={currentUser?.id} />} />            <Route path="/post_learn" element={<PostLearnPage />} />
 
             {/* Match Flow */}
-            <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
+            <Route path="/pre_match" element={<PreMatchPage />} />
             <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
             <Route path="/post_match" element={<PostMatchPage />} />
 
             {/* Test Flow */}
-            <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
+            <Route path="/pre_test" element={<PreTestPage />} />
             <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
             <Route path="/post_test" element={<PostTestPage />} />
 
@@ -270,7 +267,7 @@ function App() {
             {/* University Page */}
             <Route
                 path="/university"
-                element={<UniversityPage userId={currentUser?.id} />}
+                //element={<UniversityPage userId={currentUser?.id} />}
                 element={currentUser ? <UniversityPage /> : <Navigate to="/login" />}
             />
                 <Route
