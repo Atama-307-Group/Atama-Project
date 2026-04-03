@@ -436,13 +436,14 @@ export async function registerVerifiedUser({ username, email, password, code }) 
 }
 
 // Create a new flashcard set
-export async function uploadFlashcardSet(file, title, description, university, course) {
+export async function uploadFlashcardSet(file, title, description, university, course, isPublic = true ) {
     const formData = new FormData();
     formData.append("file", file);
     if (title) formData.append("title", title);
     if (description) formData.append("description", description);
     if (university) formData.append("university", university);
     if (course) formData.append("course", course);
+    formData.append("isPublic", isPublic);
 
     const res = await fetch(`${API_BASE}/api/flashcard-sets/upload`, {
         method: "POST",
@@ -456,12 +457,13 @@ export async function uploadFlashcardSet(file, title, description, university, c
     return res.json();
 }
 
-export async function createFlashcardSet({ title, description, university, course, flashcards }) {
+
+export async function createFlashcardSet({ title, description, university, course, flashcards, isPublic = true }) {
     const response = await fetch(`${API_BASE}/api/flashcard-sets`, {
         method: 'POST',
         credentials: "include",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, university, course, flashcards })
+        body: JSON.stringify({ title, description, university, course, flashcards, isPublic })
     });
 
     if (!response.ok) {
@@ -512,5 +514,50 @@ export async function addLibraryItemToCourse(libraryItemId, courseId, year, seme
         body: JSON.stringify({ libraryItemId, courseId, year, semester, description }),
     });
     if (!res.ok) throw new Error("Failed to add item to course");
+    return res.json();
+}
+
+export async function getSetProgress(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/progress`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load progress");
+    return res.json();
+}
+
+export async function updateCardProgress(setId, flashcardId, knowledgeLevel) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/flashcards/${flashcardId}/progress`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ knowledgeLevel }),
+    });
+    if (!res.ok) throw new Error("Failed to update progress");
+    return res.json();
+}
+
+export async function addSetStudyTime(setId, seconds) {
+    if (!seconds || seconds <= 0) return;
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/study-time`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seconds }),
+    });
+    if (!res.ok) throw new Error("Failed to record study time");
+}
+
+export async function getSetStats(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/stats`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load stats");
+    return res.json();
+}
+export async function searchLibrary(q) {
+    const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Search failed");
     return res.json();
 }

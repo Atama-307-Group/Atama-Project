@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Corrected import
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const PreMatchPage = ({ flashcards }) => {
+const PreMatchPage = () => {
+    const { state } = useLocation();
+    const flashcards = state?.flashcards || [];
+    const setTitle = state?.setTitle || '';
+
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const navigate = useNavigate();
+
+    if (flashcards.length === 0) {
+        return (
+            <div style={{ textAlign: 'center', marginTop: '100px' }}>
+                <p>No flashcards found. Please go back and select a set.</p>
+                <button onClick={() => navigate('/')}>Return Home</button>
+            </div>
+        );
+    }
 
     const handleStart = () => {
         const selected = favoritesOnly
             ? flashcards.filter((card) => card.favorite)
             : flashcards;
 
-        // Navigate to the match route and pass the cards in 'state'
-        navigate('/match', { state: { selectedCards: selected } });
+        navigate('/match', { state: { selectedCards: selected, setId: state?.setId } });
     };
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
+            <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginBottom: '1rem' }}>← Back</button>
             <h2>Match Settings</h2>
+            {setTitle && <p style={{ color: '#666', marginTop: 0 }}>{setTitle}</p>}
             <label>
                 <input
                     type="checkbox"
@@ -25,7 +39,6 @@ const PreMatchPage = ({ flashcards }) => {
                 />
                 Favorited cards only
             </label>
-
             <div style={{ marginTop: '30px' }}>
                 <button
                     onClick={handleStart}

@@ -1,0 +1,116 @@
+.pick-set-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: inherit;
+}
+
+.pick-set-back {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #2f3e3b;
+    padding: 4px 0;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+}
+
+.pick-set-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.pick-set-header h1 {
+    margin: 0 0 0.4rem;
+    font-size: 1.75rem;
+    color: #1a1a1a;
+}
+
+.pick-set-subtitle {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.pick-set-state {
+    text-align: center;
+    color: #666;
+    margin-top: 3rem;
+    font-size: 0.95rem;
+}
+
+.pick-set-error {
+    color: #c0391a;
+}
+
+.pick-set-create-btn {
+    margin-top: 1rem;
+    padding: 0.6rem 1.4rem;
+    background: #2b5c3f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pick-set-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.pick-set-card {
+    background: #fff;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 80px;
+}
+
+.pick-set-card:hover:not(:disabled) {
+    border-color: #2b5c3f;
+    box-shadow: 0 0 0 3px rgba(43, 92, 63, 0.1);
+    background: #f6fdf7;
+}
+
+.pick-set-card:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pick-set-card--loading {
+    border-color: #2b5c3f;
+    background: #f6fdf7;
+}
+
+.pick-set-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.4;
+}
+
+.pick-set-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-top-color: #2b5c3f;
+    border-radius: 50%;
+    animation: pickSetSpin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pickSetSpin {
+    to { transform: rotate(360deg); }
+}
