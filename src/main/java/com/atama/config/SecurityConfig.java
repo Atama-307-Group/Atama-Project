@@ -34,21 +34,21 @@ public class SecurityConfig {
                                 "/api/users/forgot-password",
                                 "/api/users/reset-password",
                                 "/api/users/send-verification",
-                                "/api/users/register-verified"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                                "/api/users/register-verified")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));  // your frontend
+        config.setAllowedOrigins(List.of("http://localhost:5173")); // your frontend
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);  // required for cookies to work cross-origin
+        config.setAllowedHeaders(List.of("Content-Type", "Authorization", "Accept"));
+        config.setAllowCredentials(true); // required for cookies to work cross-origin
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

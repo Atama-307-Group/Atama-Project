@@ -177,18 +177,22 @@ export async function getGoal(userId) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to load goal");
-    return res.json();
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
 }
 
 export async function updateGoal(userId, { selectedDaysOfWeek, minutesPerDay, notifyByDesktop, notifyByEmail, notificationTime }) {
     const res = await fetch(`${API_BASE}/goals/${userId}`, {
-        method: "PATCH",
+        method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ selectedDaysOfWeek, minutesPerDay, notifyByDesktop, notifyByEmail, notificationTime }),
     });
-    if (!res.ok) throw new Error("Failed to update goal");
-    return res.json();
+    const text = await res.text();
+    if (!res.ok) {
+        throw new Error(`Failed to update goal. Status: ${res.status}. Error: ${text}`);
+    }
+    return text ? JSON.parse(text) : null;
 }
 
 export async function startStudying(userId) {
@@ -229,7 +233,9 @@ export async function removeItemFromFolder(itemId) {
 /* Countdowns ------------------------------------------- */
 
 export async function getCountdowns(userId) {
-    const res = await fetch(`${API_BASE}/api/countdowns/${userId}`);
+    const res = await fetch(`${API_BASE}/api/countdowns/${userId}`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to load countdowns");
     return res.json();
 }
@@ -237,6 +243,7 @@ export async function getCountdowns(userId) {
 export async function createCountdown(userId, { reason, examDateTime, reminderMinutesBefore, notifyByDesktop, notifyByEmail }) {
     const res = await fetch(`${API_BASE}/api/countdowns/${userId}`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason, examDateTime, reminderMinutesBefore, notifyByDesktop, notifyByEmail }),
     });
@@ -247,6 +254,7 @@ export async function createCountdown(userId, { reason, examDateTime, reminderMi
 export async function deleteCountdown(countdownId) {
     const res = await fetch(`${API_BASE}/api/countdowns/${countdownId}`, {
         method: "DELETE",
+        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to delete countdown");
 }
@@ -254,6 +262,7 @@ export async function deleteCountdown(countdownId) {
 export async function deleteExpiredCountdowns(userId) {
     const res = await fetch(`${API_BASE}/api/countdowns/${userId}/expired`, {
         method: "DELETE",
+        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to delete expired countdowns");
 }
@@ -427,6 +436,26 @@ export async function registerVerifiedUser({ username, email, password, code }) 
 }
 
 // Create a new flashcard set
+export async function uploadFlashcardSet(file, title, description, university, course) {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (title) formData.append("title", title);
+    if (description) formData.append("description", description);
+    if (university) formData.append("university", university);
+    if (course) formData.append("course", course);
+
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to upload set");
+    }
+    return res.json();
+}
+
 export async function createFlashcardSet({ title, description, university, course, flashcards }) {
     const response = await fetch(`${API_BASE}/api/flashcard-sets`, {
         method: 'POST',

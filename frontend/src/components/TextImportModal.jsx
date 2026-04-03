@@ -33,7 +33,9 @@ const parseCards = (text, delimiter) => {
   return cards;
 };
 
-const TextImportModal = ({ onClose, onImport }) => {
+const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading }) => {
+  const [activeTab, setActiveTab] = useState('text'); // 'text' or 'file'
+
   const [text, setText] = useState('');
   const [delimiter, setDelimiter] = useState('');
   const [error, setError] = useState(null);
@@ -41,12 +43,39 @@ const TextImportModal = ({ onClose, onImport }) => {
   const overlayRef = useRef(null);
   const textareaRef = useRef(null);
 
+  const [dragActive, setDragActive] = useState(false);
+
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);
 
   const handleOverlayClick = (e) => {
     if (e.target === overlayRef.current) onClose();
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      onFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      onFileUpload(e.target.files[0]);
+    }
   };
 
   const handleParse = () => {
@@ -91,84 +120,134 @@ const TextImportModal = ({ onClose, onImport }) => {
           <button className="tim-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
-        {/* Step 1 — Paste */}
-        <div className="tim-section">
-          <label className="tim-label">
-            <span className="tim-step">1</span> Paste your text
-          </label>
-          <textarea
-            ref={textareaRef}
-            className="tim-textarea"
-            placeholder={"front side,back side\nhello,a greeting\napple,a red fruit"}
-            value={text}
-            onChange={(e) => { setText(e.target.value); setError(null); setPreview(null); }}
-            rows={7}
-            spellCheck={false}
-          />
+        {/* Tabs */}
+        <div className="tim-tabs">
+          <button
+            className={`tim-tab-btn ${activeTab === 'text' ? 'tim-tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('text')}
+          >
+            Paste Text
+          </button>
+          <button
+            className={`tim-tab-btn ${activeTab === 'file' ? 'tim-tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('file')}
+          >
+            Upload File
+          </button>
         </div>
 
-        {/* Step 2 — Delimiter */}
-        <div className="tim-section">
-          <label className="tim-label">
-            <span className="tim-step">2</span> Choose a delimiter <span className="tim-required">*required</span>
-          </label>
-          <div className="tim-delimiter-grid">
-            {DELIMITERS.map((d) => (
-              <button
-                key={d.value}
-                className={`tim-delim-btn${delimiter === d.value ? ' tim-delim-btn--active' : ''}`}
-                onClick={() => { setDelimiter(d.value); setError(null); setPreview(null); }}
-              >
-                <span className="tim-delim-name">{d.label}</span>
-                <span className="tim-delim-example">{d.example}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="tim-error" role="alert">
-            <span className="tim-error-icon">⚠</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Preview */}
-        {preview && (
-          <div className="tim-preview">
-            <div className="tim-preview-header">
-              <span className="tim-preview-label">Preview</span>
-              <span className="tim-preview-count">{preview.length} card{preview.length !== 1 ? 's' : ''} found</span>
+        {activeTab === 'text' && (
+          <>
+            {/* Step 1 — Paste */}
+            <div className="tim-section">
+              <label className="tim-label">
+                <span className="tim-step">1</span> Paste your text
+              </label>
+              <textarea
+                ref={textareaRef}
+                className="tim-textarea"
+                placeholder={"front side,back side\nhello,a greeting\napple,a red fruit"}
+                value={text}
+                onChange={(e) => { setText(e.target.value); setError(null); setPreview(null); }}
+                rows={7}
+                spellCheck={false}
+              />
             </div>
-            <div className="tim-preview-list">
-              {preview.slice(0, 5).map((card, i) => (
-                <div className="tim-preview-row" key={i}>
-                  <span className="tim-preview-term">{card.term}</span>
-                  <span className="tim-preview-arrow">→</span>
-                  <span className="tim-preview-def">{card.definition}</span>
+
+            {/* Step 2 — Delimiter */}
+            <div className="tim-section">
+              <label className="tim-label">
+                <span className="tim-step">2</span> Choose a delimiter <span className="tim-required">*required</span>
+              </label>
+              <div className="tim-delimiter-grid">
+                {DELIMITERS.map((d) => (
+                  <button
+                    key={d.value}
+                    className={`tim-delim-btn${delimiter === d.value ? ' tim-delim-btn--active' : ''}`}
+                    onClick={() => { setDelimiter(d.value); setError(null); setPreview(null); }}
+                  >
+                    <span className="tim-delim-name">{d.label}</span>
+                    <span className="tim-delim-example">{d.example}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="tim-error" role="alert">
+                <span className="tim-error-icon">⚠</span>
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Preview */}
+            {preview && (
+              <div className="tim-preview">
+                <div className="tim-preview-header">
+                  <span className="tim-preview-label">Preview</span>
+                  <span className="tim-preview-count">{preview.length} card{preview.length !== 1 ? 's' : ''} found</span>
                 </div>
-              ))}
-              {preview.length > 5 && (
-                <div className="tim-preview-more">+{preview.length - 5} more cards…</div>
+                <div className="tim-preview-list">
+                  {preview.slice(0, 5).map((card, i) => (
+                    <div className="tim-preview-row" key={i}>
+                      <span className="tim-preview-term">{card.term}</span>
+                      <span className="tim-preview-arrow">→</span>
+                      <span className="tim-preview-def">{card.definition}</span>
+                    </div>
+                  ))}
+                  {preview.length > 5 && (
+                    <div className="tim-preview-more">+{preview.length - 5} more cards…</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="tim-actions">
+              <button className="tim-btn tim-btn--ghost" onClick={onClose}>Cancel</button>
+              {!preview ? (
+                <button className="tim-btn tim-btn--parse" onClick={handleParse}>
+                  Parse Cards
+                </button>
+              ) : (
+                <button className="tim-btn tim-btn--import" onClick={handleImport}>
+                  Import {preview.length} Card{preview.length !== 1 ? 's' : ''}
+                </button>
               )}
             </div>
-          </div>
+          </>
         )}
 
-        {/* Actions */}
-        <div className="tim-actions">
-          <button className="tim-btn tim-btn--ghost" onClick={onClose}>Cancel</button>
-          {!preview ? (
-            <button className="tim-btn tim-btn--parse" onClick={handleParse}>
-              Parse Cards
-            </button>
-          ) : (
-            <button className="tim-btn tim-btn--import" onClick={handleImport}>
-              Import {preview.length} Card{preview.length !== 1 ? 's' : ''}
-            </button>
-          )}
-        </div>
+        {activeTab === 'file' && (
+          <div className="tim-section">
+            <div
+              className={`tim-file-upload-zone ${dragActive ? 'drag-active' : ''}`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            >
+              <p>Drag and drop a .csv or .txt file here to instantly create your set!</p>
+              <p>Or</p>
+              <input
+                type="file"
+                id="modal-file-upload"
+                accept=".csv,.txt"
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="modal-file-upload" className="tim-file-upload-btn">
+                Browse Files
+              </label>
+              {isUploading && <p className="tim-upload-loading">Uploading and analyzing file...</p>}
+            </div>
+
+            <div className="tim-actions" style={{ marginTop: '1rem' }}>
+              <button className="tim-btn tim-btn--ghost" onClick={onClose}>Cancel</button>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

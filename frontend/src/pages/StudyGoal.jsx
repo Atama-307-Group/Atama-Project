@@ -113,10 +113,9 @@ const GoalsPage = ({ userId }) => {
 
         const loadGoal = () => {
             getGoal(userId).then(goal => {
-                // Only overwrite goal settings if there's no pending save in flight.
-                // This prevents a stale poll response from clobbering a goal the
-                // user just changed (race condition: save fires, poll returns old
-                // value before the backend has committed the update).
+                // If there's no goal yet, just rely on defaults
+                if (!goal) return;
+
                 if (!pendingSaveRef.current) {
                     if (goal.selectedDaysOfWeek) {
                         setSelectedDays(goal.selectedDaysOfWeek.map(d => JAVA_TO_DAY_KEY[d]).filter(Boolean));
@@ -190,6 +189,9 @@ const GoalsPage = ({ userId }) => {
                 minutesPerDay: minutes,
                 ...extraFields,
             });
+        } catch (error) {
+            console.error("Save error:", error);
+            alert("Failed to save: " + error.message);
         } finally {
             setTimeout(() => { pendingSaveRef.current = false; }, 3000);
         }

@@ -29,10 +29,11 @@ public class JwtService {
                 .signWith(key)
                 .compact();
     }
+
     public Cookie createAuthCookie(String token) {
         Cookie cookie = new Cookie("jwt", token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);         // HTTPS only
+        // cookie.setSecure(true); // HTTPS only
         cookie.setPath("/");
         cookie.setMaxAge((int) (expirationMs / 1000)); // match token lifetime
         return cookie;

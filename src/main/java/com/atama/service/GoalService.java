@@ -21,13 +21,18 @@ public class GoalService {
         this.userRepository = userRepository;
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Goal getGoalByUserId(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
         return user.getGoal();
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Goal updateGoal(UUID userId, UpdateGoalRequest request) {
+        System.out.println("[GoalService] updateGoal for user: " + userId);
+        System.out.println("[GoalService] update request: " + request);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
@@ -35,6 +40,7 @@ public class GoalService {
         if (goal == null) {
             goal = new Goal();
             goal.setUser(user);
+            user.setGoal(goal); // link both sides of the relationship
         }
 
         goal.setSelectedDaysOfWeek(request.selectedDaysOfWeek());
@@ -80,9 +86,10 @@ public class GoalService {
     public void stopStudying(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-        //Streak logic below:
+        // Streak logic below:
         Goal goal = user.getGoal();
-        if (goal == null) return;
+        if (goal == null)
+            return;
         goal.stopStudying();
         updateStreak(goal);
         goalRepository.save(goal);
@@ -96,14 +103,11 @@ public class GoalService {
 
         if (lastStudyDate == null) {
             goal.setCurrentStreak(1);
-        }
-        else if (lastStudyDate.equals(today)) {
+        } else if (lastStudyDate.equals(today)) {
             return; // already counted today
-        }
-        else if (lastStudyDate.equals(today.minusDays(1))) {
+        } else if (lastStudyDate.equals(today.minusDays(1))) {
             goal.setCurrentStreak(goal.getCurrentStreak() + 1);
-        }
-        else {
+        } else {
             goal.setCurrentStreak(1);
         }
 

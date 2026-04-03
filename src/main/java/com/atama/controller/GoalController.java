@@ -22,7 +22,7 @@ public class GoalController {
         return ResponseEntity.ok(goalService.getGoalByUserId(userId));
     }
 
-    @PatchMapping("/{userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<Goal> updateGoal(
             @PathVariable UUID userId,
             @RequestBody UpdateGoalRequest request) {
@@ -64,5 +64,6 @@ public class GoalController {
         return ResponseEntity.ok(new StreakResponse(goal.getCurrentStreak(), goal.getBestStreak(), studyDates));
     }
 
-    public record StreakResponse(int currentStreak, int bestStreak, java.util.List<String> studyDates) {}
+    public record StreakResponse(int currentStreak, int bestStreak, java.util.List<String> studyDates) {
+    }
 }
