@@ -158,6 +158,7 @@ public class LibraryService {
                         i.getLastAccessed(),
                         i.isStarred(),
                         i.getItemType(),
+                        i.isPublic(),
                         null
                 ))
                 .toList();

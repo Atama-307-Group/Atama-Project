@@ -15,6 +15,7 @@ const CreateFlashcardSetPage = () => {
   const [university, setUniversity] = useState('');
   const [course, setCourse] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
 
   const handleCardChange = (index, updatedCard) => {
     const updated = cards.map((card, i) => (i === index ? updatedCard : card));
@@ -98,6 +99,7 @@ const CreateFlashcardSetPage = () => {
         university: university.trim(),
         course: course.trim(),
         flashcards: cleanedCards,
+          isPublic,
       });
       recordAccess(saved.id);
       navigate(`/sets/${saved.id}`);
@@ -152,7 +154,16 @@ const CreateFlashcardSetPage = () => {
           value={course}
           onChange={(e) => setCourse(e.target.value)}
       />
-
+        <div className="create-set-privacy">
+            <label>
+                <input
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={e => setIsPublic(e.target.checked)}
+                />
+                {" "}Make this set public
+            </label>
+        </div>
       <div className="create-set-cards">
         {cards.map((card, index) => (
           <FlashcardInput

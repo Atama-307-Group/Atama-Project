@@ -29,6 +29,7 @@ public class FlashcardSetService {
     public FlashcardSetResponseDTO createFlashcardSet(FlashcardSetRequestDTO dto, UUID userId) {
         FlashcardSet entity = mapper.toEntity(dto);
         entity.setOwnerId(userId);
+        entity.setPublic(dto.isPublic());
         libraryItemService.initializeLibraryItem(entity, dto, userId); // resolve library, folder, item_type
         FlashcardSet saved = flashcardSetRepository.save(entity);
         return mapper.toResponseDTO(saved);

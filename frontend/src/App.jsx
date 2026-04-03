@@ -26,6 +26,7 @@ import GoalsPage from "./pages/StudyGoal.jsx"
 import UniversityPage from './pages/UniversityPage.jsx';
 import SharedSetPage from "./pages/SharedSetPage.jsx";
 import CoursePage from './pages/CoursePage.jsx';
+import SearchPage from "./pages/SearchPage.jsx";
 
 
 function App() {
@@ -213,7 +214,7 @@ function App() {
             {/* Personal Library Page */}
             <Route
                 path="/folders"
-                element={<FoldersPage />}
+                //element={<FoldersPage />}
                 element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 
@@ -229,8 +230,11 @@ function App() {
                 element={<UniversityPage userId={currentUser?.id} />}
                 element={currentUser ? <UniversityPage /> : <Navigate to="/login" />}
             />
+                <Route
+                    path="/search" element={<SearchPage />}
+                />
 
-            {/* Course Page */}
+                {/* Course Page */}
             <Route
                 path="/course/:courseId"
                 element={<CoursePage userId={currentUser?.id} />}
