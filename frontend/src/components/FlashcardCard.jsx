@@ -1,7 +1,15 @@
 import React from 'react';
 import './FlashcardCard.css';
 
-const FlashcardCard = ({ index, card }) => {
+const KNOWLEDGE_BADGES = {
+    DONT_KNOW:     { label: "Don't Know", className: 'flashcard-card-knowledge--red' },
+    KNOW_SOMEWHAT: { label: 'Know Somewhat', className: 'flashcard-card-knowledge--yellow' },
+    KNOW_WELL:     { label: 'Know Well', className: 'flashcard-card-knowledge--green' },
+};
+
+const FlashcardCard = ({ index, card, knowledgeLevel }) => {
+    const badge = KNOWLEDGE_BADGES[knowledgeLevel] ?? KNOWLEDGE_BADGES.DONT_KNOW;
+
     const renderFields = () => {
         switch (card.type) {
             case 'NORMAL':
@@ -17,7 +25,6 @@ const FlashcardCard = ({ index, card }) => {
                         </div>
                     </>
                 );
-
             case 'FILL_BLANK':
                 return (
                     <>
@@ -28,24 +35,17 @@ const FlashcardCard = ({ index, card }) => {
                         <div className="flashcard-card-field">
                             <span className="flashcard-card-label">Correct Answers</span>
                             <ol className="flashcard-card-list">
-                                {(card.correctAnswers || []).map((a, i) => (
-                                    <li key={i}>{a}</li>
-                                ))}
+                                {(card.correctAnswers || []).map((a, i) => <li key={i}>{a}</li>)}
                             </ol>
                         </div>
                     </>
                 );
-
             case 'DRAG_DROP':
                 return (
                     <>
                         {card.imageUrl && (
                             <div className="flashcard-card-field">
-                                <img
-                                    src={card.imageUrl}
-                                    alt="Drag and drop"
-                                    className="flashcard-card-image"
-                                />
+                                <img src={card.imageUrl} alt="Drag and drop" className="flashcard-card-image" />
                             </div>
                         )}
                         {card.prompt && (
@@ -58,9 +58,7 @@ const FlashcardCard = ({ index, card }) => {
                             <div className="flashcard-card-field">
                                 <span className="flashcard-card-label">Labels</span>
                                 <div className="flashcard-card-tags">
-                                    {card.draggableLabels.map((l, i) => (
-                                        <span key={i} className="flashcard-card-tag">{l}</span>
-                                    ))}
+                                    {card.draggableLabels.map((l, i) => <span key={i} className="flashcard-card-tag">{l}</span>)}
                                 </div>
                             </div>
                         )}
@@ -76,14 +74,11 @@ const FlashcardCard = ({ index, card }) => {
                         <div className="flashcard-card-field">
                             <span className="flashcard-card-label">Steps</span>
                             <ol className="flashcard-card-list">
-                                {(card.steps || []).map((s, i) => (
-                                    <li key={i}>{s}</li>
-                                ))}
+                                {(card.steps || []).map((s, i) => <li key={i}>{s}</li>)}
                             </ol>
                         </div>
                     </>
                 );
-
             default:
                 return <div className="flashcard-card-value">Unsupported card type: {card.type}</div>;
         }
@@ -94,6 +89,9 @@ const FlashcardCard = ({ index, card }) => {
             <div className="flashcard-card-header">
                 <span className="flashcard-card-number">{index + 1}</span>
                 <span className="flashcard-card-type">{card.type?.replace('_', ' ')}</span>
+                <span className={`flashcard-card-type flashcard-card-knowledge ${badge.className}`}>
+                    {badge.label}
+                </span>
             </div>
             <div className="flashcard-card-fields">
                 {renderFields()}
