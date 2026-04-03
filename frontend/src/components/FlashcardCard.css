@@ -98,3 +98,7 @@
     color: #2b5c3f;
     background: rgba(43,92,63,0.06);
 }
+
+.flashcard-card-knowledge--red    { background: #fde8e8; border-color: #f5b8b8; color: #b91c1c; }
+.flashcard-card-knowledge--yellow { background: #fef9c3; border-color: #fcd34d; color: #92400e; }
+.flashcard-card-knowledge--green  { background: #dcfce7; border-color: #86efac; color: #15803d; }

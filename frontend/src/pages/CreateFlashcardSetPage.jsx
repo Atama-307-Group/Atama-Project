@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FlashcardInput from '../components/FlashcardInput.jsx';
-import { createFlashcardSet, recordAccess } from '../api.js';
+import TextImportModal from '../components/TextImportModal.jsx';
+import { createFlashcardSet, uploadFlashcardSet, recordAccess } from '../api.js';
 import './CreateFlashcardSetPage.css';
 
 const newNormalCard = () => ({ type: 'NORMAL', term: '', definition: '' });
@@ -13,6 +14,29 @@ const CreateFlashcardSetPage = () => {
   const [cards, setCards] = useState([newNormalCard(), newNormalCard()]);
   const [university, setUniversity] = useState('');
   const [course, setCourse] = useState('');
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
+
+  
+  const handleFileUpload = async (file) => {
+    if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
+      alert('Please upload a .csv or .txt file');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const saved = await uploadFlashcardSet(file, title.trim(), description.trim(), university.trim(), course.trim());
+      recordAccess(saved.id);
+      navigate(`/sets/${saved.id}`);
+    } catch (err) {
+      console.error(err);
+      alert('Upload failed: ' + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleCardChange = (index, updatedCard) => {
     const updated = cards.map((card, i) => (i === index ? updatedCard : card));
@@ -25,6 +49,16 @@ const CreateFlashcardSetPage = () => {
 
   const removeCard = (index) => {
     setCards(cards.filter((_, i) => i !== index));
+  };
+
+  const handleImport = (importedCards) => {
+    setCards((prev) => {
+      // Drop any unfilled placeholder cards before merging
+      const existing = prev.filter(
+        (c) => c.type !== 'NORMAL' || c.term?.trim() || c.definition?.trim()
+      );
+      return [...existing, ...importedCards];
+    });
   };
 
   const handleSave = async () => {
@@ -44,10 +78,10 @@ const CreateFlashcardSetPage = () => {
           return card.textWithBlanks?.trim() && card.correctAnswers?.some((a) => a.trim());
         case 'DRAG_DROP':
           return (
-              card.prompt?.trim() &&
-              card.imageUrl &&
-              card.dropZones?.some((z) => z.correctLabel?.trim()) &&
-              card.draggableLabels?.some((l) => l.trim())
+            card.prompt?.trim() &&
+            card.imageUrl &&
+            card.dropZones?.some((z) => z.correctLabel?.trim()) &&
+            card.draggableLabels?.some((l) => l.trim())
           );
         case 'STEPS':
           return card.title?.trim() && card.steps?.some((s) => s.trim());
@@ -63,7 +97,7 @@ const CreateFlashcardSetPage = () => {
 
     // Get rid of empty entries from list fields before sending
     const cleanedCards = validCards.map((card) => {
-      const cleaned = {...card};
+      const cleaned = { ...card };
       if (cleaned.correctAnswers) {
         cleaned.correctAnswers = cleaned.correctAnswers.filter((a) => a.trim());
       }
@@ -86,6 +120,7 @@ const CreateFlashcardSetPage = () => {
         university: university.trim(),
         course: course.trim(),
         flashcards: cleanedCards,
+          isPublic,
       });
       recordAccess(saved.id);
       navigate(`/sets/${saved.id}`);
@@ -103,6 +138,14 @@ const CreateFlashcardSetPage = () => {
       <h1>Create a New Flashcard Set</h1>
       {/* TODO: add fields for university and class */}
 
+      <button
+        className="create-set-upload-btn"
+        onClick={() => setShowImportModal(true)}
+        title="Import cards from pasted text"
+      >
+        ⬆ Upload
+      </button>
+
       <input
         type="text"
         className="create-set-title"
@@ -119,20 +162,29 @@ const CreateFlashcardSetPage = () => {
         rows={2}
       />
       <input
-          type="text"
-          className="create-set-description"
-          placeholder="University (optional)"
-          value={university}
-          onChange={(e) => setUniversity(e.target.value)}
+        type="text"
+        className="create-set-description"
+        placeholder="University (optional)"
+        value={university}
+        onChange={(e) => setUniversity(e.target.value)}
       />
       <input
-          type="text"
-          className="create-set-description"
-          placeholder="Course (optional)"
-          value={course}
-          onChange={(e) => setCourse(e.target.value)}
+        type="text"
+        className="create-set-description"
+        placeholder="Course (optional)"
+        value={course}
+        onChange={(e) => setCourse(e.target.value)}
       />
-
+        <div className="create-set-privacy">
+            <label>
+                <input
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={e => setIsPublic(e.target.checked)}
+                />
+                {" "}Make this set public
+            </label>
+        </div>
       <div className="create-set-cards">
         {cards.map((card, index) => (
           <FlashcardInput
@@ -156,6 +208,15 @@ const CreateFlashcardSetPage = () => {
           Create Set
         </button>
       </div>
+
+      {showImportModal && (
+        <TextImportModal
+          onClose={() => setShowImportModal(false)}
+          onImport={handleImport}
+          onFileUpload={handleFileUpload}
+          isUploading={isUploading}
+        />
+      )}
     </div>
   );
 };
