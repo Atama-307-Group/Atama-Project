@@ -33,7 +33,28 @@ const parseCards = (text, delimiter) => {
   return cards;
 };
 
-const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading }) => {
+const SimulatedProgressBar = () => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 95) return 95;
+        const increment = Math.max(0.5, (95 - prev) * 0.08);
+        return prev + increment;
+      });
+    }, 400);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="tim-progress-bar-container">
+      <div className="tim-progress-bar-fill" style={{ width: `${progress}%` }} />
+    </div>
+  );
+};
+
+const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading, isUploadingPdf }) => {
   const [activeTab, setActiveTab] = useState('text'); // 'text' or 'file'
 
   const [text, setText] = useState('');
@@ -68,13 +89,31 @@ const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading }) => {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      onFileUpload(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      if (activeTab === 'file' && file.name.toLowerCase().endsWith('.pdf')) {
+        alert("Please use the '✨ Use AI' tab to upload PDF files.");
+        return;
+      }
+      if (activeTab === 'ai' && !file.name.toLowerCase().endsWith('.pdf')) {
+        alert("Please upload a .pdf file for AI generation.");
+        return;
+      }
+      onFileUpload(file);
     }
   };
 
   const handleFileSelect = (e) => {
     if (e.target.files && e.target.files[0]) {
-      onFileUpload(e.target.files[0]);
+      const file = e.target.files[0];
+      if (activeTab === 'file' && file.name.toLowerCase().endsWith('.pdf')) {
+        alert("Please use the '✨ Use AI' tab to upload PDF files.");
+        return;
+      }
+      if (activeTab === 'ai' && !file.name.toLowerCase().endsWith('.pdf')) {
+        alert("Please upload a .pdf file for AI generation.");
+        return;
+      }
+      onFileUpload(file);
     }
   };
 
@@ -133,6 +172,12 @@ const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading }) => {
             onClick={() => setActiveTab('file')}
           >
             Upload File
+          </button>
+          <button
+            className={`tim-tab-btn ${activeTab === 'ai' ? 'tim-tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('ai')}
+          >
+            ✨ Use AI
           </button>
         </div>
 
@@ -240,8 +285,52 @@ const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading }) => {
               <label htmlFor="modal-file-upload" className="tim-file-upload-btn">
                 Browse Files
               </label>
-              {isUploading && <p className="tim-upload-loading">Uploading and analyzing file...</p>}
+              {isUploading && (
+                <p className="tim-upload-loading">Uploading and analyzing file...</p>
+              )}
             </div>
+
+            <div className="tim-actions" style={{ marginTop: '1rem' }}>
+              <button className="tim-btn tim-btn--ghost" onClick={onClose}>Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'ai' && (
+          <div className="tim-section">
+            {!isUploading ? (
+              <div
+                className={`tim-file-upload-zone ${dragActive ? 'drag-active' : ''}`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <p>Drag and drop a .pdf file here!</p>
+                <p className="tim-ai-hint" style={{ color: '#2d7d46', fontWeight: 600 }}>✨ Gemini AI will instantly generate flashcards for you.</p>
+                <p>Or</p>
+                <input
+                  type="file"
+                  id="modal-file-upload-ai"
+                  accept=".pdf"
+                  onChange={handleFileSelect}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="modal-file-upload-ai" className="tim-file-upload-btn">
+                  Browse Files
+                </label>
+              </div>
+            ) : (
+              <div style={{ width: '100%', textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#2d7d46', marginBottom: '15px' }}>
+                  ✅ PDF Uploaded Successfully!
+                </div>
+                <p className="tim-upload-loading" style={{ marginTop: '10px' }}>
+                  ✨ Generating your flashcards...
+                </p>
+                <SimulatedProgressBar />
+              </div>
+            )}
 
             <div className="tim-actions" style={{ marginTop: '1rem' }}>
               <button className="tim-btn tim-btn--ghost" onClick={onClose}>Cancel</button>

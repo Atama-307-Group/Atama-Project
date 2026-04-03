@@ -16,16 +16,19 @@ const CreateFlashcardSetPage = () => {
   const [course, setCourse] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
 
-  
+
   const handleFileUpload = async (file) => {
-    if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
-      alert('Please upload a .csv or .txt file');
+    const fileName = file.name.toLowerCase();
+    if (!fileName.endsWith('.csv') && !fileName.endsWith('.txt') && !fileName.endsWith('.pdf')) {
+      alert('Please upload a .csv, .txt, or .pdf file');
       return;
     }
 
     setIsUploading(true);
+    setIsUploadingPdf(fileName.endsWith('.pdf'));
     try {
       const saved = await uploadFlashcardSet(file, title.trim(), description.trim(), university.trim(), course.trim());
       recordAccess(saved.id);
@@ -35,6 +38,7 @@ const CreateFlashcardSetPage = () => {
       alert('Upload failed: ' + err.message);
     } finally {
       setIsUploading(false);
+      setIsUploadingPdf(false);
     }
   };
 
@@ -120,7 +124,7 @@ const CreateFlashcardSetPage = () => {
         university: university.trim(),
         course: course.trim(),
         flashcards: cleanedCards,
-          isPublic,
+        isPublic,
       });
       recordAccess(saved.id);
       navigate(`/sets/${saved.id}`);
@@ -175,16 +179,16 @@ const CreateFlashcardSetPage = () => {
         value={course}
         onChange={(e) => setCourse(e.target.value)}
       />
-        <div className="create-set-privacy">
-            <label>
-                <input
-                    type="checkbox"
-                    checked={isPublic}
-                    onChange={e => setIsPublic(e.target.checked)}
-                />
-                {" "}Make this set public
-            </label>
-        </div>
+      <div className="create-set-privacy">
+        <label>
+          <input
+            type="checkbox"
+            checked={isPublic}
+            onChange={e => setIsPublic(e.target.checked)}
+          />
+          {" "}Make this set public
+        </label>
+      </div>
       <div className="create-set-cards">
         {cards.map((card, index) => (
           <FlashcardInput
@@ -215,6 +219,7 @@ const CreateFlashcardSetPage = () => {
           onImport={handleImport}
           onFileUpload={handleFileUpload}
           isUploading={isUploading}
+          isUploadingPdf={isUploadingPdf}
         />
       )}
     </div>
