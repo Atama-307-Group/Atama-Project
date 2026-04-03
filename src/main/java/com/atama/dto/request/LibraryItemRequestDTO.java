@@ -9,4 +9,5 @@ import java.util.UUID;
 public class LibraryItemRequestDTO {
     private String title;
     private UUID folderID;
+    private boolean isPublic = true;
 }

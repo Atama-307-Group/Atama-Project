@@ -6,6 +6,8 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -17,6 +19,11 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  function onSearch(e) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+  }
   const mostRecent = recentSets[0] || null;
 
   return (
@@ -85,6 +92,18 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
           )}
 
           <p className="section-label">Study</p>
+
+          <form onSubmit={onSearch} style={{ marginBottom: '16px', display: 'flex', gap: '8px' }}>
+            <input
+                className="search-input"
+                placeholder="Search folders, flashcard sets, PDFs…"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--color-border)', fontSize: '14px' }}
+            />
+            <button type="submit" className="auth-btn login-btn">Search</button>
+          </form>
+
           <div className="study-grid">
             <div className="study-card" onClick={() => navigate('/pick-set?mode=learn')}>
               <div className="study-icon study-icon--blue">

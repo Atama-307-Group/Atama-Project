@@ -15,4 +15,11 @@ public interface FolderRepository extends JpaRepository<Folder, UUID> {
         @Query("SELECT f FROM Folder f LEFT JOIN FETCH f.items WHERE f.library.id = :libraryId")
         List<Folder> findAllByLibraryIdWithItems(@Param("libraryId") UUID libraryId);
 
+    @Query("""
+    select f from Folder f
+    where lower(f.name) like lower(concat('%', :q, '%'))
+    and (f.isPublic = true or f.library.user.id = :userId)
+    """)
+    List<Folder> searchFolders(@Param("q") String q, @Param("userId") UUID userId);
+
 }

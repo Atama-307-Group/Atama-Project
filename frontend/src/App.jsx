@@ -27,7 +27,7 @@ import UniversityPage from './pages/UniversityPage.jsx';
 import SharedSetPage from "./pages/SharedSetPage.jsx";
 import CoursePage from './pages/CoursePage.jsx';
 import PickSetPage from './pages/PickSetPage.jsx';
-
+import SearchPage from "./pages/SearchPage.jsx";
 
 function App() {
     const { openPopup } = useTimer();
@@ -166,6 +166,128 @@ function App() {
 
                 {/* Catch-all */}
                 <Route path="*" element={<Navigate to="/" />} />
+            {/* Home / Dashboard */}
+            <Route
+                path="/"
+                element={
+                    <StartPage
+                        currentUser={currentUser}
+                        onLogout={handleLogout}
+                    />
+                }
+            />
+
+            {/* Auth Routes */}
+            <Route
+                path="/login"
+                element={
+                    <LoginPage
+                        onLoginSuccess={handleLoginSuccess}
+                    />
+                }
+            />
+
+            <Route
+                path="/signup"
+                element={<SignupPage />}
+            />
+
+            {/* Forgot / Reset Password */}
+            <Route
+                path="/forgot-password"
+                element={<ForgotPasswordPage />}
+            />
+
+            <Route
+                path="/reset-password"
+                element={<ResetPasswordPage />}
+            />
+
+            {/* Profile & Account Management */}
+            <Route
+                path="/profile"
+                element={
+                    currentUser
+                        ? <ProfilePage currentUser={currentUser} />
+                        : <Navigate to="/login" />
+                }
+            />
+
+            <Route
+                path="/change-password"
+                element={
+                    currentUser
+                        ? <ChangePasswordPage currentUser={currentUser} />
+                        : <Navigate to="/login" />
+                }
+            />
+
+            {/* Create Flashcard Set */}
+            <Route
+                path="/create"
+                element={
+                    // currentUser
+                    //     ? <CreateFlashcardSetPage />
+                    //     : <Navigate to="/login" />
+                    <CreateFlashcardSetPage onSave={setFlashcards} />
+                }
+            />
+
+            {/* Study & Learning Flow */}
+            <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
+            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id}/>} />
+            <Route path="/post_learn" element={<PostLearnPage />} />
+
+            {/* Match Flow */}
+            <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
+            <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
+            <Route path="/post_match" element={<PostMatchPage />} />
+
+            {/* Test Flow */}
+            <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
+            <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
+            <Route path="/post_test" element={<PostTestPage />} />
+
+            <Route
+                path="/sets/:id"
+                element={<FlashcardSetPage />}
+            />
+            <Route path="/shared/:token" element={<SharedSetPage />} />
+
+            {/* Personal Library Page */}
+            <Route
+                path="/folders"
+                //element={<FoldersPage />}
+                element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+            />
+
+            {/* Study Goals Page */}
+            <Route
+                path="/goals"
+                element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
+            />
+
+            {/* University Page */}
+            <Route
+                path="/university"
+                element={<UniversityPage userId={currentUser?.id} />}
+                element={currentUser ? <UniversityPage /> : <Navigate to="/login" />}
+            />
+                <Route
+                    path="/search" element={<SearchPage />}
+                />
+
+                {/* Course Page */}
+            <Route
+                path="/course/:courseId"
+                element={<CoursePage userId={currentUser?.id} />}
+            />
+
+            {/* Catch-all */}
+            <Route
+                path="*"
+                element={<Navigate to="/" />}
+            />
 
             </Routes>
         </>

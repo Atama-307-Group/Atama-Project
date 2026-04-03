@@ -401,12 +401,12 @@ export async function registerVerifiedUser({ username, email, password, code }) 
 }
 
 // Create a new flashcard set
-export async function createFlashcardSet({ title, description, university, course, flashcards }) {
+export async function createFlashcardSet({ title, description, university, course, flashcards, isPublic = true }) {
     const response = await fetch(`${API_BASE}/api/flashcard-sets`, {
         method: 'POST',
         credentials: "include",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, university, course, flashcards })
+        body: JSON.stringify({ title, description, university, course, flashcards, isPublic })
     });
 
     if (!response.ok) {
@@ -495,5 +495,12 @@ export async function getSetStats(setId) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to load stats");
+    return res.json();
+}
+export async function searchLibrary(q) {
+    const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Search failed");
     return res.json();
 }

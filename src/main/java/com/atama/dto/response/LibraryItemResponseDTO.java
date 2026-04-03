@@ -20,5 +20,6 @@ public class LibraryItemResponseDTO {
     private Instant lastAccessed;
     private boolean starred;
     private LibraryItemType itemType;
+    private boolean isPublic = true;
     private UUID folderId; // just the ID to avoid deep nesting
 }
