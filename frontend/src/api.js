@@ -242,7 +242,7 @@ export async function getCourses(universityId) {
     return res.json();
 }
 
-export async function getEnrolledCourses() {
+export async function getEnrolledCourses(userId) {
     const res = await fetch(`${API_BASE}/api/users/enrolled-courses`, {
         credentials: "include",
     });

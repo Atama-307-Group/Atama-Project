@@ -213,22 +213,19 @@ function App() {
             {/* Personal Library Page */}
             <Route
                 path="/folders"
-                element={<FoldersPage />}
                 element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
             />
 
             {/* Study Goals Page */}
             <Route
                 path="/goals"
-                element={<GoalsPage userId={currentUser?.id} />}
-                element={currentUser ? <GoalsPage /> : <Navigate to="/login" />}
+                element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
             />
 
             {/* University Page */}
             <Route
                 path="/university"
-                element={<UniversityPage userId={currentUser?.id} />}
-                element={currentUser ? <UniversityPage /> : <Navigate to="/login" />}
+                element={currentUser ? <UniversityPage userId={currentUser.id} /> : <Navigate to="/login" />}
             />
 
             {/* Course Page */}
