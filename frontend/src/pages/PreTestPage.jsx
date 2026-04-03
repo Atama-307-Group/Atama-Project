@@ -33,6 +33,7 @@ const PreTestPage = () => {
                 promptType,
                 cards: cardsPool,
                 numQuestions: Math.min(numQuestions, cardsPool.length),
+                setId: state?.setId,
             }
         });
     };

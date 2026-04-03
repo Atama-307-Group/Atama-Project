@@ -459,3 +459,41 @@ export async function addLibraryItemToCourse(libraryItemId, courseId, year, seme
     if (!res.ok) throw new Error("Failed to add item to course");
     return res.json();
 }
+
+export async function getSetProgress(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/progress`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load progress");
+    return res.json();
+}
+
+export async function updateCardProgress(setId, flashcardId, knowledgeLevel) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/flashcards/${flashcardId}/progress`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ knowledgeLevel }),
+    });
+    if (!res.ok) throw new Error("Failed to update progress");
+    return res.json();
+}
+
+export async function addSetStudyTime(setId, seconds) {
+    if (!seconds || seconds <= 0) return;
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/study-time`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seconds }),
+    });
+    if (!res.ok) throw new Error("Failed to record study time");
+}
+
+export async function getSetStats(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/stats`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load stats");
+    return res.json();
+}

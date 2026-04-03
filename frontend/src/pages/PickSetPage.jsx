@@ -44,7 +44,7 @@ const PickSetPage = () => {
         try {
             const setData = await getFlashcardSetById(item.id);
             navigate(MODE_DESTINATIONS[mode], {
-                state: { flashcards: setData.flashcards, setTitle: setData.title },
+                state: { flashcards: setData.flashcards, setTitle: setData.title, setId: item.id },
             });
         } catch (e) {
             setError('Failed to load that set. Please try again.');

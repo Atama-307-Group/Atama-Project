@@ -25,7 +25,7 @@ const PreLearnPage = () => {
             : flashcards;
 
         navigate('/study', {
-            state: { frontChoice, cards: cardsToStudy }
+            state: { frontChoice, cards: cardsToStudy, setId: state?.setId }
         });
     };
 

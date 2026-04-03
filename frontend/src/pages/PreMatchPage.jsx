@@ -23,7 +23,7 @@ const PreMatchPage = () => {
             ? flashcards.filter((card) => card.favorite)
             : flashcards;
 
-        navigate('/match', { state: { selectedCards: selected } });
+        navigate('/match', { state: { selectedCards: selected, setId: state?.setId } });
     };
 
     return (
