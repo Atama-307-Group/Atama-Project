@@ -14,7 +14,7 @@ import {
     recordAccess,
     openPDF,
     toggleItemStarred,
-    getLibraryContents
+    getLibraryContents, getSavedSets
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
@@ -71,28 +71,8 @@ const FoldersPage = () => {
     const [selectedItemIds, setSelectedItemIds] = useState(new Set());
 
     const [openItemMenuId, setOpenItemMenuId] = useState(null);
-
+    const [savedSets, setSavedSets] = useState([]);
     const fileInputRef = useRef(null); // PDF Uploads
-
-    /*async function loadFolders() {
-        setError("");
-        setLoading(true);
-        try {
-            const data = await getFolders();
-            const list = Array.isArray(data) ? data : [];
-            setFolders(list);
-            // if (list.length && selectedFolderId == null) setSelectedFolderId(list[0].id);
-        } catch (err) {
-            setError(err.message ?? "Something went wrong");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Load the folders
-    useEffect(() => {
-        loadFolders();
-    }, []);*/
 
     // Close overflow menu when clicking outside
     useEffect(() => {
@@ -174,19 +154,6 @@ const FoldersPage = () => {
     }, [selectedFolderId]);
 
     // Loading library items
-    /*async function loadLibItems() {
-        try {
-            const data = await getLibraryItems();
-            setLibItems(Array.isArray(data) ? data : []);
-        } catch (err) {
-            setError(err.message ?? "Failed to load items");
-        }
-    }
-
-    useEffect(() => {
-        loadLibItems();
-    }, []);*/
-
     async function loadLibrary() {
         setError("");
         setLoading(true);
@@ -194,6 +161,7 @@ const FoldersPage = () => {
             const data = await getLibraryContents();
             setFolders(Array.isArray(data.folders) ? data.folders : []);
             setLibItems(Array.isArray(data.looseItems) ? data.looseItems : []);
+            getSavedSets().then(setSavedSets).catch(() => {});
         } catch (err) {
             setError(err.message ?? "Something went wrong");
         } finally {
@@ -778,7 +746,9 @@ const FoldersPage = () => {
                                         </div>
                                     </div>
                                 ))}
-
+                                {filteredItems.length > 0 && (
+                                    <div className="sectionDivider">My Sets</div>
+                                )}
                                 {filteredItems // only loose items
                                     .map((item) => (
                                         <div
@@ -821,6 +791,24 @@ const FoldersPage = () => {
                                             </div>
                                         </div>
                                     ))}
+                                {savedSets.length > 0 && (
+                                    <>
+                                        <div className="sectionDivider">Saved Sets</div>
+                                        {savedSets.map((set) => (
+                                            <div
+                                                key={set.id}
+                                                className="itemCard"
+                                                onClick={() => navigate(`/sets/${set.id}`)}
+                                            >
+                                                <div className="folderName">{set.title}</div>
+                                                <div className="folderMeta">
+                                                    <span className="itemTypeBadge">SAVED</span>
+                                                    {set.university && <span className="itemTypeBadge">{set.university}</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
 
                             </div>
 

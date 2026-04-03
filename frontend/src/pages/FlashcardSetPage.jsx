@@ -7,6 +7,9 @@ import {
     updateFlashcard,
     getSetProgress,
     getSetStats,
+    saveSet,
+    unsaveSet,
+    updateSetPrivacy,
 } from "../api.js";
 import FlashcardCard from "../components/FlashcardCard.jsx";
 import FlashcardInput from "../components/FlashcardInput.jsx";
@@ -135,6 +138,21 @@ const FlashcardSetPage = () => {
         }
     };
 
+    const handleSaveToggle = async () => {
+        if (setData.isSaved) {
+            await unsaveSet(id);
+            setSetData(prev => ({ ...prev, isSaved: false }));
+        } else {
+            await saveSet(id);
+            setSetData(prev => ({ ...prev, isSaved: true }));
+        }
+    };
+
+    const handlePrivacyToggle = async () => {
+        const updated = await updateSetPrivacy(id, !setData.isPublic);
+        setSetData(prev => ({ ...prev, isPublic: updated.isPublic }));
+    };
+
     const handleStudyMode = (mode) => {
         const destinations = { learn: '/pre_learn', match: '/pre_match', test: '/pre_test' };
         navigate(destinations[mode], {
@@ -190,6 +208,11 @@ const FlashcardSetPage = () => {
                         {setData.isOwner && (
                             <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
                         )}
+                        {!setData.isOwner && (
+                            <button className="set-page-edit-btn" onClick={handleSaveToggle}>
+                                {setData.isSaved ? '✓ Saved' : '+ Save to Library'}
+                            </button>
+                        )}
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
                         <div className="download-container" style={{ position: 'relative', display: 'inline-block' }}>
                             <button className="set-page-edit-btn" onClick={() => setShowDownloadOptions(!showDownloadOptions)}>Download</button>
@@ -198,6 +221,11 @@ const FlashcardSetPage = () => {
                                     <button onClick={() => { downloadSet('csv'); setShowDownloadOptions(false); }}>CSV file</button>
                                     <button onClick={() => { downloadSet('txt'); setShowDownloadOptions(false); }}>TXT file</button>
                                 </div>
+                            )}
+                            {setData.isOwner && (
+                                <button className="set-page-edit-btn" onClick={handlePrivacyToggle}>
+                                    {setData.isPublic ? '🔒 Make Private' : '🔓 Make Public'}
+                                </button>
                             )}
                         </div>
                     </div>
