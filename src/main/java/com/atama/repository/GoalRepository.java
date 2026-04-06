@@ -10,4 +10,6 @@ public interface GoalRepository extends JpaRepository<Goal, UUID> {
 
     @org.springframework.data.jpa.repository.Query("SELECT DISTINCT g FROM Goal g JOIN FETCH g.user WHERE g.notifyByEmail = true")
     List<Goal> findByNotifyByEmailTrueWithUser();
+    @org.springframework.data.jpa.repository.Query("SELECT g FROM Goal g JOIN FETCH g.user")
+    List<Goal> findAllWithUser();
 }
