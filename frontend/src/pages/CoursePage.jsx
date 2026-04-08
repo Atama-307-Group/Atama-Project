@@ -1,22 +1,17 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems,
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, openPDF, downloadPDF, getLibraryItems,
     addLibraryItemToCourse, updateCourseLibraryItem, deleteCourseLibraryItem, getGroupsByCourse } from "../api.js";
 import "./CoursePage.css";
+
 import Highlighted from "../components/Highlighted.jsx";
+import CourseToolbar from "../components/CourseToolbar";
+import { NUMERIC_YEARS, YEARS, SEMESTERS } from "../constants.js";
 
-const YEARS = ["Unknown", ...Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - i))];
-const NUMERIC_YEARS = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
-const SEMESTERS = ["Unknown", "Fall", "Spring", "Summer", "Winter"];
-const ITEM_TYPES = ["PDF", "FLASHCARD_SET", "PRACTICE_TEST"];
+import useEscapeKey from "../hooks/useEscapeKey.js"
+import useCourseItems from "../hooks/useCourseItems";
+import useFilteredItems from "../hooks/useFilteredItems";
 
-const SORT_LABELS = {
-    "alpha-asc": "Alphabetical (A → Z)",
-    "alpha-desc": "Alphabetical (Z → A)",
-    "created-desc": "Date added (Newest)",
-    "created-asc": "Date added (Oldest)",
-    "accessed-desc": "Last accessed by you"
-};
 
 const CoursePage = ({ userId }) => {
     const navigate = useNavigate();
@@ -25,15 +20,9 @@ const CoursePage = ({ userId }) => {
     const [showLeaveModal, setShowLeaveModal] = useState(false);
     const [leaving, setLeaving] = useState(false);
 
-    // Course library items
-    const [items, setItems] = useState([]);
-    const [itemsLoading, setItemsLoading] = useState(true);
-    const [itemsError, setItemsError] = useState("");
-
     // Sorting
     const [sortBy, setSortBy] = useState("alpha-asc");
     const [showSortMenu, setShowSortMenu] = useState(false);
-    const sortMenuRef = useRef(null);
 
     // Search
     const [query, setQuery] = useState("");
@@ -45,7 +34,6 @@ const CoursePage = ({ userId }) => {
     const [filterYearMin, setFilterYearMin] = useState(NUMERIC_YEARS[NUMERIC_YEARS.length - 1]);
     const [filterYearMax, setFilterYearMax] = useState(NUMERIC_YEARS[0]);
     const [filterIncludeUnknownYear, setFilterIncludeUnknownYear] = useState(true);
-    const filterPanelRef = useRef(null);
 
     // PDF upload modal
     const fileInputRef = useRef(null);
@@ -92,58 +80,29 @@ const CoursePage = ({ userId }) => {
         getCourse(courseId).then(setCourse).catch(console.error);
     }, [courseId]);
 
-    useEffect(() => {
-        if (!courseId) return;
-        setItemsLoading(true);
-        getCourseItems(courseId)
-            .then(data => setItems(Array.isArray(data) ? data : []))
-            .catch(e => setItemsError(e.message ?? "Failed to load course items"))
-            .finally(() => setItemsLoading(false));
-    }, [courseId]);
+    const { items, setItems, loading: itemsLoading, error: itemsError } = useCourseItems(courseId);
 
-    useEffect(() => {
-        if (!courseId) return;
-        getGroupsByCourse(courseId)
-            .then(data => setGroups(Array.isArray(data) ? data : []))
-            .catch(() => setGroups([]))
-            .finally(() => setGroupsLoading(false));
-    }, [courseId]);
+    const filteredItems = useFilteredItems(items, query, sortBy, {
+        filterTypes,
+        filterSemesters,
+        filterYearMin,
+        filterYearMax,
+        filterIncludeUnknownYear,
+    });
 
-    useEffect(() => {
-        if (!showSortMenu) return;
-        function handlePointerDown(e) {
-            if (sortMenuRef.current && !sortMenuRef.current.contains(e.target)) setShowSortMenu(false);
-        }
-        window.addEventListener("pointerdown", handlePointerDown);
-        return () => window.removeEventListener("pointerdown", handlePointerDown);
-    }, [showSortMenu]);
-
-    useEffect(() => {
-        if (!showFilterPanel) return;
-        function handlePointerDown(e) {
-            if (filterPanelRef.current && !filterPanelRef.current.contains(e.target)) setShowFilterPanel(false);
-        }
-        window.addEventListener("pointerdown", handlePointerDown);
-        return () => window.removeEventListener("pointerdown", handlePointerDown);
-    }, [showFilterPanel]);
-
-    useEffect(() => {
-        function onKeyDown(e) {
-            if (e.key === "Escape") {
-                setShowPDFModal(false);
-                setShowLeaveModal(false);
-                setShowSortMenu(false);
-                setShowFilterPanel(false);
-                setShowLibraryModal(false);
-                setShowLibMetaModal(false);
-                setOpenMenuId(null);
-                setEditingItem(null);
-                setDeletingItem(null);
-            }
-        }
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
+    const handleEscape = useCallback(() => {
+        setShowPDFModal(false);
+        setShowLeaveModal(false);
+        setShowSortMenu(false);
+        setShowFilterPanel(false);
+        setShowLibraryModal(false);
+        setShowLibMetaModal(false);
+        setOpenMenuId(null);
+        setEditingItem(null);
+        setDeletingItem(null);
     }, []);
+
+    useEscapeKey(handleEscape);
 
     useEffect(() => {
         if (!openMenuId) return;
@@ -176,53 +135,6 @@ const CoursePage = ({ userId }) => {
         );
     }, [libraryItems, librarySearch]);
 
-    const filteredItems = useMemo(() => {
-        const q = query.trim().toLowerCase();
-
-        function safeTime(x) {
-            const t = x ? new Date(x).getTime() : 0;
-            return Number.isFinite(t) ? t : 0;
-        }
-
-        function compareBySort(a, b) {
-            const titleA = a.libraryItem?.title ?? "";
-            const titleB = b.libraryItem?.title ?? "";
-            switch (sortBy) {
-                case "alpha-desc": return titleB.localeCompare(titleA);
-                case "created-asc": return safeTime(a.libraryItem?.createdAt) - safeTime(b.libraryItem?.createdAt);
-                case "created-desc": return safeTime(b.libraryItem?.createdAt) - safeTime(a.libraryItem?.createdAt);
-                case "accessed-desc": return safeTime(b.libraryItem?.lastAccessed) - safeTime(a.libraryItem?.lastAccessed);
-                case "alpha-asc":
-                default: return titleA.localeCompare(titleB);
-            }
-        }
-
-        return [...items]
-            .filter(item => {
-                if (q) {
-                    const titleMatch = (item.libraryItem?.title ?? "").toLowerCase().includes(q);
-                    const descMatch = (item.description ?? "").toLowerCase().includes(q);
-                    if (!titleMatch && !descMatch) return false;
-                }
-                if (filterTypes.size > 0) {
-                    const type = item.libraryItem?.itemType ?? "PDF";
-                    if (!filterTypes.has(type)) return false;
-                }
-                if (filterSemesters.size > 0) {
-                    const sem = item.semester ?? "Unknown";
-                    if (!filterSemesters.has(sem)) return false;
-                }
-                const itemYear = item.year ?? "Unknown";
-                if (itemYear === "Unknown") {
-                    if (!filterIncludeUnknownYear) return false;
-                } else {
-                    const y = parseInt(itemYear, 10);
-                    if (Number.isFinite(y) && (y < filterYearMin || y > filterYearMax)) return false;
-                }
-                return true;
-            })
-            .sort(compareBySort);
-    }, [items, query, sortBy, filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
 
     function toggleSet(setter, value) {
         setter(prev => {
@@ -389,155 +301,32 @@ const CoursePage = ({ userId }) => {
                 </button>
             </div>
 
-            <div className="courseToolbar">
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="application/pdf"
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                />
-                <button className="toolbarBtn--upload" onClick={() => fileInputRef.current.click()}>
-                    + Upload PDF
-                </button>
-                <button className="toolbarBtn--library" onClick={handleOpenLibraryModal}>
-                    + Add from Library
-                </button>
-
-                <div className="courseSearch">
-                    <input
-                        className="courseSearchInput"
-                        placeholder="Search titles and descriptions…"
-                        value={query}
-                        onChange={e => setQuery(e.target.value)}
-                    />
-                </div>
-
-                {/* Filter button */}
-                <div className="filterWrap" ref={filterPanelRef}>
-                    <button
-                        type="button"
-                        className={`toolbarBtn--filter ${activeFilterCount > 0 ? "toolbarBtn--filterActive" : ""}`}
-                        onClick={() => setShowFilterPanel(p => !p)}
-                        aria-haspopup="true"
-                        aria-expanded={showFilterPanel}
-                        title="Filter"
-                    >
-                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path d="M1 3h13M3 7h9M5.5 11h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
-                        </svg>
-                        {activeFilterCount > 0 && (
-                            <span className="filterBadge">{activeFilterCount}</span>
-                        )}
-                    </button>
-
-                    {showFilterPanel && (
-                        <div className="filterPanel" role="dialog" aria-label="Filter options">
-                            <div className="filterPanelHeader">
-                                <span className="filterPanelTitle">Filter</span>
-                                {activeFilterCount > 0 && (
-                                    <button className="filterClearBtn" onClick={clearFilters}>Clear all</button>
-                                )}
-                            </div>
-
-                            <div className="filterSection">
-                                <div className="filterSectionLabel">Type</div>
-                                <div className="filterChips">
-                                    {ITEM_TYPES.map(type => (
-                                        <button
-                                            key={type}
-                                            className={`filterChip ${filterTypes.has(type) ? "filterChipActive" : ""}`}
-                                            onClick={() => toggleSet(setFilterTypes, type)}
-                                        >
-                                            {type === "FLASHCARD_SET" ? "Flashcards" : type === "PRACTICE_TEST" ? "Practice Test" : type}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="filterSection">
-                                <div className="filterSectionLabel">Semester</div>
-                                <div className="filterChips">
-                                    {SEMESTERS.map(sem => (
-                                        <button
-                                            key={sem}
-                                            className={`filterChip ${filterSemesters.has(sem) ? "filterChipActive" : ""}`}
-                                            onClick={() => toggleSet(setFilterSemesters, sem)}
-                                        >
-                                            {sem}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="filterSection">
-                                <div className="filterSectionLabel">Year</div>
-                                <div className="yearRangeRow">
-                                    <span className="yearRangeLabel">{filterYearMin}</span>
-                                    <div className="yearRangeSliders">
-                                        <input
-                                            type="range"
-                                            className="yearSlider"
-                                            min={yearMin}
-                                            max={yearMax}
-                                            value={filterYearMin}
-                                            onChange={e => {
-                                                const v = parseInt(e.target.value, 10);
-                                                setFilterYearMin(Math.min(v, filterYearMax));
-                                            }}
-                                        />
-                                        <input
-                                            type="range"
-                                            className="yearSlider"
-                                            min={yearMin}
-                                            max={yearMax}
-                                            value={filterYearMax}
-                                            onChange={e => {
-                                                const v = parseInt(e.target.value, 10);
-                                                setFilterYearMax(Math.max(v, filterYearMin));
-                                            }}
-                                        />
-                                    </div>
-                                    <span className="yearRangeLabel">{filterYearMax}</span>
-                                </div>
-                                <label className="filterCheckLabel">
-                                    <input
-                                        type="checkbox"
-                                        checked={filterIncludeUnknownYear}
-                                        onChange={e => setFilterIncludeUnknownYear(e.target.checked)}
-                                    />
-                                    Include unknown year
-                                </label>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                <div className="sortWrap" ref={sortMenuRef}>
-                    <button
-                        type="button"
-                        className="toolbarBtn--sort"
-                        onClick={() => setShowSortMenu(p => !p)}
-                        aria-haspopup="true"
-                        aria-expanded={showSortMenu}
-                    >
-                        ⇅ {SORT_LABELS[sortBy]}
-                    </button>
-                    {showSortMenu && (
-                        <div className="dropdownMenu" role="menu">
-                            {Object.entries(SORT_LABELS).map(([key, label]) => (
-                                <button
-                                    key={key}
-                                    className={`menuItem ${sortBy === key ? "menuItemActive" : ""}`}
-                                    onClick={() => { setSortBy(key); setShowSortMenu(false); }}
-                                >
-                                    {label}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
+            <CourseToolbar
+                query={query}
+                onQueryChange={setQuery}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+                showSortMenu={showSortMenu}
+                onToggleSortMenu={setShowSortMenu}
+                showFilterPanel={showFilterPanel}
+                onToggleFilterPanel={setShowFilterPanel}
+                activeFilterCount={activeFilterCount}
+                filterTypes={filterTypes}
+                filterSemesters={filterSemesters}
+                filterYearMin={filterYearMin}
+                filterYearMax={filterYearMax}
+                filterIncludeUnknownYear={filterIncludeUnknownYear}
+                onToggleFilterType={v => toggleSet(setFilterTypes, v)}
+                onToggleFilterSemester={v => toggleSet(setFilterSemesters, v)}
+                onFilterYearMinChange={v => setFilterYearMin(Math.min(v, filterYearMax))}
+                onFilterYearMaxChange={v => setFilterYearMax(Math.max(v, filterYearMin))}
+                onFilterIncludeUnknownYearChange={setFilterIncludeUnknownYear}
+                onClearFilters={clearFilters}
+                onUploadClick={() => fileInputRef.current.click()}
+                onAddFromLibrary={handleOpenLibraryModal}
+                fileInputRef={fileInputRef}
+                onFileChange={handleFileChange}
+            />
 
             {error && <div className="courseError">{error}</div>}
 

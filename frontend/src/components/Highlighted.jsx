@@ -1,4 +1,6 @@
 import { } from "react";
+import "./Highlighted.css";
+
 
 function getHighlightSegments(text, query) {
     if (!query || !text) return [{ text, match: false }];
