@@ -48,6 +48,7 @@ public class CourseLibraryItemController {
     public ResponseEntity<CourseLibraryItem> updateItem(@PathVariable UUID id, @RequestBody UpdateItemRequest body) {
         CourseLibraryItem item = courseLibraryItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
+
         item.setYear(body.year());
         item.setSemester(body.semester());
         item.setDescription(body.description());
