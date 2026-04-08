@@ -396,6 +396,18 @@ export async function updateCourseLibraryItem(id, year, semester, description) {
     return res.json();
 }
 
+export async function updateCourseLibraryItemTitle(id, { title }) {
+    const res = await fetch(`${API_BASE}/library-items/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+    });
+    if (!res.ok) throw new Error("Failed to update library item");
+    return res.json();
+}
+
+
 export async function deleteCourseLibraryItem(id) {
     const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
         method: "DELETE",
