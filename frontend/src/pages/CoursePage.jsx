@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems, addLibraryItemToCourse, getGroupsByCourse } from "../api.js";
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems,
+    addLibraryItemToCourse, updateCourseLibraryItem, deleteCourseLibraryItem, getGroupsByCourse } from "../api.js";
 import "./CoursePage.css";
+import Highlighted from "../components/Highlighted.jsx";
 
 const YEARS = ["Unknown", ...Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - i))];
 const NUMERIC_YEARS = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
@@ -15,31 +17,6 @@ const SORT_LABELS = {
     "created-asc": "Date added (Oldest)",
     "accessed-desc": "Last accessed by you"
 };
-
-// Splits text into segments, marking which parts match the query
-function getHighlightSegments(text, query) {
-    if (!query || !text) return [{ text, match: false }];
-    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(`(${escaped})`, "gi");
-    const parts = text.split(regex);
-    return parts.map(part => ({
-        text: part,
-        match: regex.test(part),
-    }));
-}
-
-function Highlighted({ text, query }) {
-    const segments = getHighlightSegments(text, query);
-    return (
-        <span>
-            {segments.map((seg, i) =>
-                seg.match
-                    ? <mark key={i} className="searchHighlight">{seg.text}</mark>
-                    : <span key={i}>{seg.text}</span>
-            )}
-        </span>
-    );
-}
 
 const CoursePage = ({ userId }) => {
     const navigate = useNavigate();
@@ -63,8 +40,8 @@ const CoursePage = ({ userId }) => {
 
     // Filters
     const [showFilterPanel, setShowFilterPanel] = useState(false);
-    const [filterTypes, setFilterTypes] = useState(new Set()); // empty = all
-    const [filterSemesters, setFilterSemesters] = useState(new Set()); // empty = all
+    const [filterTypes, setFilterTypes] = useState(new Set());
+    const [filterSemesters, setFilterSemesters] = useState(new Set());
     const [filterYearMin, setFilterYearMin] = useState(NUMERIC_YEARS[NUMERIC_YEARS.length - 1]);
     const [filterYearMax, setFilterYearMax] = useState(NUMERIC_YEARS[0]);
     const [filterIncludeUnknownYear, setFilterIncludeUnknownYear] = useState(true);
@@ -86,16 +63,6 @@ const CoursePage = ({ userId }) => {
     const [groups, setGroups] = useState([]);
     const [groupsLoading, setGroupsLoading] = useState(true);
 
-    const activeFilterCount = useMemo(() => {
-        let n = 0;
-        if (filterTypes.size > 0) n++;
-        if (filterSemesters.size > 0) n++;
-        const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
-        const yearMax = NUMERIC_YEARS[0];
-        if (filterYearMin !== yearMin || filterYearMax !== yearMax || !filterIncludeUnknownYear) n++;
-        return n;
-    }, [filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
-
     // Add from personal library
     const [showLibraryModal, setShowLibraryModal] = useState(false);
     const [libraryItems, setLibraryItems] = useState([]);
@@ -109,6 +76,16 @@ const CoursePage = ({ userId }) => {
     const [libMetaSemester, setLibMetaSemester] = useState("Unknown");
     const [libMetaDescription, setLibMetaDescription] = useState("");
     const [libMetaAdding, setLibMetaAdding] = useState(false);
+
+    // Edit / delete your own items
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const [editingItem, setEditingItem] = useState(null);
+    const [editYear, setEditYear] = useState("Unknown");
+    const [editSemester, setEditSemester] = useState("Unknown");
+    const [editDescription, setEditDescription] = useState("");
+    const [editSaving, setEditSaving] = useState(false);
+    const [deletingItem, setDeletingItem] = useState(null);
+    const [deleteConfirming, setDeleteConfirming] = useState(false);
 
     useEffect(() => {
         if (!courseId) return;
@@ -132,31 +109,24 @@ const CoursePage = ({ userId }) => {
             .finally(() => setGroupsLoading(false));
     }, [courseId]);
 
-    // Close sort menu on outside click
     useEffect(() => {
         if (!showSortMenu) return;
         function handlePointerDown(e) {
-            if (sortMenuRef.current && !sortMenuRef.current.contains(e.target)) {
-                setShowSortMenu(false);
-            }
+            if (sortMenuRef.current && !sortMenuRef.current.contains(e.target)) setShowSortMenu(false);
         }
         window.addEventListener("pointerdown", handlePointerDown);
         return () => window.removeEventListener("pointerdown", handlePointerDown);
     }, [showSortMenu]);
 
-    // Close filter panel on outside click
     useEffect(() => {
         if (!showFilterPanel) return;
         function handlePointerDown(e) {
-            if (filterPanelRef.current && !filterPanelRef.current.contains(e.target)) {
-                setShowFilterPanel(false);
-            }
+            if (filterPanelRef.current && !filterPanelRef.current.contains(e.target)) setShowFilterPanel(false);
         }
         window.addEventListener("pointerdown", handlePointerDown);
         return () => window.removeEventListener("pointerdown", handlePointerDown);
     }, [showFilterPanel]);
 
-    // Close modals on Escape
     useEffect(() => {
         function onKeyDown(e) {
             if (e.key === "Escape") {
@@ -166,11 +136,31 @@ const CoursePage = ({ userId }) => {
                 setShowFilterPanel(false);
                 setShowLibraryModal(false);
                 setShowLibMetaModal(false);
+                setOpenMenuId(null);
+                setEditingItem(null);
+                setDeletingItem(null);
             }
         }
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
+
+    useEffect(() => {
+        if (!openMenuId) return;
+        function handlePointerDown() { setOpenMenuId(null); }
+        window.addEventListener("pointerdown", handlePointerDown);
+        return () => window.removeEventListener("pointerdown", handlePointerDown);
+    }, [openMenuId]);
+
+    const activeFilterCount = useMemo(() => {
+        let n = 0;
+        if (filterTypes.size > 0) n++;
+        if (filterSemesters.size > 0) n++;
+        const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
+        const yearMax = NUMERIC_YEARS[0];
+        if (filterYearMin !== yearMin || filterYearMax !== yearMax || !filterIncludeUnknownYear) n++;
+        return n;
+    }, [filterTypes, filterSemesters, filterYearMin, filterYearMax, filterIncludeUnknownYear]);
 
     const addedLibraryItemIds = useMemo(
         () => new Set(items.map(cli => cli.libraryItem?.id).filter(Boolean)),
@@ -209,26 +199,19 @@ const CoursePage = ({ userId }) => {
 
         return [...items]
             .filter(item => {
-                // Text search: title + description
                 if (q) {
                     const titleMatch = (item.libraryItem?.title ?? "").toLowerCase().includes(q);
                     const descMatch = (item.description ?? "").toLowerCase().includes(q);
                     if (!titleMatch && !descMatch) return false;
                 }
-
-                // Type filter
                 if (filterTypes.size > 0) {
                     const type = item.libraryItem?.itemType ?? "PDF";
                     if (!filterTypes.has(type)) return false;
                 }
-
-                // Semester filter
                 if (filterSemesters.size > 0) {
                     const sem = item.semester ?? "Unknown";
                     if (!filterSemesters.has(sem)) return false;
                 }
-
-                // Year filter
                 const itemYear = item.year ?? "Unknown";
                 if (itemYear === "Unknown") {
                     if (!filterIncludeUnknownYear) return false;
@@ -236,7 +219,6 @@ const CoursePage = ({ userId }) => {
                     const y = parseInt(itemYear, 10);
                     if (Number.isFinite(y) && (y < filterYearMin || y > filterYearMax)) return false;
                 }
-
                 return true;
             })
             .sort(compareBySort);
@@ -350,6 +332,48 @@ const CoursePage = ({ userId }) => {
         setShowLibraryModal(true);
     }
 
+    function handleOpenEdit(e, cli) {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        setEditingItem(cli);
+        setEditYear(cli.year ?? "Unknown");
+        setEditSemester(cli.semester ?? "Unknown");
+        setEditDescription(cli.description ?? "");
+    }
+
+    async function handleEditSave() {
+        if (!editingItem) return;
+        setEditSaving(true);
+        try {
+            const updated = await updateCourseLibraryItem(
+                editingItem.id,
+                editYear,
+                editSemester,
+                editDescription || null,
+            );
+            setItems(prev => prev.map(i => i.id === updated.id ? updated : i));
+            setEditingItem(null);
+        } catch (err) {
+            setError(err.message ?? "Failed to save changes");
+        } finally {
+            setEditSaving(false);
+        }
+    }
+
+    async function handleDeleteConfirm() {
+        if (!deletingItem) return;
+        setDeleteConfirming(true);
+        try {
+            await deleteCourseLibraryItem(deletingItem.id);
+            setItems(prev => prev.filter(i => i.id !== deletingItem.id));
+            setDeletingItem(null);
+        } catch (err) {
+            setError(err.message ?? "Failed to remove item");
+        } finally {
+            setDeleteConfirming(false);
+        }
+    }
+
     const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
     const yearMax = NUMERIC_YEARS[0];
 
@@ -416,7 +440,6 @@ const CoursePage = ({ userId }) => {
                                 )}
                             </div>
 
-                            {/* Type */}
                             <div className="filterSection">
                                 <div className="filterSectionLabel">Type</div>
                                 <div className="filterChips">
@@ -432,7 +455,6 @@ const CoursePage = ({ userId }) => {
                                 </div>
                             </div>
 
-                            {/* Semester */}
                             <div className="filterSection">
                                 <div className="filterSectionLabel">Semester</div>
                                 <div className="filterChips">
@@ -448,7 +470,6 @@ const CoursePage = ({ userId }) => {
                                 </div>
                             </div>
 
-                            {/* Year */}
                             <div className="filterSection">
                                 <div className="filterSectionLabel">Year</div>
                                 <div className="yearRangeRow">
@@ -533,6 +554,83 @@ const CoursePage = ({ userId }) => {
                     </div>
                 ) : (
                     <div className="courseItemsGrid">
+                        {filteredItems.map(cli => {
+                            const isOwner = cli.libraryItem?.ownerId === userId;
+                            const isMenuOpen = openMenuId === cli.id;
+                            return (
+                                <div
+                                    key={cli.id}
+                                    className={`itemCard ${isOwner ? "itemCard--mine" : ""}`}
+                                    onClick={() => {
+                                        if (cli.libraryItem?.itemType === "PDF") openPDF(cli.libraryItem.id);
+                                    }}
+                                >
+                                    {/* Owner icon — visible on hover */}
+                                    {isOwner && (
+                                        <div className="ownerBadge" title="Added by you">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+                                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                            </svg>
+                                        </div>
+                                    )}
+
+                                    {/* Three-dot menu for owner */}
+                                    {isOwner && (
+                                        <div className="cardMenuWrap" onClick={e => e.stopPropagation()}>
+                                            <button
+                                                className="cardMenuBtn"
+                                                title="Options"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    setOpenMenuId(prev => prev === cli.id ? null : cli.id);
+                                                }}
+                                            >
+                                                ···
+                                            </button>
+                                            {isMenuOpen && (
+                                                <div className="cardMenu">
+                                                    <button className="cardMenuItem" onClick={e => handleOpenEdit(e, cli)}>
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        className="cardMenuItem cardMenuItem--danger"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            setOpenMenuId(null);
+                                                            setDeletingItem(cli);
+                                                        }}
+                                                    >
+                                                        Remove from course
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <div className="folderName">
+                                        <Highlighted text={cli.libraryItem?.title ?? "Untitled"} query={query.trim()} />
+                                    </div>
+                                    <div className="folderMeta">
+                                        <span className="itemTypeBadge">{cli.libraryItem?.itemType ?? "PDF"}</span>
+                                        <div className="cliMeta">
+                                            {cli.semester && cli.semester !== "Unknown" && (
+                                                <span className="cliTag">{cli.semester}</span>
+                                            )}
+                                            {cli.year && cli.year !== "Unknown" && (
+                                                <span className="cliTag">{cli.year}</span>
+                                            )}
+                                            {cli.libraryItem?.itemType === "PDF" && (
+                                                <button
+                                                    className="downloadBtn"
+                                                    title="Download PDF"
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
+                                                    }}
+                                                >
+                                                    ⭳
+                                                </button>
                         {filteredItems.map(cli => (
                             <div
                                 key={cli.id}
@@ -569,15 +667,16 @@ const CoursePage = ({ userId }) => {
                                                 ⭳
                                             </button>
                                             )}
+                                        </div>
                                     </div>
+                                    {cli.description && (
+                                        <div className="cliDescription">
+                                            <Highlighted text={cli.description} query={query.trim()} />
+                                        </div>
+                                    )}
                                 </div>
-                                {cli.description && (
-                                    <div className="cliDescription">
-                                        <Highlighted text={cli.description} query={query.trim()} />
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
@@ -706,119 +805,168 @@ const CoursePage = ({ userId }) => {
                 </div>
             )}
 
-        {/* Library picker modal */}
-        {showLibraryModal && (
-            <div className="modalOverlay" onClick={() => setShowLibraryModal(false)}>
-                <div className="modal modalLarge" onClick={e => e.stopPropagation()}>
-                    <div className="modalTitle">Add from Library</div>
-                    <input
-                        className="pdfInput"
-                        placeholder="Search your library…"
-                        value={librarySearch}
-                        onChange={e => setLibrarySearch(e.target.value)}
-                        style={{ marginBottom: "12px" }}
-                    />
-                    {libraryLoading ? (
-                        <div className="emptyState">Loading your library…</div>
-                    ) : libraryError ? (
-                        <div className="courseError">{libraryError}</div>
-                    ) : filteredLibraryItems.length === 0 ? (
-                        <div className="emptyState">No library items found.</div>
-                    ) : (
-                        <div className="libraryPickerList">
-                            {filteredLibraryItems.map(li => {
-                                const alreadyAdded = addedLibraryItemIds.has(li.id);
-                                const isSelected = selectedLibraryItem?.id === li.id;
-                                return (
-                                    <div
-                                        key={li.id}
-                                        className={`libraryPickerItem
-                                            ${isSelected ? "libraryPickerItem--selected" : ""}
-                                            ${alreadyAdded ? "libraryPickerItem--disabled" : ""}
-                                        `}
-                                        onClick={() => {
-                                            if (alreadyAdded) return;
-                                            setSelectedLibraryItem(prev => prev?.id === li.id ? null : li);
-                                        }}
-                                    >
-                                        <div className="libraryPickerItemTitle">
-                                            <Highlighted text={li.title ?? "Untitled"} query={librarySearch.trim()} />
-                                            {alreadyAdded && <span className="alreadyAddedBadge">Already added</span>}
+            {/* Library picker modal */}
+            {showLibraryModal && (
+                <div className="modalOverlay" onClick={() => setShowLibraryModal(false)}>
+                    <div className="modal modalLarge" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Add from Library</div>
+                        <input
+                            className="librarySearchInput"
+                            placeholder="Search your library…"
+                            value={librarySearch}
+                            onChange={e => setLibrarySearch(e.target.value)}
+                        />
+                        {libraryLoading ? (
+                            <div className="emptyState">Loading your library…</div>
+                        ) : libraryError ? (
+                            <div className="courseError">{libraryError}</div>
+                        ) : filteredLibraryItems.length === 0 ? (
+                            <div className="emptyState">No library items found.</div>
+                        ) : (
+                            <div className="libraryPickerList">
+                                {filteredLibraryItems.map(li => {
+                                    const alreadyAdded = addedLibraryItemIds.has(li.id);
+                                    const isSelected = selectedLibraryItem?.id === li.id;
+                                    return (
+                                        <div
+                                            key={li.id}
+                                            className={`libraryPickerItem ${isSelected ? "libraryPickerItem--selected" : ""} ${alreadyAdded ? "libraryPickerItem--disabled" : ""}`}
+                                            onClick={() => {
+                                                if (alreadyAdded) return;
+                                                setSelectedLibraryItem(prev => prev?.id === li.id ? null : li);
+                                            }}
+                                        >
+                                            <div className="libraryPickerItemTitle">
+                                                <Highlighted text={li.title ?? "Untitled"} query={librarySearch.trim()} />
+                                                {alreadyAdded && <span className="alreadyAddedBadge">Already added</span>}
+                                            </div>
+                                            <div className="libraryPickerItemMeta">
+                                                <span className="itemTypeBadge">{li.itemType ?? "PDF"}</span>
+                                                {li.description && (
+                                                    <span className="libraryPickerItemDesc">
+                                                        <Highlighted text={li.description} query={librarySearch.trim()} />
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="libraryPickerItemMeta">
-                                            <span className="itemTypeBadge">{li.itemType ?? "PDF"}</span>
-                                            {li.description && (
-                                                <span className="libraryPickerItemDesc">
-                                                    <Highlighted text={li.description} query={librarySearch.trim()} />
-                                                </span>
-                                            )}
-                                        </div>
-
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
+                        )}
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={() => setShowLibraryModal(false)}>
+                                Cancel
+                            </button>
+                            <button className="btn primary" onClick={handleLibraryNext} disabled={!selectedLibraryItem}>
+                                Next
+                            </button>
                         </div>
-                    )}
-                    <div className="modalActions">
-                        <button className="btn cancelBtn" onClick={() => setShowLibraryModal(false)}>
-                            Cancel
-                        </button>
-                        <button
-                            className="btn primary"
-                            onClick={handleLibraryNext}
-                            disabled={!selectedLibraryItem}
-                        >
-                            Next
-                        </button>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {/* Library item metadata modal */}
-        {showLibMetaModal && (
-            <div className="modalOverlay" onClick={() => setShowLibMetaModal(false)}>
-                <div className="modal" onClick={e => e.stopPropagation()}>
-                    <div className="modalTitle">Add to Course</div>
-                    <div className="pdfForm">
-                        <label className="pdfLabel">
-                            Year
-                            <select className="pdfSelect" value={libMetaYear} onChange={e => setLibMetaYear(e.target.value)}>
-                                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                            </select>
-                        </label>
-                        <label className="pdfLabel">
-                            Semester
-                            <select className="pdfSelect" value={libMetaSemester} onChange={e => setLibMetaSemester(e.target.value)}>
-                                {SEMESTERS.map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                        </label>
-                        <label className="pdfLabel">
-                            Description
-                            <textarea
-                                className="pdfTextarea"
-                                value={libMetaDescription}
-                                onChange={e => setLibMetaDescription(e.target.value.slice(0, 255))}
-                                placeholder="Add additional information here, e.g. professor(s)"
-                                rows={3}
-                                maxLength={255}
-                            />
-                        </label>
-                        <p className="pdfWarning">
-                            ⚠️ Ensure that you have uploaded the correct file and that all information is correct!
-                        </p>
-                    </div>
-                    <div className="modalActions">
-                        <button className="btn cancelBtn" onClick={handleLibMetaBack}>
-                            ← Back
-                        </button>
-                        <button className="btn primary" onClick={handleLibMetaConfirm} disabled={libMetaAdding}>
-                            {libMetaAdding ? "Adding..." : "Add to Course"}
-                        </button>
+            {/* Library item metadata modal */}
+            {showLibMetaModal && (
+                <div className="modalOverlay" onClick={() => setShowLibMetaModal(false)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Add to Course</div>
+                        <div className="pdfForm">
+                            <label className="pdfLabel">
+                                Year
+                                <select className="pdfSelect" value={libMetaYear} onChange={e => setLibMetaYear(e.target.value)}>
+                                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                </select>
+                            </label>
+                            <label className="pdfLabel">
+                                Semester
+                                <select className="pdfSelect" value={libMetaSemester} onChange={e => setLibMetaSemester(e.target.value)}>
+                                    {SEMESTERS.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </label>
+                            <label className="pdfLabel">
+                                Description
+                                <textarea
+                                    className="pdfTextarea"
+                                    value={libMetaDescription}
+                                    onChange={e => setLibMetaDescription(e.target.value.slice(0, 255))}
+                                    placeholder="Add additional information here, e.g. professor(s)"
+                                    rows={3}
+                                    maxLength={255}
+                                />
+                            </label>
+                            <p className="pdfWarning">
+                                ⚠️ Ensure that you have uploaded the correct file and that all information is correct!
+                            </p>
+                        </div>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={handleLibMetaBack}>
+                                ← Back
+                            </button>
+                            <button className="btn primary" onClick={handleLibMetaConfirm} disabled={libMetaAdding}>
+                                {libMetaAdding ? "Adding..." : "Add to Course"}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
+
+            {/* Edit modal */}
+            {editingItem && (
+                <div className="modalOverlay" onClick={() => setEditingItem(null)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Edit Details</div>
+                        <div className="pdfForm">
+                            <label className="pdfLabel">
+                                Year
+                                <select className="pdfSelect" value={editYear} onChange={e => setEditYear(e.target.value)}>
+                                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                </select>
+                            </label>
+                            <label className="pdfLabel">
+                                Semester
+                                <select className="pdfSelect" value={editSemester} onChange={e => setEditSemester(e.target.value)}>
+                                    {SEMESTERS.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </label>
+                            <label className="pdfLabel">
+                                Description
+                                <textarea
+                                    className="pdfTextarea"
+                                    value={editDescription}
+                                    onChange={e => setEditDescription(e.target.value.slice(0, 255))}
+                                    placeholder="Add additional information here, e.g. professor(s)"
+                                    rows={3}
+                                    maxLength={255}
+                                />
+                            </label>
+                        </div>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={() => setEditingItem(null)}>Cancel</button>
+                            <button className="btn primary" onClick={handleEditSave} disabled={editSaving}>
+                                {editSaving ? "Saving..." : "Save Changes"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete confirmation modal */}
+            {deletingItem && (
+                <div className="modalOverlay" onClick={() => setDeletingItem(null)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modalTitle">Remove from course?</div>
+                        <p className="modalBody">
+                            <strong>{deletingItem.libraryItem?.title ?? "This item"}</strong> will be removed from the course but will remain in your library.
+                        </p>
+                        <div className="modalActions">
+                            <button className="btn cancelBtn" onClick={() => setDeletingItem(null)}>Cancel</button>
+                            <button className="btn leaveConfirmBtn" onClick={handleDeleteConfirm} disabled={deleteConfirming}>
+                                {deleteConfirming ? "Removing..." : "Remove"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

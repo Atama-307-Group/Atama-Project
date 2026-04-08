@@ -1,0 +1,48 @@
+POST http://localhost:8080/folders
+Content-Type: application/json
+Content-Length: 47
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "name": "My 2nd folder",
+  "libraryId": 1
+}
+
+<> 2026-02-22T140700.200.json
+
+###
+
+POST http://localhost:8080/folders
+Content-Type: application/json
+Content-Length: 49
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "name": "My First Folder",
+  "libraryId": 1
+}
+
+<> 2026-02-22T140058.200.json
+
+###
+
+POST http://localhost:8080/folders
+Content-Type: application/json
+Content-Length: 49
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "name": "My First Folder",
+  "libraryId": 1
+}
+
+<> 2026-02-22T135829.500.json
+
+###
+
