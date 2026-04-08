@@ -773,6 +773,98 @@ button.leaveConfirmBtn:disabled {
     letter-spacing: 0.2px;
 }
 
+/* Owner indicator */
+.itemCard--mine {
+    border-color: rgba(124, 111, 205, 0.45);
+}
+
+.ownerBadge {
+    position: absolute;
+    top: 10px;
+    right: 36px;
+    color: #7c6fcd;
+    opacity: 0;
+    transition: opacity 0.15s;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.itemCard:hover .ownerBadge {
+    opacity: 1;
+}
+
+/* Three-dot menu */
+.cardMenuWrap {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.cardMenuBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 900;
+    color: #335145;
+    padding: 2px 5px;
+    border-radius: 6px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
+    letter-spacing: 1px;
+}
+
+.itemCard:hover .cardMenuBtn {
+    opacity: 1;
+}
+
+.cardMenuBtn:hover {
+    background: rgba(51, 81, 69, 0.1);
+}
+
+.cardMenu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #fff;
+    border: 1px solid rgba(51, 81, 69, 0.18);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(30, 53, 47, 0.18);
+    min-width: 170px;
+    overflow: hidden;
+    z-index: 10;
+    animation: menuPop 100ms ease-out;
+}
+
+.cardMenuItem {
+    width: 100%;
+    display: block;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E352F;
+    cursor: pointer;
+    transition: background 80ms ease;
+    font-family: inherit;
+}
+
+.cardMenuItem:hover {
+    background: rgba(51, 81, 69, 0.07);
+}
+
+.cardMenuItem--danger {
+    color: #c0392b;
+}
+
+.cardMenuItem--danger:hover {
+    background: rgba(192, 57, 43, 0.07);
+}
+
 /* Study Groups section */
 .studyGroupsSection {
     margin-top: 36px;
