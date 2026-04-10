@@ -79,8 +79,9 @@ public class LibraryItemController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "title", required = false) String title
     ) throws IOException {
-        UUID userId = getAuthenticatedUserId();                         // ← yours
-        LibraryItem item = libraryItemService.uploadPDF(file, title, userId); // ← both
+        UUID userId = getAuthenticatedUserId();
+        System.out.println("Authenticated userId: " + userId);
+        LibraryItem item = libraryItemService.uploadPDF(file, title, userId);
         return ResponseEntity.ok(toResponse(item));
     }
 
@@ -150,5 +151,11 @@ public class LibraryItemController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
 
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLibraryItem(@PathVariable UUID id) {
+        libraryItemService.deleteLibraryItem(id);
+        return ResponseEntity.noContent().build();
     }
 }
