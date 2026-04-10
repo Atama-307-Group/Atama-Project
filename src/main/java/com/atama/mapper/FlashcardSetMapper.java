@@ -20,7 +20,7 @@ public class FlashcardSetMapper {
         entity.setDescription(dto.getDescription());
         entity.setUniversity(dto.getUniversity());
         entity.setCourse(dto.getCourse());
-        entity.setOwnerId(dto.getOwnerId());
+        //entity.setOwnerId(dto.getOwnerId());
         dto.getFlashcards().stream()
                 .map(flashcardMapper::toEntity)
                 .forEach(entity::addFlashcard); // use addFlashcard to maintain bidirectional link
@@ -33,7 +33,7 @@ public class FlashcardSetMapper {
         dto.setDescription(entity.getDescription());
         dto.setUniversity(entity.getUniversity());
         dto.setCourse(entity.getCourse());
-        dto.setOwnerId(entity.getOwnerId());
+        //dto.setOwnerId(entity.getOwnerId());
         dto.setIsPublic(entity.isPublic());
         dto.setFlashcards(
                 entity.getFlashcards().stream()
