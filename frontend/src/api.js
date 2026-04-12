@@ -117,14 +117,6 @@ export async function setFolderPrivacy(folderId, isPublic) {
     return res.json();
 }
 
-export async function getLibraryItems() {
-    const res = await fetch(`${API_BASE}/library-items`, {
-        credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to load library items");
-    return res.json();
-}
-
 export async function getLibraryContents() {
     const res = await fetch(`${API_BASE}/api/libraries/me/contents`, {
         credentials: "include",
@@ -213,6 +205,15 @@ export async function updateSetPrivacy(id, isPublic) {
     if (!res.ok) throw new Error('Failed to update privacy');
     return res.json();
 }
+
+export async function deleteFlashcardSet(setId) {
+    const res = await fetch(`${API_BASE}/flashcard-sets/${setId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to delete flashcard set");
+}
+
 /* Goals ------------------------------------------- */
 
 export async function getGoal(userId) {
@@ -596,6 +597,9 @@ export async function getCourseItems(courseId) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to fetch course items");
+      console.log("fetching course items for:", courseId);
+
+
     return res.json();
 }
 

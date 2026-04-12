@@ -68,4 +68,7 @@ public abstract class LibraryItem {
     @JsonProperty("isPublic")
     @Column(name = "is_public", nullable = false)
     private boolean isPublic = true;
+
+    @Column(nullable = false)
+    private boolean hidden = false;
 }

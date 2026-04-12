@@ -155,10 +155,6 @@ public class FlashcardSetController {
     }
 
     private UUID getAuthenticatedUserId() {
-        /*String userId = (String) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return UUID.fromString(userId);*/
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
             return null;

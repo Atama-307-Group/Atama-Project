@@ -4,6 +4,7 @@ import com.atama.repository.*;
 import com.atama.model.*;
 import com.atama.dto.request.*;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,10 +140,16 @@ public class LibraryItemService {
 
     @Transactional
     public void deleteLibraryItem(UUID itemId) {
+        LibraryItem item = libraryItemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found: " + itemId));
 
-        LibraryItem libraryItem = libraryItemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
-
-        libraryItemRepository.delete(libraryItem);
+        if (item.getCourseAssignments() != null && !item.getCourseAssignments().isEmpty()) {
+            // Linked to one or more courses — soft delete
+            item.setHidden(true);
+            libraryItemRepository.save(item);
+        } else {
+            // No course links — safe to hard delete
+            libraryItemRepository.delete(item);
+        }
     }
 }
