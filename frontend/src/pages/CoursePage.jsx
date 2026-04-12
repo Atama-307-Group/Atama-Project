@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, openPDF, downloadPDF, getLibraryItems,
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, openPDF, downloadPDF,
     addLibraryItemToCourse, updateCourseLibraryItem, deleteCourseLibraryItem, getGroupsByCourse } from "../api.js";
 import "./CoursePage.css";
 

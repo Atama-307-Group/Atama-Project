@@ -4,7 +4,6 @@ import {
     setFolderStarred,
     getFolderItems,
     setFolderPrivacy,
-    getLibraryItems,
     moveItemToFolder,
     removeItemFromFolder,
     uploadPDF,
@@ -15,6 +14,7 @@ import {
     getLibraryContents,
     getSavedSets,
     getUserGroups,
+    deleteFlashcardSet,
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
