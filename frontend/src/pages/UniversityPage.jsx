@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UniversityPage.css";
+import EnrollModal from "../components/EnrollModal.jsx"
+import LeaveAllCoursesModal from "../components/LeaveAllCoursesModal.jsx"
 import { useCourseEnrollment } from "../hooks/useCourseEnrollment.js";
 import { useSearch } from "../hooks/useSearch.jsx";
 import EnrollFromScheduleModal from "../components/EnrollFromScheduleModal";
@@ -24,13 +26,38 @@ const UniversityPage = ({ userId }) => {
 
     const navigate = useNavigate();
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
+    const [showLeaveAllCoursesModal, setShowLeaveAllCoursesModal] = useState(false);
+    const [leavingAll, setLeavingAll] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
+    const [leaveOneCourse, setLeaveOneCourse] = useState(null);
+    const [leavingOne, setLeavingOne] = useState(false);
+    const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
+
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [activeIndex, setActiveIndex] = useState(0);
     const menuRef = useRef(null);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
 
-    const visibleCourses = view === "enrolled"
-        ? courses.filter(c => enrolledIds.has(c.id))
-        : courses;
+    // Global keyboard shortcut: Cmd/Ctrl+K to open search
+    useEffect(() => {
+        function onKeyDown(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                setSearchOpen(true);
+            }
+            if (e.key === "Escape") {
+                if (searchOpen) {
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                } else if (showLeaveAllCoursesModal) {
+                    setShowLeaveAllCoursesModal(false);
+                }
+            }
+        }
+        document.addEventListener("keydown", onKeyDown);
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [searchOpen, showLeaveAllCoursesModal]);
 
     function handleSetView(v) {
         setView(v);
@@ -49,13 +76,123 @@ const UniversityPage = ({ userId }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [openMenuId]);
 
+    // Filtered search results
+    const searchResults = searchQuery.trim().length === 0 ? [] : courses.filter(c => {
+        const q = searchQuery.toLowerCase();
+        return (
+            c.courseCode.toLowerCase().includes(q) ||
+            c.courseName.toLowerCase().includes(q)
+        );
+    }).slice(0, 8);
+
+    useEffect(() => { setActiveIndex(0); }, [searchQuery]);
+
+    function handleSearchKeyDown(e) {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setActiveIndex(i => Math.min(i + 1, searchResults.length - 1));
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setActiveIndex(i => Math.max(i - 1, 0));
+        } else if (e.key === "Enter") {
+            if (searchResults[activeIndex]) handleSearchSelect(searchResults[activeIndex]);
+        }
+    }
+
+    function handleSearchSelect(course) {
+        setSearchOpen(false);
+        setSearchQuery("");
+        if (enrolledIds.has(course.id)) {
+            navigate(`/course/${course.id}`);
+        } else {
+            setSelectedCourse(course);
+        }
+    }
+
+    function highlightMatch(text, query) {
+        if (!query.trim()) return text;
+        const idx = text.toLowerCase().indexOf(query.toLowerCase());
+        if (idx === -1) return text;
+        return (
+            <>
+                {text.slice(0, idx)}
+                <mark className="searchHighlight">{text.slice(idx, idx + query.length)}</mark>
+                {text.slice(idx + query.length)}
+            </>
+        );
+    }
+
+    async function handleEnroll() {
+        if (!selectedCourse) return;
+        setEnrolling(true);
+        try {
+            await enrollInCourse(userId, selectedCourse.id);
+            setEnrolledIds(prev => new Set([...prev, selectedCourse.id]));
+            setSelectedCourse(null);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setEnrolling(false);
+        }
+    }
+
+    async function handleLeaveAll(scheduleDate) {
+        setLeavingAll(true);
+        try {
+            if (scheduleDate) {
+                await fetch(`/api/users/${userId}/schedule-leave`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ scheduledFor: scheduleDate.toISOString() })
+                });
+                setScheduledLeaveDate(scheduleDate);
+            } else {
+                await Promise.all([...enrolledIds].map(courseId => unenrollFromAllCourses(userId, courseId)));
+                setEnrolledIds(new Set());
+                setScheduledLeaveDate(null);
+            }
+            setShowLeaveAllCoursesModal(false);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLeavingAll(false);
+        }
+    }
+
+    async function handleLeaveOne() {
+        if (!leaveOneCourse) return;
+        setLeavingOne(true);
+        try {
+            await unenrollFromCourse(userId, leaveOneCourse.id);
+            setEnrolledIds(prev => {
+                const next = new Set(prev);
+                next.delete(leaveOneCourse.id);
+                return next;
+            });
+            setLeaveOneCourse(null);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLeavingOne(false);
+        }
+    }
+
+    const visibleCourses = view === "enrolled"
+        ? courses.filter(c => enrolledIds.has(c.id))
+        : courses;
+
+    function handleSetView(v) {
+        setView(v);
+        localStorage.setItem("universityView", v);
+    }
+
     return (
         <div className="universityPage">
             <div className="universityHeader">
                 <button className="backBtn" onClick={() => navigate('/')}>← Back</button>
                 <h1 className="universityTitle">{university ? university.name : "Loading..."}</h1>
                 {enrolledIds.size > 0 && (
-                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
+                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllCoursesModal(true)}>
                         Leave All Your Courses
                     </button>
                 )}
@@ -224,23 +361,12 @@ const UniversityPage = ({ userId }) => {
 
             {/* Enroll modal */}
             {selectedCourse && (
-                <div className="modalOverlay" onClick={() => setSelectedCourse(null)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="modalTitle">Enroll in course?</div>
-                        <p className="modalBody">
-                            Do you want to enroll in <strong>{selectedCourse.courseCode} — {selectedCourse.courseName}</strong>?
-                            This will give you access to the course page and resources.
-                        </p>
-                        <div className="modalActions">
-                            <button className="btn cancelBtn" onClick={() => setSelectedCourse(null)}>
-                                Cancel
-                            </button>
-                            <button className="btn primary" onClick={handleEnroll} disabled={enrolling}>
-                                {enrolling ? "Enrolling..." : "Yes, enroll"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <EnrollModal
+                    course={selectedCourse}
+                    enrolling={enrolling}
+                    onConfirm={handleEnroll}
+                    onCancel={() => setSelectedCourse(null)}
+                />
             )}
 
             {/* Enroll from schedule modal */}
@@ -278,23 +404,13 @@ const UniversityPage = ({ userId }) => {
             )}
 
             {/* Leave all courses modal */}
-            {showLeaveAllModal && (
-                <div className="modalOverlay" onClick={() => setShowLeaveAllModal(false)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="modalTitle">Leave all courses?</div>
-                        <p className="modalBody">
-                            Are you sure you want to leave all your enrolled courses? You can always re-enroll later.
-                        </p>
-                        <div className="modalActions">
-                            <button className="btn cancelBtn" onClick={() => setShowLeaveAllModal(false)}>
-                                Cancel
-                            </button>
-                            <button className="btn leaveAllConfirmBtn" onClick={handleLeaveAll} disabled={leavingAll}>
-                                {leavingAll ? "Leaving..." : "Yes, leave all"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {showLeaveAllCoursesModal && (
+                <LeaveAllCoursesModal
+                        leavingAll={leavingAll}
+                        scheduledLeaveDate={scheduledLeaveDate}
+                        onConfirm={handleLeaveAll}
+                        onCancel={() => setShowLeaveAllCoursesModal(false)}
+                    />
             )}
 
 
