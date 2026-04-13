@@ -54,7 +54,7 @@ const SimulatedProgressBar = () => {
   );
 };
 
-const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading, isUploadingPdf }) => {
+const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading, isUploadingPdf, aiDisabled, onAiDisabledClick }) => {
   const [activeTab, setActiveTab] = useState('text'); // 'text' or 'file'
 
   const [text, setText] = useState('');
@@ -174,10 +174,11 @@ const TextImportModal = ({ onClose, onImport, onFileUpload, isUploading, isUploa
             Upload File
           </button>
           <button
-            className={`tim-tab-btn ${activeTab === 'ai' ? 'tim-tab-btn--active' : ''}`}
-            onClick={() => setActiveTab('ai')}
+              className={`tim-tab-btn ${activeTab === 'ai' ? 'tim-tab-btn--active' : ''}`}
+              onClick={() => aiDisabled ? onAiDisabledClick() : setActiveTab('ai')}
+              style={{ opacity: aiDisabled ? 0.5 : 1, cursor: aiDisabled ? 'not-allowed' : 'pointer' }}
           >
-            ✨ Use AI
+              ✨ Use AI
           </button>
         </div>
 

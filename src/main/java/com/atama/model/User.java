@@ -36,6 +36,9 @@ public class User {
     @Column
     private boolean verified = false;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean aiDisabled = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")
     private University university;

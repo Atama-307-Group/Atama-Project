@@ -202,4 +202,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void updateAiDisabled(UUID userId, boolean aiDisabled) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setAiDisabled(aiDisabled);
+        userRepository.save(user);
+    }
+
 }

@@ -55,7 +55,10 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
                 </div>
                 <div className="dropdown-divider" />
                 <button className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/profile'); }}>
-                  Settings
+                  Profile Settings
+                </button>
+                <button className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/settings'); }}>
+                    Settings
                 </button>
                 <button className="dropdown-item logout-btn" onClick={onLogout}>
                   Log Out
