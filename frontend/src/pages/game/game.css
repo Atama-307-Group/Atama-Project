@@ -1,0 +1,264 @@
+/* game.css */
+
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    color: white;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10000; /* overlay above everything */
+}
+
+.game-bg-host {
+    background-color: #f2f2f2;
+}
+
+.game-bg-join {
+    background-color: #46178f;
+}
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Host Lobby */
+.host-lobby-header {
+    background-color: white;
+    color: black;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.join-code-huge {
+    font-size: 64px;
+    font-weight: 800;
+}
+
+.highlight-url {
+    background-color: #ececec;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.host-lobby-controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 40px;
+}
+
+.game-btn {
+    padding: 16px 32px;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.game-btn:active {
+    transform: scale(0.98);
+}
+.game-btn.primary {
+    background-color: #1368ce;
+    color: white;
+}
+.game-btn.secondary {
+    background-color: #26890c;
+    color: white;
+}
+.game-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.players-grid {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 40px;
+    gap: 20px;
+    justify-content: center;
+}
+
+.player-badge {
+    background-color: white;
+    color: black;
+    font-size: 24px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+}
+
+.player-badge.large {
+    font-size: 32px;
+    padding: 20px 40px;
+    margin-top: 20px;
+}
+
+/* Join View */
+.kahoot-logo-text {
+    font-size: 72px;
+    font-weight: 900;
+    margin-bottom: 40px;
+}
+
+.join-form {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    padding: 30px;
+    border-radius: 4px;
+    width: 320px;
+    gap: 15px;
+}
+
+.game-input {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+.game-input:focus {
+    outline: none;
+    border-color: #1368ce;
+}
+
+.enter-btn {
+    background-color: #333;
+    color: white;
+    width: 100%;
+}
+
+.game-error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Questions View */
+.host-question-display {
+    text-align: center;
+    color: black;
+    padding: 40px;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: auto;
+}
+
+.host-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+    padding: 20px 40px;
+}
+
+.participant-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+    height: 100vh;
+    padding: 10px;
+}
+
+.option-card {
+    display: flex;
+    align-items: center;
+    background-color: #e21b3c;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    padding: 20px 40px;
+    border-radius: 8px;
+    min-height: 150px;
+    box-shadow: 0 4px 0px rgba(0,0,0,0.2);
+}
+
+.option-card.clickable {
+    cursor: pointer;
+}
+.option-card.clickable:active {
+    transform: scale(0.98);
+}
+
+.option-card.shape-0 { background-color: #e21b3c; } /* Red */
+.option-card.shape-1 { background-color: #1368ce; } /* Blue */
+.option-card.shape-2 { background-color: #d89e00; } /* Yellow */
+.option-card.shape-3 { background-color: #26890c; } /* Green */
+
+.host-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background-color: white;
+    color: black;
+    align-items: center;
+}
+
+.leaderboard {
+    background: white;
+    color: black;
+    padding: 40px;
+    border-radius: 8px;
+    width: 600px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px 0;
+    border-bottom: 2px solid #eee;
+}
+
+/* Podium */
+.podium-view {
+    justify-content: flex-end;
+    padding-bottom: 50px;
+}
+
+.podium-place {
+    background: #1368ce;
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 32px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    position: absolute;
+    bottom: 0;
+}
+
+.place-1 { height: 400px; left: 50%; transform: translateX(-50%); }
+.place-2 { height: 300px; left: calc(50% - 220px); transform: translateX(-50%); background: #e21b3c;}
+.place-3 { height: 200px; left: calc(50% + 220px); transform: translateX(-50%); background: #26890c;}
+
+.score-badge {
+    background: white;
+    color: black;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+}

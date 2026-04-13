@@ -30,6 +30,16 @@ public class JwtService {
                 .compact();
     }
 
+    public UUID extractUserId(String token) {
+        Key key = Keys.hmacShaKeyFor(secret.getBytes());
+        return UUID.fromString(Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject());
+    }
+
     public Cookie createAuthCookie(String token) {
         Cookie cookie = new Cookie("jwt", token);
         cookie.setHttpOnly(true);

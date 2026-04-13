@@ -561,3 +561,31 @@ export async function searchLibrary(q) {
     if (!res.ok) throw new Error("Search failed");
     return res.json();
 }
+/* Multiplayer Games ------------------------------------------- */
+
+export async function hostGame(flashcardSetId) {
+    const res = await fetch(`${API_BASE}/api/games/host`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ flashcardSetId }),
+    });
+    if (!res.ok) throw new Error("Failed to host game");
+    return res.json();
+}
+
+export async function validateGame(joinCode) {
+    const res = await fetch(`${API_BASE}/api/games/${joinCode}/validate`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Invalid join code");
+    return res.text();
+}
+
+export async function fetchGameState(joinCode) {
+    const res = await fetch(`${API_BASE}/api/games/${joinCode}/state`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Could not fetch game state");
+    return res.json();
+}

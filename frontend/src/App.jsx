@@ -31,6 +31,9 @@ import ExamReminderBanner from "./components/ExamReminderBanner.jsx";
 import DesktopNotification from "./components/DesktopNotification.jsx";
 import PickSetPage from './pages/PickSetPage.jsx';
 import SearchPage from "./pages/SearchPage.jsx";
+import HostGameView from './pages/game/HostGameView.jsx';
+import ParticipantJoinView from './pages/game/ParticipantJoinView.jsx';
+import ParticipantPlayView from './pages/game/ParticipantPlayView.jsx';
 
 function App() {
     const { openPopup } = useTimer();
@@ -179,10 +182,27 @@ function App() {
                 />
 
 
-                {/* Search Page */}
                 <Route
                     path="/search"
                     element={<SearchPage />}
+                />
+
+                {/* Kahoot-Style Game Routes */}
+                <Route
+                    path="/game/host/:joinCode"
+                    element={currentUser ? <HostGameView currentUser={currentUser} /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/game/join"
+                    element={<ParticipantJoinView currentUser={currentUser} />}
+                />
+                <Route
+                    path="/game/join/:joinCode"
+                    element={<ParticipantJoinView currentUser={currentUser} />}
+                />
+                <Route
+                    path="/game/play/:joinCode"
+                    element={<ParticipantPlayView currentUser={currentUser} />}
                 />
 
                 {/* Catch-all */}
