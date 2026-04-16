@@ -14,15 +14,20 @@ import {
     recordAccess,
     openPDF,
     toggleItemStarred,
-    getLibraryContents, getSavedSets
+    getLibraryContents,
+    getSavedSets,
+    getUserGroups,
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
 
-const FoldersPage = () => {
-    const navigate = useNavigate(); // TODO use
+const FoldersPage = ({ userId }) => {
+    const navigate = useNavigate();
     const [folders, setFolders] = useState([]);
     const [selectedFolderId, setSelectedFolderId] = useState(null);
+
+    const [studyGroups, setStudyGroups] = useState([]);
+    const [studyGroupsLoading, setStudyGroupsLoading] = useState(true);
 
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
@@ -172,6 +177,14 @@ const FoldersPage = () => {
     useEffect(() => {
         loadLibrary();
     }, []);
+
+    useEffect(() => {
+        if (!userId) return;
+        getUserGroups(userId)
+            .then(memberships => setStudyGroups(Array.isArray(memberships) ? memberships : []))
+            .catch(() => setStudyGroups([]))
+            .finally(() => setStudyGroupsLoading(false));
+    }, [userId]);
 
     const filteredFolderItems = useMemo(() => {
         function safeTime(x) {
@@ -807,6 +820,37 @@ const FoldersPage = () => {
                                                 </div>
                                             </div>
                                         ))}
+                                    </>
+                                )}
+
+                                {!studyGroupsLoading && studyGroups.length > 0 && (
+                                    <>
+                                        <div className="sectionDivider">Study Groups</div>
+                                        {studyGroups.map((membership) => {
+                                            const g = membership.group;
+                                            if (!g) return null;
+                                            const courseName = g.course?.courseCode ?? g.course?.courseName ?? null;
+                                            return (
+                                                <div
+                                                    key={g.id}
+                                                    className="itemCard studyGroupItem"
+                                                    onClick={() => navigate(`/groups/${g.id}`)}
+                                                >
+                                                    <div className="folderName">{g.name}</div>
+                                                    <div className="folderMeta">
+                                                        <span className={`itemTypeBadge studyGroupPrivacy--${g.privacy?.toLowerCase()}`}>
+                                                            {g.privacy}
+                                                        </span>
+                                                        {courseName && (
+                                                            <span className="itemTypeBadge">{courseName}</span>
+                                                        )}
+                                                        {membership.role === "OWNER" && (
+                                                            <span className="itemTypeBadge ownerBadge">Owner</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </>
                                 )}
 

@@ -3,6 +3,7 @@ package com.atama.controller;
 import com.atama.model.GroupMembership;
 import com.atama.model.StudyGroup;
 import com.atama.service.StudyGroupService;
+import com.atama.service.StudyGroupService.LeaderboardEntry;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,5 +71,10 @@ public class StudyGroupController {
     @GetMapping("/users/{userId}/groups")
     public ResponseEntity<List<GroupMembership>> getGroupsForUser(@PathVariable UUID userId) {
         return ResponseEntity.ok(studyGroupService.getGroupsForUser(userId));
+    }
+
+    @GetMapping("/groups/{groupId}/leaderboard")
+    public ResponseEntity<List<LeaderboardEntry>> getLeaderboard(@PathVariable UUID groupId) {
+        return ResponseEntity.ok(studyGroupService.getLeaderboard(groupId));
     }
 }

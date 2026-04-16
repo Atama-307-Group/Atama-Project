@@ -4,17 +4,27 @@ import com.atama.model.GroupMembership;
 import com.atama.model.GroupMembership.Role;
 import com.atama.model.StudyGroup;
 import com.atama.model.StudyGroup.Privacy;
+import com.atama.model.StudySession;
 import com.atama.model.User;
 import com.atama.repository.GroupMembershipRepository;
 import com.atama.repository.StudyGroupRepository;
+import com.atama.repository.StudySessionRepository;
 import com.atama.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class StudyGroupService {
@@ -22,14 +32,26 @@ public class StudyGroupService {
     private final StudyGroupRepository studyGroupRepository;
     private final GroupMembershipRepository membershipRepository;
     private final UserRepository userRepository;
+    private final StudySessionRepository studySessionRepository;
 
     public StudyGroupService(StudyGroupRepository studyGroupRepository,
                              GroupMembershipRepository membershipRepository,
-                             UserRepository userRepository) {
+                             UserRepository userRepository,
+                             StudySessionRepository studySessionRepository) {
         this.studyGroupRepository = studyGroupRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
+        this.studySessionRepository = studySessionRepository;
     }
+
+    public record LeaderboardEntry(
+            String userId,
+            String username,
+            String profilePictureUrl,
+            long weeklyMinutes,
+            int currentStreak
+    ) {}
+
 
     @Transactional(readOnly = true)
     public List<StudyGroup> getGroupsByCourseId(UUID courseId) {
@@ -102,6 +124,52 @@ public class StudyGroupService {
     @Transactional(readOnly = true)
     public List<GroupMembership> getGroupsForUser(UUID userId) {
         return membershipRepository.findByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LeaderboardEntry> getLeaderboard(UUID groupId) {
+        StudyGroup group = getGroupById(groupId);
+        UUID courseId = group.getCourse().getId();
+
+        List<GroupMembership> memberships = membershipRepository.findByGroupId(groupId);
+        List<UUID> userIds = memberships.stream()
+                .map(m -> m.getUser().getId())
+                .collect(Collectors.toList());
+
+        Instant weekStart = ZonedDateTime.now(ZoneOffset.UTC)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC)
+                .toInstant();
+
+        List<StudySession> sessions = studySessionRepository
+                .findWeeklySessionsByUsersAndCourse(userIds, courseId, weekStart);
+
+        Map<UUID, Long> secondsByUser = sessions.stream()
+                .collect(Collectors.groupingBy(
+                        StudySession::getUserId,
+                        Collectors.summingLong(StudySession::getSeconds)
+                ));
+
+        List<User> users = userRepository.findAllByIdWithGoal(userIds);
+        Map<UUID, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+
+        return memberships.stream()
+                .map(m -> {
+                    User user = userMap.get(m.getUser().getId());
+                    long weeklyMinutes = secondsByUser.getOrDefault(user.getId(), 0L) / 60;
+                    int streak = user.getGoal() != null ? user.getGoal().getCurrentStreak() : 0;
+                    return new LeaderboardEntry(
+                            user.getId().toString(),
+                            user.getUsername(),
+                            user.getProfilePictureUrl(),
+                            weeklyMinutes,
+                            streak
+                    );
+                })
+                .sorted(Comparator.comparingLong(LeaderboardEntry::weeklyMinutes).reversed())
+                .collect(Collectors.toList());
     }
 
     private GroupMembership addMember(StudyGroup group, UUID userId) {

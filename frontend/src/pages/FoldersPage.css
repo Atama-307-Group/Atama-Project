@@ -385,6 +385,22 @@ body {
   margin-top: 8px;
 }
 
+/* Study group cards in library */
+.studyGroupPrivacy--public {
+  background: rgba(58, 158, 126, 0.15);
+  color: #2b5c3f;
+}
+
+.studyGroupPrivacy--private {
+  background: rgba(124, 111, 205, 0.15);
+  color: #5a4fa0;
+}
+
+.ownerBadge {
+  background: rgba(255, 196, 0, 0.2);
+  color: #7a5a00;
+}
+
 @media (max-width: 900px) {
   .folderContents .itemsList { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }

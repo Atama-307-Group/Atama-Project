@@ -633,3 +633,82 @@ export async function deleteReview(setId) {
     });
     if (!res.ok) throw new Error("Failed to delete review");
 }
+
+/* Study Groups ------------------------------------------- */
+
+export async function getGroup(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch group");
+    return res.json();
+}
+
+export async function getGroupsByCourse(courseId) {
+    const res = await fetch(`${API_BASE}/api/courses/${courseId}/groups`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch study groups");
+    return res.json();
+}
+
+export async function createGroup(groupData, creatorId) {
+    const res = await fetch(`${API_BASE}/api/groups?creatorId=${creatorId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(groupData),
+    });
+    if (!res.ok) throw new Error("Failed to create group");
+    return res.json();
+}
+
+export async function joinPublicGroup(groupId, userId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/join?userId=${userId}`, {
+        method: "POST",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to join group");
+    return res.json();
+}
+
+export async function joinGroupByToken(token, userId) {
+    const res = await fetch(`${API_BASE}/api/groups/join?token=${token}&userId=${userId}`, {
+        method: "POST",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to join group");
+    return res.json();
+}
+
+export async function leaveGroup(groupId, userId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/members/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to leave group");
+}
+
+export async function getGroupMembers(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/members`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch members");
+    return res.json();
+}
+
+export async function getUserGroups(userId) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/groups`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch your groups");
+    return res.json();
+}
+
+export async function getGroupLeaderboard(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/leaderboard`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch leaderboard");
+    return res.json();
+}
