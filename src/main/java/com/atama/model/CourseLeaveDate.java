@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -22,15 +22,15 @@ public class CourseLeaveDate {
 
     @Setter
     @Column(name = "scheduled_for", nullable = false)
-    private LocalDateTime scheduledFor;
+    private Instant scheduledFor;
 
     @Setter
     @Column(name = "executed_at")
-    private LocalDateTime executedAt;
+    private Instant executedAt;
 
     public CourseLeaveDate() {}
 
-    public CourseLeaveDate(UUID userId, LocalDateTime scheduledFor) {
+    public CourseLeaveDate(UUID userId, Instant scheduledFor) {
         this.userId = userId;
         this.scheduledFor = scheduledFor;
     }

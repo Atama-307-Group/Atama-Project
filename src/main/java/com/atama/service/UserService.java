@@ -183,6 +183,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
+        System.out.println("Unenrolling from all courses.");
         user.getEnrolledCourses().clear();
         userRepository.save(user);
     }
