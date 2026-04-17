@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems, addLibraryItemToCourse } from "../api.js";
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems, addLibraryItemToCourse, getGroupsByCourse } from "../api.js";
 import "./CoursePage.css";
 
 const YEARS = ["Unknown", ...Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - i))];
@@ -82,6 +82,10 @@ const CoursePage = ({ userId }) => {
 
     const [error, setError] = useState("");
 
+    // Study groups preview
+    const [groups, setGroups] = useState([]);
+    const [groupsLoading, setGroupsLoading] = useState(true);
+
     const activeFilterCount = useMemo(() => {
         let n = 0;
         if (filterTypes.size > 0) n++;
@@ -118,6 +122,14 @@ const CoursePage = ({ userId }) => {
             .then(data => setItems(Array.isArray(data) ? data : []))
             .catch(e => setItemsError(e.message ?? "Failed to load course items"))
             .finally(() => setItemsLoading(false));
+    }, [courseId]);
+
+    useEffect(() => {
+        if (!courseId) return;
+        getGroupsByCourse(courseId)
+            .then(data => setGroups(Array.isArray(data) ? data : []))
+            .catch(() => setGroups([]))
+            .finally(() => setGroupsLoading(false));
     }, [courseId]);
 
     // Close sort menu on outside click
@@ -528,6 +540,8 @@ const CoursePage = ({ userId }) => {
                                 onClick={() => {
                                     if (cli.libraryItem?.itemType === "PDF") {
                                         openPDF(cli.libraryItem.id);
+                                    } else if (cli.libraryItem?.itemType === "FLASHCARD_SET") {
+                                        navigate(`/sets/${cli.libraryItem.id}`);
                                     }
                                 }}
                             >
@@ -564,6 +578,55 @@ const CoursePage = ({ userId }) => {
                                 )}
                             </div>
                         ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Study Groups section */}
+            <div className="studyGroupsSection">
+                <div className="studyGroupsSectionHeader">
+                    <h2 className="studyGroupsSectionTitle">Study Groups</h2>
+                    <button
+                        className="viewAllGroupsBtn"
+                        onClick={() => navigate(`/courses/${courseId}/groups`)}
+                    >
+                        View All →
+                    </button>
+                </div>
+                {groupsLoading ? (
+                    <p className="studyGroupsEmpty">Loading groups…</p>
+                ) : groups.length === 0 ? (
+                    <p className="studyGroupsEmpty">
+                        No study groups yet.{" "}
+                        <button className="studyGroupsInlineLink" onClick={() => navigate(`/courses/${courseId}/groups`)}>
+                            Create one
+                        </button>
+                    </p>
+                ) : (
+                    <div className="studyGroupsRow">
+                        {groups.slice(0, 4).map(g => (
+                            <div
+                                key={g.id}
+                                className="studyGroupCard"
+                                onClick={() => navigate(`/groups/${g.id}`)}
+                            >
+                                <div className="studyGroupCardName">{g.name}</div>
+                                {g.description && (
+                                    <div className="studyGroupCardDesc">{g.description}</div>
+                                )}
+                                <span className={`studyGroupPrivacyBadge studyGroupPrivacyBadge--${g.privacy?.toLowerCase()}`}>
+                                    {g.privacy}
+                                </span>
+                            </div>
+                        ))}
+                        {groups.length > 4 && (
+                            <div
+                                className="studyGroupCard studyGroupCard--more"
+                                onClick={() => navigate(`/courses/${courseId}/groups`)}
+                            >
+                                +{groups.length - 4} more
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
