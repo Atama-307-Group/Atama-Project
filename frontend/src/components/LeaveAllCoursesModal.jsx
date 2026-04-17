@@ -108,8 +108,7 @@ const LeaveAllCoursesModal = ({ leavingAll, scheduledLeaveDate, onConfirm, onCan
                             year={calViewYear}
                             month={calViewMonth}
                             selectedDate={scheduleLeaveDate}
-                            onSelect={setScheduleLeaveDate}
-                                onSelect={(date) => { console.log("selected:", date); setScheduleLeaveDate(date); }}
+                            onSelect={(date) => { console.log("selected:", date); setScheduleLeaveDate(date); }}
 
                         />
 

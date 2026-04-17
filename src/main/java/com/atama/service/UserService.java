@@ -195,10 +195,8 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        // Clear all courses
+        System.out.println("Unenrolling from all courses.");
         user.getEnrolledCourses().clear();
-
-        // Save the user
         userRepository.save(user);
     }
 
@@ -208,5 +206,4 @@ public class UserService {
         user.setAiDisabled(aiDisabled);
         userRepository.save(user);
     }
-
 }
