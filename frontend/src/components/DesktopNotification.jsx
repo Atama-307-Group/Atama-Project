@@ -36,7 +36,8 @@ const DesktopNotification = ({ userId }) => {
 
     /* ── Study reminder check ── */
 
-    const checkStudyReminder = useCallback(async () => {
+    const
+    checkStudyReminder = useCallback(async () => {
         if (!userId) return;
         try {
             const goal = await getGoal(userId);
@@ -109,19 +110,42 @@ const DesktopNotification = ({ userId }) => {
         }
     }, [userId, addNotification]);
 
+const checkCourseLeaveNotification = useCallback(async () => {
+    if (!userId) return;
+    try {
+        const res = await fetch(`/api/users/${userId}/schedule-leave/status`);
+        const data = await res.json();
+        if (!data.executedAt) return;
+
+        const key = `course-leave-${data.executedAt}`;
+        if (shownIdsRef.current.has(key)) return;
+        shownIdsRef.current.add(key);
+
+        addNotification(
+            "Courses Left 🎓",
+            "You have been automatically unenrolled from all your courses.",
+            "📅"
+        );
+    } catch {
+        /* silent */
+    }
+}, [userId, addNotification]);
+
     /* ── Polling ── */
 
     useEffect(() => {
         checkStudyReminder();
         checkExamReminders();
+        checkCourseLeaveNotification();
 
         const interval = setInterval(() => {
             checkStudyReminder();
             checkExamReminders();
-        }, 30000); // check every 30 seconds
+            checkCourseLeaveNotification();
+        }, 30000);
 
         return () => clearInterval(interval);
-    }, [checkStudyReminder, checkExamReminders]);
+    }, [checkStudyReminder, checkExamReminders, checkCourseLeaveNotification]);
 
     /* ── Render ── */
 
