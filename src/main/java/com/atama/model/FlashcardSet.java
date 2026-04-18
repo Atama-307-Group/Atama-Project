@@ -16,8 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class FlashcardSet extends LibraryItem {
     private String description;
-    private String university;      // TODO should be university object
-    private String course;      // TODO should be course object
+    private String university;      // TODO should be university object?
+    private String course;      // TODO should be course object?
 
     @OneToMany(mappedBy = "flashcardSet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Flashcard> flashcards = new ArrayList<>();

@@ -170,6 +170,31 @@ export async function resolveSharedLink(token) {
     return res.json();
 }
 
+export async function saveSet(id) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/save`, { method: 'POST', credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to save set');
+}
+
+export async function unsaveSet(id) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/save`, { method: 'DELETE', credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to unsave set');
+}
+
+export async function getSavedSets() {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/saved`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch saved sets');
+    return res.json();
+}
+export async function updateSetPrivacy(id, isPublic) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/privacy`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic }),
+    });
+    if (!res.ok) throw new Error('Failed to update privacy');
+    return res.json();
+}
 /* Goals ------------------------------------------- */
 
 export async function getGoal(userId) {
@@ -285,7 +310,7 @@ export async function getCourses(universityId) {
     return res.json();
 }
 
-export async function getEnrolledCourses() {
+export async function getEnrolledCourses(userId) {
     const res = await fetch(`${API_BASE}/api/users/enrolled-courses`, {
         credentials: "include",
     });
@@ -365,6 +390,25 @@ export async function recordAccess(itemId) {
         method: "POST",
         credentials: "include",
     });
+}
+
+export async function updateCourseLibraryItem(id, year, semester, description) {
+    const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ year, semester, description }),
+    });
+    if (!res.ok) throw new Error("Failed to update item");
+    return res.json();
+}
+
+export async function deleteCourseLibraryItem(id) {
+    const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to remove item");
 }
 
 export function openPDF(itemId) {
@@ -587,5 +631,114 @@ export async function fetchGameState(joinCode) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Could not fetch game state");
+    return res.json();
+}
+
+/* Reviews ------------------------------------------- */
+
+export async function getMyReview(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/reviews/mine`, {
+        credentials: "include",
+    });
+    if (res.status === 204) return null; // no review yet
+    if (!res.ok) throw new Error("Failed to fetch review");
+    return res.json();
+}
+
+export async function upsertReview(setId, stars, tags) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/reviews`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stars, tags }),
+    });
+    if (!res.ok) throw new Error("Failed to submit review");
+    return res.json();
+}
+
+export async function deleteReview(setId) {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/${setId}/reviews/mine`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to delete review");
+}
+
+/* Study Groups ------------------------------------------- */
+
+export async function getGroup(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch group");
+    return res.json();
+}
+
+export async function getGroupsByCourse(courseId) {
+    const res = await fetch(`${API_BASE}/api/courses/${courseId}/groups`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch study groups");
+    return res.json();
+}
+
+export async function createGroup(groupData, creatorId) {
+    const res = await fetch(`${API_BASE}/api/groups?creatorId=${creatorId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(groupData),
+    });
+    if (!res.ok) throw new Error("Failed to create group");
+    return res.json();
+}
+
+export async function joinPublicGroup(groupId, userId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/join?userId=${userId}`, {
+        method: "POST",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to join group");
+    return res.json();
+}
+
+export async function joinGroupByToken(token, userId) {
+    const res = await fetch(`${API_BASE}/api/groups/join?token=${token}&userId=${userId}`, {
+        method: "POST",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to join group");
+    return res.json();
+}
+
+export async function leaveGroup(groupId, userId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/members/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to leave group");
+}
+
+export async function getGroupMembers(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/members`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch members");
+    return res.json();
+}
+
+export async function getUserGroups(userId) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/groups`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch your groups");
+    return res.json();
+}
+
+export async function getGroupLeaderboard(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/leaderboard`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch leaderboard");
     return res.json();
 }

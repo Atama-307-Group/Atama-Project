@@ -14,15 +14,20 @@ import {
     recordAccess,
     openPDF,
     toggleItemStarred,
-    getLibraryContents
+    getLibraryContents,
+    getSavedSets,
+    getUserGroups,
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
 
-const FoldersPage = () => {
-    const navigate = useNavigate(); // TODO use
+const FoldersPage = ({ userId }) => {
+    const navigate = useNavigate();
     const [folders, setFolders] = useState([]);
     const [selectedFolderId, setSelectedFolderId] = useState(null);
+
+    const [studyGroups, setStudyGroups] = useState([]);
+    const [studyGroupsLoading, setStudyGroupsLoading] = useState(true);
 
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
@@ -71,28 +76,8 @@ const FoldersPage = () => {
     const [selectedItemIds, setSelectedItemIds] = useState(new Set());
 
     const [openItemMenuId, setOpenItemMenuId] = useState(null);
-
+    const [savedSets, setSavedSets] = useState([]);
     const fileInputRef = useRef(null); // PDF Uploads
-
-    /*async function loadFolders() {
-        setError("");
-        setLoading(true);
-        try {
-            const data = await getFolders();
-            const list = Array.isArray(data) ? data : [];
-            setFolders(list);
-            // if (list.length && selectedFolderId == null) setSelectedFolderId(list[0].id);
-        } catch (err) {
-            setError(err.message ?? "Something went wrong");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Load the folders
-    useEffect(() => {
-        loadFolders();
-    }, []);*/
 
     // Close overflow menu when clicking outside
     useEffect(() => {
@@ -174,19 +159,6 @@ const FoldersPage = () => {
     }, [selectedFolderId]);
 
     // Loading library items
-    /*async function loadLibItems() {
-        try {
-            const data = await getLibraryItems();
-            setLibItems(Array.isArray(data) ? data : []);
-        } catch (err) {
-            setError(err.message ?? "Failed to load items");
-        }
-    }
-
-    useEffect(() => {
-        loadLibItems();
-    }, []);*/
-
     async function loadLibrary() {
         setError("");
         setLoading(true);
@@ -194,6 +166,7 @@ const FoldersPage = () => {
             const data = await getLibraryContents();
             setFolders(Array.isArray(data.folders) ? data.folders : []);
             setLibItems(Array.isArray(data.looseItems) ? data.looseItems : []);
+            getSavedSets().then(setSavedSets).catch(() => {});
         } catch (err) {
             setError(err.message ?? "Something went wrong");
         } finally {
@@ -204,6 +177,14 @@ const FoldersPage = () => {
     useEffect(() => {
         loadLibrary();
     }, []);
+
+    useEffect(() => {
+        if (!userId) return;
+        getUserGroups(userId)
+            .then(memberships => setStudyGroups(Array.isArray(memberships) ? memberships : []))
+            .catch(() => setStudyGroups([]))
+            .finally(() => setStudyGroupsLoading(false));
+    }, [userId]);
 
     const filteredFolderItems = useMemo(() => {
         function safeTime(x) {
@@ -778,7 +759,9 @@ const FoldersPage = () => {
                                         </div>
                                     </div>
                                 ))}
-
+                                {filteredItems.length > 0 && (
+                                    <div className="sectionDivider">My Sets</div>
+                                )}
                                 {filteredItems // only loose items
                                     .map((item) => (
                                         <div
@@ -821,6 +804,55 @@ const FoldersPage = () => {
                                             </div>
                                         </div>
                                     ))}
+                                {savedSets.length > 0 && (
+                                    <>
+                                        <div className="sectionDivider">Saved Sets</div>
+                                        {savedSets.map((set) => (
+                                            <div
+                                                key={set.id}
+                                                className="itemCard"
+                                                onClick={() => navigate(`/sets/${set.id}`)}
+                                            >
+                                                <div className="folderName">{set.title}</div>
+                                                <div className="folderMeta">
+                                                    <span className="itemTypeBadge">SAVED</span>
+                                                    {set.university && <span className="itemTypeBadge">{set.university}</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {!studyGroupsLoading && studyGroups.length > 0 && (
+                                    <>
+                                        <div className="sectionDivider">Study Groups</div>
+                                        {studyGroups.map((membership) => {
+                                            const g = membership.group;
+                                            if (!g) return null;
+                                            const courseName = g.course?.courseCode ?? g.course?.courseName ?? null;
+                                            return (
+                                                <div
+                                                    key={g.id}
+                                                    className="itemCard studyGroupItem"
+                                                    onClick={() => navigate(`/groups/${g.id}`)}
+                                                >
+                                                    <div className="folderName">{g.name}</div>
+                                                    <div className="folderMeta">
+                                                        <span className={`itemTypeBadge studyGroupPrivacy--${g.privacy?.toLowerCase()}`}>
+                                                            {g.privacy}
+                                                        </span>
+                                                        {courseName && (
+                                                            <span className="itemTypeBadge">{courseName}</span>
+                                                        )}
+                                                        {membership.role === "OWNER" && (
+                                                            <span className="itemTypeBadge ownerBadge">Owner</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </>
+                                )}
 
                             </div>
 

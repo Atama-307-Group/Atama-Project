@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ public class FlashcardSetService {
     private final FlashcardSetMapper mapper;
     private final FlashcardMapper flashcardMapper;
     private final LibraryItemService libraryItemService;
+    private final UserSavedSetRepository userSavedSetRepository;
+    private final FlashcardSetReviewService reviewService;
 
     // TODO: the services should return the DTO not the entity
     public FlashcardSetResponseDTO createFlashcardSet(FlashcardSetRequestDTO dto, UUID userId) {
@@ -35,13 +38,31 @@ public class FlashcardSetService {
         return mapper.toResponseDTO(saved);
     }
 
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     public FlashcardSetResponseDTO getFlashcardSetById(UUID id) {
         FlashcardSet entity = flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
         return mapper.toResponseDTO(entity);
-    }
+    }*/
+    @Transactional(readOnly = true)
+    public FlashcardSetResponseDTO getFlashcardSetById(UUID id, UUID requesterId) {
+        FlashcardSet entity = flashcardSetRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
 
+        FlashcardSetResponseDTO dto = mapper.toResponseDTO(entity);
+
+        // From HEAD: owner/saved metadata
+        dto.setIsOwner(requesterId != null && requesterId.equals(entity.getOwnerId()));
+        dto.setIsSaved(requesterId != null && userSavedSetRepository.existsByUserIdAndFlashcardSetId(requesterId, entity.getId()));
+
+        // From main: review aggregates
+        FlashcardSetReviewService.ReviewAggregate agg = reviewService.getAggregate(id);
+        dto.setAverageRating(agg.averageStars());
+        dto.setTopTags(agg.topTags());
+        dto.setReviewCount(agg.reviewCount());
+
+        return dto;
+    }
     @Transactional(readOnly = true)
     public List<FlashcardSetResponseDTO> getFlashcardSetsByOwner(UUID ownerId) {
         return flashcardSetRepository.findByOwnerId(ownerId)
@@ -86,4 +107,38 @@ public class FlashcardSetService {
         return flashcardMapper.toResponseDTO(flashcardRepository.save(updated));
     }
 
+    public void saveSet(UUID setId, UUID userId) {
+        if (userSavedSetRepository.existsByUserIdAndFlashcardSetId(userId, setId)) return;
+        FlashcardSet set = flashcardSetRepository.findById(setId)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", setId));
+        UserSavedSet saved = new UserSavedSet();
+        saved.setUserId(userId);
+        saved.setFlashcardSet(set);
+        userSavedSetRepository.save(saved);
+    }
+
+    @Transactional
+    public void unsaveSet(UUID setId, UUID userId) {
+        userSavedSetRepository.deleteByUserIdAndFlashcardSetId(userId, setId);
+    }
+
+    public List<FlashcardSetResponseDTO> getSavedSets(UUID userId) {
+        return userSavedSetRepository.findByUserId(userId).stream()
+                .map(uss -> mapper.toResponseDTO(uss.getFlashcardSet()))
+                .toList();
+    }
+
+    public FlashcardSetResponseDTO updatePrivacy(UUID id, boolean isPublic, UUID requesterId) throws AccessDeniedException {
+        FlashcardSet entity = flashcardSetRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
+        if (!entity.getOwnerId().equals(requesterId)) {
+            throw new AccessDeniedException("Not the owner of this set");
+        }
+        entity.setPublic(isPublic);
+        flashcardSetRepository.save(entity);
+        FlashcardSetResponseDTO dto = mapper.toResponseDTO(entity);
+        dto.setIsOwner(true);
+        dto.setIsSaved(false);
+        return dto;
+    }
 }

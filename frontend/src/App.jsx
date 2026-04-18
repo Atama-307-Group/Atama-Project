@@ -34,6 +34,9 @@ import SearchPage from "./pages/SearchPage.jsx";
 import HostGameView from './pages/game/HostGameView.jsx';
 import ParticipantJoinView from './pages/game/ParticipantJoinView.jsx';
 import ParticipantPlayView from './pages/game/ParticipantPlayView.jsx';
+import StudyGroupPage from "./pages/StudyGroupPage.jsx";
+import StudyGroupsListPage from "./pages/StudyGroupsListPage.jsx";
+
 
 function App() {
     const { openPopup } = useTimer();
@@ -148,13 +151,13 @@ function App() {
                 <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
                 <Route path="/post_test" element={<PostTestPage />} />
 
-                <Route path="/sets/:id" element={<FlashcardSetPage />} />
+                <Route path="/sets/:id" element={<FlashcardSetPage currentUser={currentUser} />} />
                 <Route path="/shared/:token" element={<SharedSetPage />} />
 
                 {/* Personal Library */}
                 <Route
                     path="/folders"
-                    element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+                    element={currentUser ? <FoldersPage userId={currentUser.id} /> : <Navigate to="/login" />}
                 />
 
                 {/* Study Goals Page */}
@@ -182,6 +185,19 @@ function App() {
                 />
 
 
+                {/* Study Groups list for a course */}
+                <Route
+                    path="/courses/:courseId/groups"
+                    element={currentUser ? <StudyGroupsListPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
+
+                {/* Individual study group */}
+                <Route
+                    path="/groups/:groupId"
+                    element={currentUser ? <StudyGroupPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
+
+                {/* Search Page */}
                 <Route
                     path="/search"
                     element={<SearchPage />}

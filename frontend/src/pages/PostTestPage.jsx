@@ -58,7 +58,7 @@ const PostTestPage = () => {
                         border: 'none'
                     }}
                 >
-                    Back to Flashcards
+                    Back to Home
                 </button>
             </div>
         </div>

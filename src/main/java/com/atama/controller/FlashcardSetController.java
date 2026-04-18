@@ -10,10 +10,12 @@ import com.atama.service.FlashcardSetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,8 +38,12 @@ public class FlashcardSetController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FlashcardSetResponseDTO> getFlashcardSetById(@PathVariable UUID id) {
-        return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
+        UUID userId = getAuthenticatedUserId();
+        return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id, userId));
     }
+    /*public ResponseEntity<FlashcardSetResponseDTO> getFlashcardSetById(@PathVariable UUID id) {
+        return ResponseEntity.ok(flashcardSetService.getFlashcardSetById(id));
+    }*/
 
     /*
      * @GetMapping("/owner/{ownerId}")
@@ -123,10 +129,39 @@ public class FlashcardSetController {
         }
     }
 
+    @PostMapping("/{id}/save")
+    public ResponseEntity<Void> saveSet(@PathVariable UUID id) {
+        flashcardSetService.saveSet(id, getAuthenticatedUserId());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/save")
+    public ResponseEntity<Void> unsaveSet(@PathVariable UUID id) {
+        flashcardSetService.unsaveSet(id, getAuthenticatedUserId());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/saved")
+    public ResponseEntity<List<FlashcardSetResponseDTO>> getSavedSets() {
+        return ResponseEntity.ok(flashcardSetService.getSavedSets(getAuthenticatedUserId()));
+    }
+
+    @PatchMapping("/{id}/privacy")
+    public ResponseEntity<FlashcardSetResponseDTO> updatePrivacy(
+            @PathVariable UUID id,
+            @RequestBody Map<String, Boolean> body) throws AccessDeniedException {
+        boolean isPublic = body.get("isPublic");
+        return ResponseEntity.ok(flashcardSetService.updatePrivacy(id, isPublic, getAuthenticatedUserId()));
+    }
+
     private UUID getAuthenticatedUserId() {
-        String userId = (String) SecurityContextHolder.getContext()
+        /*String userId = (String) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return UUID.fromString(userId);
-    }
+        return UUID.fromString(userId);*/
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return null;
+        }
+        return UUID.fromString((String) auth.getPrincipal());    }
 }

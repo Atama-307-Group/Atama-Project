@@ -23,10 +23,9 @@ public class StreakReminderService {
     @Scheduled(cron = "0 0 23 * * *")
     public void sendStreakReminders() {
         LocalDate today = LocalDate.now();
-        List<Goal> allGoals = goalRepository.findAll();
-        List<Goal> uniqueGoals = allGoals.stream().distinct().toList();
+        List<Goal> allGoals = goalRepository.findAllWithUser();
 
-        for (Goal goal : uniqueGoals) {
+        for (Goal goal : allGoals) {
             // Skip users who already studied today
             if (goal.getStudyDates() != null && goal.getStudyDates().contains(today)) {
                 continue;

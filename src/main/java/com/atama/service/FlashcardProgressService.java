@@ -20,6 +20,7 @@ public class FlashcardProgressService {
     private final FlashcardRepository flashcardRepository;
     private final FlashcardSetRepository flashcardSetRepository;
     private final SetStudyTimeRepository studyTimeRepository;
+    private final StudySessionRepository studySessionRepository;
 
     /**
      * Returns all progress rows for this user+set.
@@ -85,6 +86,12 @@ public class FlashcardProgressService {
 
         record.setStudySeconds(record.getStudySeconds() + seconds);
         studyTimeRepository.save(record);
+
+        StudySession session = new StudySession();
+        session.setUserId(userId);
+        session.setFlashcardSet(set);
+        session.setSeconds(seconds);
+        studySessionRepository.save(session);
     }
 
     /** Aggregate stats for a set for this user. */
