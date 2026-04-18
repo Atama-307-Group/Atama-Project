@@ -1,12 +1,9 @@
 const BASE = "http://localhost:8080";
 const API_BASE = "http://localhost:8080";
 
-/* Personal Library ------------------------------------------- */
 
 export async function getFolders() {
-    const res = await fetch(`${API_BASE}/folders`, {
-        credentials: "include",
-    });
+    const res = await fetch(`${API_BASE}/folders`);
     if (!res.ok) throw new Error("Failed to load folders");
     return res.json();
 }
@@ -14,7 +11,6 @@ export async function getFolders() {
 export async function createFolder({ name }) {
     const res = await fetch(`${API_BASE}/folders`, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
     });
@@ -25,14 +21,12 @@ export async function createFolder({ name }) {
 export async function deleteFolder(folderId) {
     const res = await fetch(`${API_BASE}/folders/${folderId}`, {
         method: "DELETE",
-        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to delete folder");
 }
 
 async function request(path, options = {}) {
     const res = await fetch(`${BASE}${path}`, {
-        credentials: "include",
         headers: { "Content-Type": "application/json", ...(options.headers || {}) },
         ...options,
     });
@@ -45,7 +39,7 @@ async function request(path, options = {}) {
     // Handle endpoints that return no body (common for PATCH/DELETE)
     if (res.status === 204) return null;
 
-    // Only parse JSON if it's actually JSON
+    // Only parse JSON if it’s actually JSON
     const ct = res.headers.get("content-type") || "";
     if (ct.includes("application/json")) {
         return res.json();
@@ -70,28 +64,20 @@ export function setFolderStarred(folderId, starred) {
     });
 }
 
-export async function toggleItemStarred(itemId) {
-    const res = await fetch(`${API_BASE}/library-items/${itemId}/star`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-    });
-    if (!res.ok) throw new Error("Failed to update star");
-    return res.json();
-}
-
 export async function getFolderItems(folderId) {
-    const res = await fetch(`${API_BASE}/folders/${folderId}/items`, {
-        credentials: "include",
-    });
+    const res = await fetch(`http://localhost:8080/folders/${folderId}/items`);
     if (!res.ok) throw new Error("Failed to load folder items");
     return res.json();
 }
 
 export async function setFolderPrivacy(folderId, isPublic) {
-    const res = await fetch(`${API_BASE}/folders/${folderId}/privacy`, {
+    // return request(`/folders/${folderId}/privacy`, {
+    //     method: "PATCH",
+    //     body: JSON.stringify({isPublic})
+    // })
+
+    const res = await fetch(`http://localhost:8080/folders/${folderId}/privacy`, {
         method: "PATCH",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isPublic }),
     });
@@ -100,27 +86,13 @@ export async function setFolderPrivacy(folderId, isPublic) {
 }
 
 export async function getLibraryItems() {
-    const res = await fetch(`${API_BASE}/library-items`, {
-        credentials: "include",
-    });
+    const res = await fetch(`${API_BASE}/library-items`);
     if (!res.ok) throw new Error("Failed to load library items");
     return res.json();
 }
 
-export async function getLibraryContents() {
-    const res = await fetch(`${API_BASE}/api/libraries/me/contents`, {
-        credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to load library");
-    return res.json();
-}
-
-/* Flashcards ------------------------------------------- */
-
 export async function getFlashcardSetById(id) {
-    const res = await fetch(`${BASE}/api/flashcard-sets/${id}`, {
-        credentials: "include",
-    });
+    const res = await fetch(`${BASE}/api/flashcard-sets/${id}`);
     if (!res.ok) {
         const text = await res.text().catch(() => "");
         throw new Error(text || "Failed to load flashcard set");
@@ -128,10 +100,9 @@ export async function getFlashcardSetById(id) {
     return res.json();
 }
 
-export async function updateFlashcardSetMeta(id, { title, description, university, course }) {
+export async function updateFlashcardSetMeta(id, { title, description, university, course}) {
     const res = await fetch(`/api/flashcard-sets/${id}/meta`, {
         method: 'PATCH',
-        credentials: "include",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, description, university, course }),
     });
@@ -142,7 +113,6 @@ export async function updateFlashcardSetMeta(id, { title, description, universit
 export async function updateFlashcard(setId, flashcardId, cardData) {
     const res = await fetch(`/api/flashcard-sets/${setId}/flashcards/${flashcardId}`, {
         method: 'PATCH',
-        credentials: "include",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cardData),
     });
@@ -153,7 +123,6 @@ export async function updateFlashcard(setId, flashcardId, cardData) {
 export async function generateSharedLink(flashcardSetId) {
     const res = await fetch('/api/shared-links', {
         method: 'POST',
-        credentials: "include",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ flashcardSetId }),
     });
@@ -162,84 +131,43 @@ export async function generateSharedLink(flashcardSetId) {
 }
 
 export async function resolveSharedLink(token) {
-    const res = await fetch(`/api/shared-links/${token}`, {
-        credentials: "include",
-    });
+    const res = await fetch(`/api/shared-links/${token}`);
     if (res.status === 410) throw new Error('This link has expired.');
     if (!res.ok) throw new Error('Link not found.');
     return res.json();
 }
 
-export async function saveSet(id) {
-    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/save`, { method: 'POST', credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to save set');
-}
-
-export async function unsaveSet(id) {
-    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/save`, { method: 'DELETE', credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to unsave set');
-}
-
-export async function getSavedSets() {
-    const res = await fetch(`${API_BASE}/api/flashcard-sets/saved`, { credentials: 'include' });
-    if (!res.ok) throw new Error('Failed to fetch saved sets');
-    return res.json();
-}
-export async function updateSetPrivacy(id, isPublic) {
-    const res = await fetch(`${API_BASE}/api/flashcard-sets/${id}/privacy`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isPublic }),
-    });
-    if (!res.ok) throw new Error('Failed to update privacy');
-    return res.json();
-}
 /* Goals ------------------------------------------- */
 
 export async function getGoal(userId) {
-    const res = await fetch(`${API_BASE}/goals/${userId}`, {
-        credentials: "include",
-    });
+    const res = await fetch(`${API_BASE}/goals/${userId}`);
     if (!res.ok) throw new Error("Failed to load goal");
-    const text = await res.text();
-    return text ? JSON.parse(text) : null;
+    return res.json();
 }
 
-export async function updateGoal(userId, { selectedDaysOfWeek, minutesPerDay, notifyByDesktop, notifyByEmail, notificationTime }) {
+export async function updateGoal(userId, { selectedDaysOfWeek, minutesPerDay }) {
     const res = await fetch(`${API_BASE}/goals/${userId}`, {
-        method: "PUT",
-        credentials: "include",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selectedDaysOfWeek, minutesPerDay, notifyByDesktop, notifyByEmail, notificationTime }),
+        body: JSON.stringify({ selectedDaysOfWeek, minutesPerDay }),
     });
-    const text = await res.text();
-    if (!res.ok) {
-        throw new Error(`Failed to update goal. Status: ${res.status}. Error: ${text}`);
-    }
-    return text ? JSON.parse(text) : null;
+    if (!res.ok) throw new Error("Failed to update goal");
+    return res.json();
 }
 
 export async function startStudying(userId) {
-    const res = await fetch(`${API_BASE}/goals/${userId}/start`, {
-        method: "POST",
-        credentials: "include",
-    });
+    const res = await fetch(`${API_BASE}/goals/${userId}/start`, { method: "POST" });
     if (!res.ok) throw new Error("Failed to start studying");
 }
 
 export async function stopStudying(userId) {
-    const res = await fetch(`${API_BASE}/goals/${userId}/stop`, {
-        method: "POST",
-        credentials: "include",
-    });
+    const res = await fetch(`${API_BASE}/goals/${userId}/stop`, { method: "POST" });
     if (!res.ok) throw new Error("Failed to stop studying");
 }
 
 export async function moveItemToFolder(itemId, folderId) {
     const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
         method: "PATCH",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ folderId }),
     });
@@ -250,9 +178,11 @@ export async function moveItemToFolder(itemId, folderId) {
 export async function removeItemFromFolder(itemId) {
     const res = await fetch(`${API_BASE}/library-items/${itemId}/folder`, {
         method: "DELETE",
-        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to remove item from folder");
+<<<<<<< Updated upstream
+}
+=======
 }
 
 /* Countdowns ------------------------------------------- */
@@ -605,6 +535,63 @@ export async function searchLibrary(q) {
     if (!res.ok) throw new Error("Search failed");
     return res.json();
 }
+
+/* Concept Maps ------------------------------------------- */
+
+export async function generateConceptMap(setId, selectedCardIds, title) {
+    const res = await fetch(`${API_BASE}/api/concept-maps/generate`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setId, selectedCardIds, title }),
+    });
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "Failed to generate concept map");
+    }
+    return res.json();
+}
+
+export async function uploadConceptMapPng(mapId, file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    const res = await fetch(`${API_BASE}/api/concept-maps/${mapId}/png`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+    });
+    if (!res.ok) throw new Error("Failed to upload PNG");
+    return res.json();
+}
+
+export async function getConceptMap(id) {
+    const res = await fetch(`${API_BASE}/api/concept-maps/${id}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load concept map");
+    return res.json();
+}
+
+export const updateConceptMapGraph = async (id, newGraphData) => {
+    const res = await fetch(`${API_BASE}/api/concept-maps/${id}/graph`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ graphData: JSON.stringify(newGraphData) }),
+    });
+    if (!res.ok) throw new Error("Failed to update concept map graph");
+    return res.json();
+};
+
+export async function getMyConceptMaps() {
+    const res = await fetch(`${API_BASE}/api/concept-maps/my-maps`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load concept maps");
+    return res.json();
+}
+
 /* Multiplayer Games ------------------------------------------- */
 
 export async function hostGame(flashcardSetId) {
@@ -742,3 +729,4 @@ export async function getGroupLeaderboard(groupId) {
     if (!res.ok) throw new Error("Failed to fetch leaderboard");
     return res.json();
 }
+>>>>>>> Stashed changes
