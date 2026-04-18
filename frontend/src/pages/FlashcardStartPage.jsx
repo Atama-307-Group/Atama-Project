@@ -1,12 +1,168 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './FlashcardStartPage.css';
+import { hostGame, getLibraryContents, validateGame } from '../api.js';
 
+/* ── Collab Game Modal ─────────────────────────────────────────── */
+function CollabGameModal({ onClose, navigate }) {
+  const [tab, setTab] = useState('host'); // 'host' | 'join'
+  const [sets, setSets] = useState([]);
+  const [loadingSets, setLoadingSets] = useState(true);
+  const [hostingId, setHostingId] = useState(null);
+  const [joinPin, setJoinPin] = useState('');
+  const [joining, setJoining] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (tab === 'host') {
+      setLoadingSets(true);
+      getLibraryContents()
+        .then((data) => {
+          const loose = Array.isArray(data.looseItems) ? data.looseItems : [];
+          setSets(loose.filter((item) =>
+            item.itemType === 'FLASHCARD_SET' ||
+            item.itemType === 'flashcard_set' ||
+            item.item_type === 'FLASHCARD_SET'
+          ));
+        })
+        .catch(() => setError('Could not load your library.'))
+        .finally(() => setLoadingSets(false));
+    }
+  }, [tab]);
+
+  const handleHost = async (item) => {
+    setHostingId(item.id);
+    setError('');
+    try {
+      const { joinCode } = await hostGame(item.id);
+      onClose();
+      navigate(`/game/host/${joinCode}`);
+    } catch (e) {
+      setError('Failed to create game. Please try again.');
+      setHostingId(null);
+    }
+  };
+
+  const handleJoin = async (e) => {
+    e.preventDefault();
+    const code = joinPin.trim();
+    if (!code) return;
+    setJoining(true);
+    setError('');
+    try {
+      await validateGame(code);
+      onClose();
+      navigate(`/game/play/${code}`);
+    } catch {
+      setError('Invalid PIN or game not found. Please try again.');
+      setJoining(false);
+    }
+  };
+
+  // Close on backdrop click
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
+  return (
+    <div className="collab-modal-backdrop" onClick={handleBackdropClick}>
+      <div className="collab-modal">
+        {/* Header */}
+        <div className="collab-modal-header">
+          <div className="collab-modal-title-group">
+            <span className="collab-modal-icon">🎮</span>
+            <h2 className="collab-modal-title">Collab Game</h2>
+          </div>
+          <button className="collab-modal-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+
+        {/* Tabs */}
+        <div className="collab-tabs">
+          <button
+            className={`collab-tab ${tab === 'host' ? 'collab-tab--active' : ''}`}
+            onClick={() => { setTab('host'); setError(''); }}
+          >
+            🏠 Host a Game
+          </button>
+          <button
+            className={`collab-tab ${tab === 'join' ? 'collab-tab--active' : ''}`}
+            onClick={() => { setTab('join'); setError(''); }}
+          >
+            🔗 Join a Game
+          </button>
+        </div>
+
+        {/* Tab content */}
+        <div className="collab-modal-body">
+          {error && <p className="collab-error">{error}</p>}
+
+          {tab === 'host' && (
+            <>
+              <p className="collab-hint">Pick a flashcard set to start a game. Share the PIN code with friends!</p>
+              {loadingSets && <p className="collab-loading">Loading your sets…</p>}
+              {!loadingSets && sets.length === 0 && (
+                <div className="collab-empty">
+                  <p>You don't have any flashcard sets yet.</p>
+                  <button className="collab-create-btn" onClick={() => { onClose(); navigate('/create'); }}>
+                    Create a Set
+                  </button>
+                </div>
+              )}
+              {!loadingSets && sets.length > 0 && (
+                <div className="collab-set-list">
+                  {sets.map((item) => (
+                    <button
+                      key={item.id}
+                      className={`collab-set-card ${hostingId === item.id ? 'collab-set-card--loading' : ''}`}
+                      onClick={() => handleHost(item)}
+                      disabled={!!hostingId}
+                    >
+                      <span className="collab-set-icon">📚</span>
+                      <span className="collab-set-name">{item.title}</span>
+                      {hostingId === item.id
+                        ? <span className="collab-spinner" />
+                        : <span className="collab-set-arrow">→</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {tab === 'join' && (
+            <div className="collab-join-panel">
+              <p className="collab-hint">Enter the PIN code shared by the game host.</p>
+              <form className="collab-join-form" onSubmit={handleJoin}>
+                <input
+                  id="collab-join-pin"
+                  className="collab-pin-input"
+                  type="text"
+                  placeholder="Enter PIN…"
+                  value={joinPin}
+                  onChange={(e) => setJoinPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  maxLength={6}
+                  autoFocus
+                  required
+                />
+                <button type="submit" className="collab-join-btn" disabled={joinPin.trim().length < 4 || joining}>
+                  {joining ? 'Checking…' : 'Join Game →'}
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main Page ─────────────────────────────────────────────────── */
 const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showCollabModal, setShowCollabModal] = useState(false);
 
 
   useEffect(() => {
@@ -151,7 +307,29 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
                 <p className="study-card-sub">Create your ideal study set</p>
               </div>
             </div>
+
+            <div className="action-card action-card--collab" onClick={() => setShowCollabModal(true)}>
+              <div className="study-icon study-icon--collab">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div>
+                <p className="study-card-title collab-btn-title">Play Collab Game</p>
+                <p className="study-card-sub">Host or join a live quiz</p>
+              </div>
+            </div>
           </div>
+
+          {showCollabModal && (
+            <CollabGameModal
+              onClose={() => setShowCollabModal(false)}
+              navigate={navigate}
+            />
+          )}
 
           <p className="section-label" style={{marginTop: '16px'}}>Your pages</p>
           <div className="study-grid" style={{marginBottom: '28px'}}>

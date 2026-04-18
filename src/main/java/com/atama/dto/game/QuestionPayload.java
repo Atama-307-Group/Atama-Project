@@ -14,4 +14,5 @@ public class QuestionPayload {
     private List<String> options;
     private int questionIndex;
     private int totalQuestions;
+    private String correctAnswer; // sent only when question ends
 }

@@ -1,30 +1,31 @@
-/* game.css */
+/* ═══════════════════════════════════════════════════════════════
+   game.css — Atama collab-game styles
+   Matches the rest of the app (cream bg · brand green · Inter)
+   Answer-choice colours (shape-0…3) are intentionally unchanged.
+═══════════════════════════════════════════════════════════════ */
 
+/* ── Page shell ───────────────────────────────────────────────── */
 .game-container {
     width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    color: white;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 10000; /* overlay above everything */
+    z-index: 10000;
+    background-color: #fdfbf7;   /* same cream as the rest of the app */
+    color: #1E352F;
+    box-sizing: border-box;
 }
 
-.game-bg-host {
-    background-color: #f2f2f2;
-}
-
-.game-bg-join {
-    background-color: #46178f;
-}
-
+/* layout helpers */
 .centered {
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+    flex-direction: column;
 }
 
 .flex-col {
@@ -32,233 +33,480 @@
     flex-direction: column;
 }
 
-/* Host Lobby */
+/* ── Background variants ──────────────────────────────────────── */
+.game-bg-host { background-color: #fdfbf7; }
+.game-bg-join  { background-color: #fdfbf7; }
+
+/* ── Shared button ────────────────────────────────────────────── */
+.game-btn {
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 800;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    font-family: inherit;
+    letter-spacing: 0.02em;
+}
+.game-btn:active  { transform: scale(0.97); }
+.game-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.game-btn.primary {
+    background: linear-gradient(135deg, #2b5c3f 0%, #1e4530 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(43, 92, 63, 0.28);
+}
+.game-btn.primary:hover:not([disabled]) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(43, 92, 63, 0.35);
+}
+
+.game-btn.secondary {
+    background: white;
+    color: #2b5c3f;
+    border: 1.5px solid rgba(43, 92, 63, 0.3);
+    box-shadow: 0 2px 8px rgba(43, 92, 63, 0.1);
+}
+.game-btn.secondary:hover:not([disabled]) {
+    background: #f0faf4;
+    border-color: #77BFA3;
+    transform: translateY(-1px);
+}
+
+/* ── Host lobby ───────────────────────────────────────────────── */
 .host-lobby-header {
-    background-color: white;
-    color: black;
-    padding: 20px 40px;
+    background: white;
+    border-bottom: 1.5px solid rgba(51, 81, 69, 0.12);
+    padding: 24px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 12px rgba(30, 53, 47, 0.07);
 }
 
-.join-code-huge {
-    font-size: 64px;
-    font-weight: 800;
+.host-lobby-header h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #335145;
 }
 
 .highlight-url {
-    background-color: #ececec;
-    padding: 4px 8px;
-    border-radius: 4px;
+    background: rgba(119, 191, 163, 0.18);
+    color: #2b5c3f;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 800;
+}
+
+.join-code-huge {
+    font-size: 56px;
+    font-weight: 950;
+    color: #1E352F;
+    letter-spacing: 0.05em;
+    background: rgba(119, 191, 163, 0.12);
+    border: 1.5px solid rgba(119, 191, 163, 0.5);
+    padding: 8px 28px;
+    border-radius: 16px;
 }
 
 .host-lobby-controls {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 20px 40px;
+    gap: 12px;
 }
 
-.game-btn {
-    padding: 16px 32px;
-    font-size: 20px;
-    font-weight: bold;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
-.game-btn:active {
-    transform: scale(0.98);
-}
-.game-btn.primary {
-    background-color: #1368ce;
-    color: white;
-}
-.game-btn.secondary {
-    background-color: #26890c;
-    color: white;
-}
-.game-btn[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
+/* ── Players grid (lobby) ─────────────────────────────────────── */
 .players-grid {
     display: flex;
     flex-wrap: wrap;
-    padding: 40px;
-    gap: 20px;
+    padding: 32px 40px;
+    gap: 14px;
     justify-content: center;
+    align-content: flex-start;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .player-badge {
-    background-color: white;
-    color: black;
-    font-size: 24px;
+    background: white;
+    color: #1E352F;
+    font-size: 16px;
+    font-weight: 800;
     padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+    border-radius: 40px;
+    border: 1.5px solid rgba(119, 191, 163, 0.6);
+    box-shadow: 0 4px 12px rgba(30, 53, 47, 0.07);
+    animation: badge-pop 0.2s ease-out;
 }
 
 .player-badge.large {
-    font-size: 32px;
-    padding: 20px 40px;
-    margin-top: 20px;
+    font-size: 24px;
+    padding: 16px 36px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #2b5c3f 0%, #1e4530 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 6px 20px rgba(43, 92, 63, 0.28);
+    margin-top: 24px;
 }
 
-/* Join View */
-.kahoot-logo-text {
-    font-size: 72px;
+@keyframes badge-pop {
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
+
+/* ── "Get Ready" / countdown ─────────────────────────────────── */
+.countdown-text {
+    font-size: 64px;
+    font-weight: 950;
+    color: #2b5c3f;
+    animation: pulse-text 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-text {
+    from { opacity: 0.7; transform: scale(0.97); }
+    to   { opacity: 1;   transform: scale(1);    }
+}
+
+/* ── Question header (host & participant) ────────────────────── */
+.host-question-display {
+    text-align: center;
+    padding: 28px 40px;
+    background: white;
+    border-bottom: 1.5px solid rgba(51, 81, 69, 0.1);
+    box-shadow: 0 2px 12px rgba(30, 53, 47, 0.06);
+}
+
+.host-question-display h2 {
+    font-size: 13px;
     font-weight: 900;
-    margin-bottom: 40px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #7a9e90;
+    margin: 0 0 8px;
+}
+
+.host-question-display h1 {
+    font-size: 26px;
+    font-weight: 900;
+    color: #1E352F;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.participant-question-display {
+    text-align: center;
+    padding: 28px 32px 20px;
+    background: white;
+    border-bottom: 1.5px solid rgba(51, 81, 69, 0.1);
+    box-shadow: 0 2px 12px rgba(30, 53, 47, 0.06);
+}
+
+.participant-question-display h2 {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #7a9e90;
+    margin: 0 0 8px;
+}
+
+.participant-question-display h1 {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1E352F;
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* ── Answer options grids ─────────────────────────────────────── */
+.host-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 20px 40px;
+    flex: 1;
+}
+
+.participant-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+    flex: 1;
+    /* fill the remaining height below the question header */
+    height: calc(100vh - 140px);
+}
+
+/* ── Option cards — keep the Kahoot colours ───────────────────── */
+.option-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    padding: 20px 24px;
+    border-radius: 16px;
+    min-height: 120px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+    line-height: 1.3;
+}
+
+.option-card.clickable { cursor: pointer; }
+
+.option-card.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.option-card.clickable:active { transform: scale(0.97); }
+
+/* Answer colours — intentionally unchanged */
+.option-card.shape-0 { background-color: #e21b3c; }
+.option-card.shape-1 { background-color: #1368ce; }
+.option-card.shape-2 { background-color: #d89e00; }
+.option-card.shape-3 { background-color: #26890c; }
+
+.option-shape {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    flex-shrink: 0;
+}
+
+.option-text {
+    flex: 1;
+}
+
+/* ── Host footer (answer count + next btn) ────────────────────── */
+.host-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 40px;
+    background: white;
+    border-top: 1.5px solid rgba(51, 81, 69, 0.1);
+    box-shadow: 0 -2px 10px rgba(30, 53, 47, 0.05);
+}
+
+.host-footer p {
+    font-size: 15px;
+    font-weight: 800;
+    color: #335145;
+    margin: 0;
+}
+
+/* ── Leaderboard (between questions) ─────────────────────────── */
+.leaderboard {
+    background: white;
+    color: #1E352F;
+    padding: 36px 40px;
+    border-radius: 22px;
+    width: min(600px, 90vw);
+    box-shadow: 0 8px 32px rgba(30, 53, 47, 0.12);
+    border: 1.5px solid rgba(119, 191, 163, 0.3);
+}
+
+.leaderboard h2 {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #7a9e90;
+    margin: 0 0 20px;
+    text-align: center;
+}
+
+.leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 800;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(51, 81, 69, 0.1);
+    color: #1E352F;
+}
+
+.leaderboard-row:last-child { border-bottom: none; }
+
+/* ── Score badge (participant result) ─────────────────────────── */
+.score-badge {
+    background: white;
+    color: #1E352F;
+    border: 1.5px solid rgba(119, 191, 163, 0.5);
+    padding: 14px 36px;
+    border-radius: 50px;
+    font-size: 22px;
+    font-weight: 900;
+    margin-top: 16px;
+    box-shadow: 0 4px 16px rgba(30, 53, 47, 0.08);
+}
+
+/* ── Podium (finished screen) ─────────────────────────────────── */
+.podium-view {
+    justify-content: flex-end;
+    padding-bottom: 60px;
+    position: relative;
+}
+
+.podium-view > h1 {
+    position: absolute;
+    top: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 36px;
+    font-weight: 950;
+    color: #1E352F;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.podium-place {
+    width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-weight: 900;
+    font-size: 20px;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    position: absolute;
+    bottom: 60px;
+    padding-top: 16px;
+    color: white;
+    text-align: center;
+    line-height: 1.4;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+}
+
+/* podium heights / positions */
+.place-1 { height: 360px; left: 50%;                      transform: translateX(-50%); background: linear-gradient(180deg, #f5c518, #e6a800); color: #1a1000; }
+.place-2 { height: 260px; left: calc(50% - 200px);        transform: translateX(-50%); background: linear-gradient(180deg, #adb5bd, #868e96); }
+.place-3 { height: 180px; left: calc(50% + 200px);        transform: translateX(-50%); background: linear-gradient(180deg, #cd7f32, #a0522d); }
+
+/* ── Participant lobby ("You're in!") ─────────────────────────── */
+.game-container.game-bg-join.centered h2 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1E352F;
+    margin: 0 0 8px;
+}
+
+.game-container.game-bg-join.centered > p {
+    color: #335145;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ── Waiting message ─────────────────────────────────────────── */
+.game-container h2 {
+    font-size: 24px;
+    font-weight: 900;
+    color: #1E352F;
+}
+
+/* ── "Game Over" participant screen ───────────────────────────── */
+.game-container h1 {
+    font-size: 36px;
+    font-weight: 950;
+    color: #1E352F;
+    margin: 0 0 8px;
+}
+
+/* ── Join form (ParticipantJoinView) ─────────────────────────── */
+.kahoot-logo-text {
+    font-size: 52px;
+    font-weight: 950;
+    color: #1E352F;
+    margin-bottom: 32px;
+    letter-spacing: 0.1px;
 }
 
 .join-form {
     display: flex;
     flex-direction: column;
     background: white;
-    padding: 30px;
-    border-radius: 4px;
-    width: 320px;
-    gap: 15px;
+    padding: 32px;
+    border-radius: 22px;
+    width: min(360px, 90vw);
+    gap: 14px;
+    border: 1.5px solid rgba(51,81,69,0.15);
+    box-shadow: 0 8px 32px rgba(30, 53, 47, 0.10);
 }
 
 .game-input {
     text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    padding: 15px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    padding: 14px;
+    border: 2px solid rgba(51, 81, 69, 0.2);
+    border-radius: 12px;
+    color: #1E352F;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .game-input:focus {
-    outline: none;
-    border-color: #1368ce;
+    border-color: #2b5c3f;
+    box-shadow: 0 0 0 3px rgba(43, 92, 63, 0.12);
+}
+
+.game-input::placeholder {
+    color: #aac4b8;
+    letter-spacing: 0;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .enter-btn {
-    background-color: #333;
+    background: linear-gradient(135deg, #2b5c3f 0%, #1e4530 100%);
     color: white;
     width: 100%;
+    font-size: 16px;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(43, 92, 63, 0.25);
+}
+
+.enter-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .game-error {
-    color: red;
-    font-weight: bold;
+    color: #c0392b;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    background: rgba(192, 57, 43, 0.07);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0;
+}
+
+/* ── "Waiting for players" hint ──────────────────────────────── */
+.game-waiting-hint {
+    font-size: 16px;
+    font-weight: 700;
+    color: #7a9e90;
+    margin-top: 32px;
     text-align: center;
 }
 
-/* Questions View */
-.host-question-display {
-    text-align: center;
-    color: black;
-    padding: 40px;
-    background: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: auto;
-}
+/* ── Participant result colours ──────────────────────────────── */
+.result-correct   { color: #2b5c3f; }
+.result-incorrect { color: #c0392b; }
 
-.host-options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 20px;
-    padding: 20px 40px;
-}
-
-.participant-options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 10px;
-    height: 100vh;
-    padding: 10px;
-}
-
-.option-card {
-    display: flex;
-    align-items: center;
-    background-color: #e21b3c;
-    color: white;
-    font-size: 32px;
-    font-weight: bold;
-    padding: 20px 40px;
-    border-radius: 8px;
-    min-height: 150px;
-    box-shadow: 0 4px 0px rgba(0,0,0,0.2);
-}
-
-.option-card.clickable {
-    cursor: pointer;
-}
-.option-card.clickable:active {
-    transform: scale(0.98);
-}
-
-.option-card.shape-0 { background-color: #e21b3c; } /* Red */
-.option-card.shape-1 { background-color: #1368ce; } /* Blue */
-.option-card.shape-2 { background-color: #d89e00; } /* Yellow */
-.option-card.shape-3 { background-color: #26890c; } /* Green */
-
-.host-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 40px;
-    background-color: white;
-    color: black;
-    align-items: center;
-}
-
-.leaderboard {
-    background: white;
-    color: black;
-    padding: 40px;
-    border-radius: 8px;
-    width: 600px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.leaderboard-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 24px;
-    font-weight: bold;
-    padding: 15px 0;
-    border-bottom: 2px solid #eee;
-}
-
-/* Podium */
-.podium-view {
-    justify-content: flex-end;
-    padding-bottom: 50px;
-}
-
-.podium-place {
-    background: #1368ce;
-    width: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 32px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    position: absolute;
-    bottom: 0;
-}
-
-.place-1 { height: 400px; left: 50%; transform: translateX(-50%); }
-.place-2 { height: 300px; left: calc(50% - 220px); transform: translateX(-50%); background: #e21b3c;}
-.place-3 { height: 200px; left: calc(50% + 220px); transform: translateX(-50%); background: #26890c;}
-
-.score-badge {
-    background: white;
-    color: black;
-    padding: 15px 30px;
-    border-radius: 30px;
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 20px;
-}

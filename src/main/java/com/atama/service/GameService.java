@@ -75,10 +75,12 @@ public class GameService {
         // We synthesize options. If it's normal, we get other definitions.
         String questionText = "Question";
         List<String> options = new ArrayList<>();
-        
+        String correctAnswer = "";
+
         if (currentFc instanceof NormalFlashcardResponseDTO normalFc) {
             questionText = normalFc.getTerm();
-            options.add(normalFc.getDefinition()); // correct answer
+            correctAnswer = normalFc.getDefinition(); // save before shuffle
+            options.add(correctAnswer);
 
             // Synthesize false answers
             List<String> allDefs = new ArrayList<>();
@@ -102,10 +104,11 @@ public class GameService {
              // For drag drop/fill blank, we might just be broad
              questionText = "Special Flashcard. Select any option.";
              options.addAll(Arrays.asList("A", "B", "C", "D"));
+             correctAnswer = "A";
         }
 
         Collections.shuffle(options);
-        QuestionPayload payload = new QuestionPayload(questionText, options, game.getCurrentQuestionIndex() + 1, game.getFlashcards().size());
+        QuestionPayload payload = new QuestionPayload(questionText, options, game.getCurrentQuestionIndex() + 1, game.getFlashcards().size(), correctAnswer);
         game.setCurrentQuestionPayload(payload);
         return payload;
     }

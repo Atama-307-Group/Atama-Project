@@ -58,8 +58,10 @@ public class GameWebSocketController {
         
         if (allAnswered && session.getState() == com.atama.model.game.GameState.QUESTION_ACTIVE) {
             gameService.endQuestion(payload.getJoinCode());
-            messagingTemplate.convertAndSend("/topic/game/" + payload.getJoinCode(), 
-                new GameMessage("QUESTION_ENDED", session.getPlayers()));
+            String correctAnswer = session.getCurrentQuestionPayload() != null
+                ? session.getCurrentQuestionPayload().getCorrectAnswer() : "";
+            messagingTemplate.convertAndSend("/topic/game/" + payload.getJoinCode(),
+                new GameMessage("QUESTION_ENDED", new QuestionEndedPayload(session.getPlayers(), correctAnswer)));
         } else {
             // Broadcast so host sees the "X / Y Answers" counter update dynamically
             messagingTemplate.convertAndSend("/topic/game/" + payload.getJoinCode(), 
@@ -72,8 +74,10 @@ public class GameWebSocketController {
         String joinCode = payload.get("joinCode");
         gameService.endQuestion(joinCode);
         GameSession session = gameService.getGame(joinCode);
-        messagingTemplate.convertAndSend("/topic/game/" + joinCode, 
-            new GameMessage("QUESTION_ENDED", session.getPlayers()));
+        String correctAnswer = session.getCurrentQuestionPayload() != null
+            ? session.getCurrentQuestionPayload().getCorrectAnswer() : "";
+        messagingTemplate.convertAndSend("/topic/game/" + joinCode,
+            new GameMessage("QUESTION_ENDED", new QuestionEndedPayload(session.getPlayers(), correctAnswer)));
     }
     
     @MessageMapping("/game.nextQuestion")
@@ -89,5 +93,14 @@ public class GameWebSocketController {
              messagingTemplate.convertAndSend("/topic/game/" + joinCode, 
                     new GameMessage("QUESTION_ACTIVE", nextQ));
         }
+    }
+
+    @MessageMapping("/game.endGame")
+    public void endGame(@Payload Map<String, String> payload) {
+        String joinCode = payload.get("joinCode");
+        gameService.finishGame(joinCode);
+        GameSession session = gameService.getGame(joinCode);
+        messagingTemplate.convertAndSend("/topic/game/" + joinCode,
+            new GameMessage("FINISHED", session.getPlayers()));
     }
 }

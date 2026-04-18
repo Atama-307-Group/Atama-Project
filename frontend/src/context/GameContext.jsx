@@ -14,11 +14,12 @@ export function GameProvider({ children }) {
     const [connected, setConnected] = useState(false);
     
     // Game State
-    const [gameState, setGameState] = useState('LOBBY'); // LOBBY, QUESTION_STARTING, QUESTION_ACTIVE, QUESTION_ENDED, FINISHED
+    const [gameState, setGameState] = useState('LOBBY');
     const [players, setPlayers] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(null);
+    const [correctAnswer, setCorrectAnswer] = useState(null);
     const [joinCode, setJoinCode] = useState(null);
-    const [participantId, setParticipantId] = useState(null); // UUID assigned on join
+    const [participantId, setParticipantId] = useState(null);
 
     const connectToGame = async (code, nick, myPartId, onConnect) => {
         setJoinCode(code);
@@ -79,18 +80,22 @@ export function GameProvider({ children }) {
             case 'QUESTION_STARTING':
                 setGameState('QUESTION_STARTING');
                 setCurrentQuestion(null);
+                setCorrectAnswer(null);
                 break;
             case 'QUESTION_ACTIVE':
                 setGameState('QUESTION_ACTIVE');
                 setCurrentQuestion(msg.payload);
+                setCorrectAnswer(null);
                 break;
             case 'QUESTION_ENDED':
                 setGameState('QUESTION_ENDED');
-                setPlayers(msg.payload);
+                // payload is { players, correctAnswer }
+                setPlayers(msg.payload.players || msg.payload);
+                setCorrectAnswer(msg.payload.correctAnswer || null);
                 break;
             case 'FINISHED':
                 setGameState('FINISHED');
-                setPlayers(msg.payload);
+                setPlayers(msg.payload.players || msg.payload);
                 break;
             default:
                 console.log('Unknown message type', msg);
@@ -144,18 +149,29 @@ export function GameProvider({ children }) {
         setJoinCode(null);
     };
 
+    const endGame = () => {
+        if (stompClient && connected) {
+            stompClient.publish({
+                destination: '/app/game.endGame',
+                body: JSON.stringify({ joinCode })
+            });
+        }
+    };
+
     return (
         <GameContext.Provider value={{
             connected,
             gameState,
             players,
             currentQuestion,
+            correctAnswer,
             joinCode,
             participantId,
             connectToGame,
             startGame,
             nextQuestion,
             endQuestion,
+            endGame,
             submitAnswer,
             disconnect
         }}>
