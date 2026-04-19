@@ -181,7 +181,7 @@ public class UserService {
         }
     }
 
-    public void unenrollFromCourse(UUID userId, UUID courseId) {
+    public void unenrollFromCourse(UUID userId, UUID courseId) {    // One course
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         Course course = courseRepository.findById(courseId)
@@ -198,7 +198,7 @@ public class UserService {
         // Clear all courses
         user.getEnrolledCourses().clear();
 
-        // Save the user — Hibernate deletes all join table entries
+        // Save the user
         userRepository.save(user);
     }
 
