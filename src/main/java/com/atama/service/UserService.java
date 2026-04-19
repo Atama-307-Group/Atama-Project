@@ -69,18 +69,6 @@ public class UserService {
         return savedUser;
     }
 
-//    public User loginUser(String identifier, String password) {
-//        // Try finding by username first, then by email
-//        User user = userRepository.findByUsername(identifier)
-//                .orElseGet(() -> userRepository.findByEmail(identifier)
-//                        .orElseThrow(() -> new IllegalArgumentException("Invalid username/email or password.")));
-//
-//        if (!passwordEncoder.matches(password, user.getPassword())) {
-//            throw new IllegalArgumentException("Invalid username/email or password.");
-//        }
-//
-//        return user;
-//    }
     public LoginResult loginUser(String identifier, String password) {
         User user = userRepository.findByUsername(identifier)
                 .orElseGet(() -> userRepository.findByEmail(identifier)
@@ -90,7 +78,7 @@ public class UserService {
             throw new IllegalArgumentException("Invalid username/email or password.");
         }
 
-        String token = jwtService.generateToken(user.getId(), user.getUsername());
+        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getEmail());
         return new LoginResult(user, token);
     }
 
@@ -195,11 +183,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        // Clear all courses
         user.getEnrolledCourses().clear();
-
-        // Save the user — Hibernate deletes all join table entries
         userRepository.save(user);
     }
-
 }
