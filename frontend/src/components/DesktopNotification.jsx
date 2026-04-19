@@ -118,11 +118,11 @@ const checkCourseLeaveNotification = useCallback(async () => {
         if (!data.executedAt) return;
 
         const key = `course-leave-${data.executedAt}`;
-        if (shownIdsRef.current.has(key)) return;
-        shownIdsRef.current.add(key);
+        if (localStorage.getItem(key)) return;
+        localStorage.setItem(key, "true");
 
         addNotification(
-            "Courses Left 🎓",
+            "Courses Left",
             "You have been automatically unenrolled from all your courses.",
             "📅"
         );
