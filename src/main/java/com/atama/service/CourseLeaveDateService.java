@@ -17,15 +17,18 @@ public class CourseLeaveDateService {
         this.courseLeaveDateRepository = courseLeaveDateRepository;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public CourseLeaveDate scheduleLeave(UUID userId, Instant scheduledFor) {
-        courseLeaveDateRepository.findByUserIdAndExecutedAtIsNull(userId)
-                .ifPresent(existing -> {
-                    System.out.println("Deleting existing leave: " + existing.getId());
-                    courseLeaveDateRepository.delete(existing);
-                });
+        Optional<CourseLeaveDate> existing = courseLeaveDateRepository.findByUserId(userId);
 
-        CourseLeaveDate leave = new CourseLeaveDate(userId, scheduledFor);
-        return courseLeaveDateRepository.save(leave);
+        if (existing.isPresent()) {
+            CourseLeaveDate leave = existing.get();
+            leave.setScheduledFor(scheduledFor);
+            leave.setExecutedAt(null);
+            return courseLeaveDateRepository.save(leave);
+        }
+
+        return courseLeaveDateRepository.save(new CourseLeaveDate(userId, scheduledFor));
     }
 
     public Optional<CourseLeaveDate> getRecentlyExecuted(UUID userId) {
