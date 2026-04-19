@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useTimer } from './context/TimerContext';
+import TimerPopup from './components/TimerPopup.jsx';
 
 import StartPage from './pages/FlashcardStartPage.jsx';
 import StudyPage from './pages/StudyPage.jsx';
@@ -21,8 +23,6 @@ import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
 import GoalsPage from "./pages/StudyGoal.jsx"
-<<<<<<< Updated upstream
-=======
 import CountdownPage from "./pages/CountdownPage.jsx";
 import UniversityPage from './pages/UniversityPage.jsx';
 import SharedSetPage from "./pages/SharedSetPage.jsx";
@@ -31,58 +31,20 @@ import ExamReminderBanner from "./components/ExamReminderBanner.jsx";
 import DesktopNotification from "./components/DesktopNotification.jsx";
 import PickSetPage from './pages/PickSetPage.jsx';
 import SearchPage from "./pages/SearchPage.jsx";
-import HostGameView from './pages/game/HostGameView.jsx';
-import ParticipantJoinView from './pages/game/ParticipantJoinView.jsx';
-import ParticipantPlayView from './pages/game/ParticipantPlayView.jsx';
 import StudyGroupPage from "./pages/StudyGroupPage.jsx";
 import StudyGroupsListPage from "./pages/StudyGroupsListPage.jsx";
 import ConceptMapPage from "./pages/ConceptMapPage.jsx";
->>>>>>> Stashed changes
-
-import SharedSetPage from "./pages/SharedSetPage.jsx";
+import HostGameView from './pages/game/HostGameView.jsx';
+import ParticipantJoinView from './pages/game/ParticipantJoinView.jsx';
+import ParticipantPlayView from './pages/game/ParticipantPlayView.jsx';
 
 function App() {
+    const { openPopup } = useTimer();
+
     const [currentUser, setCurrentUser] = useState(() => {
         const saved = localStorage.getItem('currentUser');
         return saved ? JSON.parse(saved) : null;
-    })
-
-    const [flashcards, setFlashcards] = useState([
-        { id: 1, type: 'REGULAR', term: 'Mitosis', definition: 'Cell division producing two identical daughter cells', favorite: false },
-        { id: 2, type: 'REGULAR', term: 'Osmosis', definition: 'Movement of water through a semipermeable membrane', favorite: false },
-        { id: 3, type: 'REGULAR', term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into glucose', favorite: false },
-        { id: 4, type: 'REGULAR', term: 'Homeostasis', definition: 'Maintaining a stable internal environment', favorite: false },
-        { id: 5, type: 'REGULAR', term: 'Meiosis', definition: 'Cell division producing four genetically unique gametes', favorite: false },
-        { id: 6, type: 'REGULAR', term: 'DNA', definition: 'Molecule carrying genetic instructions for life', favorite: false },
-
-        {
-            id: 7,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'This app is called __ and is a project for CS __.',
-            correctAnswers: ['Atama', '307'],
-            favorite: true
-        },
-        {
-            id: 8,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'Water freezes at __°C and boils at __°C at sea level.',
-            correctAnswers: ['0', '100'],
-            favorite: true
-        },
-        {
-            id: 9,
-            type: 'FILL_BLANK',
-            textWithBlanks: 'The chemical symbol for Gold is __ and for Silver is __.',
-            correctAnswers: ['Au', 'Ag'],
-            favorite: true
-        }
-    ]);
-
-    const handleToggleFavorite = (id) => {
-        setFlashcards(prev =>
-            prev.map(card => card.id === id ? { ...card, favorite: !card.favorite } : card)
-        );
-    };
+    });
 
     const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
         const user = { id, username, email, profilePictureUrl, verified };
@@ -96,123 +58,166 @@ function App() {
     };
 
     return (
-        <Routes>
+        <>
+            <ExamReminderBanner userId={currentUser?.id} />
+            <DesktopNotification userId={currentUser?.id} />
+            {currentUser && <TimerPopup />}
 
-            {/* Home / Dashboard */}
-            <Route
-                path="/"
-                element={
-                    <StartPage
-                        currentUser={currentUser}
-                        onLogout={handleLogout}
-                    />
-                }
-            />
+            {currentUser && (
+                <button
+                    onClick={openPopup}
+                    style={{
+                        position: 'fixed',
+                        bottom: '24px',
+                        right: '24px',
+                        padding: '12px 24px',
+                        background: '#2b5c3f',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(43, 92, 63, 0.3)',
+                        zIndex: 1000,
+                        transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 6px 16px rgba(43, 92, 63, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(43, 92, 63, 0.3)';
+                    }}
+                >
+                    ⏱
+                </button>
+            )}
 
-            {/* Auth Routes */}
-            <Route
-                path="/login"
-                element={
-                    <LoginPage
-                        onLoginSuccess={handleLoginSuccess}
-                    />
-                }
-            />
+            <Routes>
 
-            <Route
-                path="/signup"
-                element={<SignupPage />}
-            />
+                {/* Home / Dashboard */}
+                <Route
+                    path="/"
+                    element={
+                        <StartPage
+                            currentUser={currentUser}
+                            onLogout={handleLogout}
+                        />
+                    }
+                />
 
-            {/* Forgot / Reset Password */}
-            <Route
-                path="/forgot-password"
-                element={<ForgotPasswordPage />}
-            />
+                {/* Auth Routes */}
+                <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            <Route
-                path="/reset-password"
-                element={<ResetPasswordPage />}
-            />
+                {/* Profile & Account Management */}
+                <Route
+                    path="/profile"
+                    element={currentUser ? <ProfilePage currentUser={currentUser} /> : <Navigate to="/login" />}
+                />
+                <Route
+                    path="/change-password"
+                    element={currentUser ? <ChangePasswordPage currentUser={currentUser} /> : <Navigate to="/login" />}
+                />
 
-            {/* Profile & Account Management */}
-            <Route
-                path="/profile"
-                element={
-                    currentUser
-                        ? <ProfilePage currentUser={currentUser} />
-                        : <Navigate to="/login" />
-                }
-            />
+                {/* Create Flashcard Set */}
+                <Route
+                    path="/create"
+                    element={currentUser ? <CreateFlashcardSetPage /> : <Navigate to="/login" />}
+                />
 
-            <Route
-                path="/change-password"
-                element={
-                    currentUser
-                        ? <ChangePasswordPage currentUser={currentUser} />
-                        : <Navigate to="/login" />
-                }
-            />
+                {/* Pick a set to study */}
+                <Route
+                    path="/pick-set"
+                    element={currentUser ? <PickSetPage /> : <Navigate to="/login" />}
+                />
 
-            {/* Create Flashcard Set */}
-            <Route
-                path="/create"
-                element={
-                    // currentUser
-                    //     ? <CreateFlashcardSetPage />
-                    //     : <Navigate to="/login" />
-                    <CreateFlashcardSetPage onSave={setFlashcards} />
-                }
-            />
+                {/* Study & Learning Flow — flashcards passed via router state */}
+                <Route path="/pre_learn" element={<PreLearnPage />} />
+                <Route path="/study" element={<StudyPage onToggleFavorite={() => {}} userId={currentUser?.id} />} />
+                <Route path="/post_learn" element={<PostLearnPage />} />
 
-            {/* Study & Learning Flow */}
-            <Route path="/pre_learn" element={<PreLearnPage flashcards={flashcards} />} />
-            <Route path="/study" element={<StudyPage onToggleFavorite={handleToggleFavorite} userId={currentUser?.id}/>} />
-            <Route path="/post_learn" element={<PostLearnPage />} />
+                {/* Match Flow */}
+                <Route path="/pre_match" element={<PreMatchPage />} />
+                <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
+                <Route path="/post_match" element={<PostMatchPage />} />
 
-            {/* Match Flow */}
-            <Route path="/pre_match" element={<PreMatchPage flashcards={flashcards} />} />
-            <Route path="/match" element={<MatchPage />} />
-            <Route path="/post_match" element={<PostMatchPage />} />
+                {/* Test Flow */}
+                <Route path="/pre_test" element={<PreTestPage />} />
+                <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
+                <Route path="/post_test" element={<PostTestPage />} />
 
-<<<<<<< Updated upstream
-            {/* Test Flow */}
-            <Route path="/pre_test" element={<PreTestPage flashcards={flashcards} />} />
-            <Route path="/practice_test" element={<PracticeTestPage />} />
-            <Route path="/post_test" element={<PostTestPage />} />
-=======
                 <Route path="/sets/:id" element={<FlashcardSetPage currentUser={currentUser} />} />
                 <Route path="/shared/:token" element={<SharedSetPage />} />
                 <Route path="/concept-maps/:id" element={currentUser ? <ConceptMapPage /> : <Navigate to="/login" />} />
->>>>>>> Stashed changes
+                
+                {/* Multiplayer Games */}
+                <Route path="/game/host/:joinCode" element={currentUser ? <HostGameView currentUser={currentUser} /> : <Navigate to="/login" />} />
+                <Route path="/game/play/:joinCode" element={<ParticipantPlayView currentUser={currentUser} />} />
+                <Route path="/game/join" element={<ParticipantJoinView currentUser={currentUser} />} />
+                <Route path="/game/join/:joinCode" element={<ParticipantJoinView currentUser={currentUser} />} />
 
-            <Route
-                path="/sets/:id"
-                element={<FlashcardSetPage />}
-            />
-            <Route path="/shared/:token" element={<SharedSetPage />} />
+                {/* Personal Library */}
+                <Route
+                    path="/folders"
+                    element={currentUser ? <FoldersPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
 
-            {/* Personal Library Page */}
-            <Route
-                path="/folders"
-                element={<FoldersPage />}
-                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
-            />
+                {/* Study Goals Page */}
+                <Route
+                    path="/goals"
+                    element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
 
-            {/* Study Goals Page */}
-            <Route
-                path="/goals"
-                element={<GoalsPage userId={currentUser?.id} />}
-                // element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
-            />
+                {/* University Page */}
+                <Route
+                    path="/university"
+                    element={currentUser ? <UniversityPage userId={currentUser?.id} /> : <Navigate to="/login" />}
+                />
 
-            {/* Catch-all */}
-            <Route
-                path="*"
-                element={<Navigate to="/" />}
-            />
+                {/* Course Page */}
+                <Route
+                    path="/course/:courseId"
+                    element={<CoursePage userId={currentUser?.id} />}
+                />
 
-        </Routes>
+                {/* Exam Countdowns Page */}
+                <Route
+                    path="/countdowns"
+                    element={<CountdownPage userId={currentUser?.id} />}
+                />
+
+
+                {/* Study Groups list for a course */}
+                <Route
+                    path="/courses/:courseId/groups"
+                    element={currentUser ? <StudyGroupsListPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
+
+                {/* Individual study group */}
+                <Route
+                    path="/groups/:groupId"
+                    element={currentUser ? <StudyGroupPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
+
+                {/* Search Page */}
+                <Route
+                    path="/search"
+                    element={<SearchPage />}
+                />
+
+                {/* Catch-all */}
+                <Route
+                    path="*"
+                    element={<Navigate to="/" />}
+                />
+
+            </Routes>
+        </>
     );
 }
 

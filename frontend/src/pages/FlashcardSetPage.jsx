@@ -31,8 +31,6 @@ const FlashcardSetPage = () => {
     //Downloading
     const [showDownloadOptions, setShowDownloadOptions] = useState(false);
 
-<<<<<<< Updated upstream
-=======
     // Progress
     const [progressMap, setProgressMap] = useState({});
     const [stats, setStats] = useState(null);
@@ -52,7 +50,6 @@ const FlashcardSetPage = () => {
     // Concept Map Modal
     const [showConceptMapModal, setShowConceptMapModal] = useState(false);
 
->>>>>>> Stashed changes
     useEffect(() => {
         if (!UUID_REGEX.test(id)) {
             setError("Invalid flashcard set.");
@@ -204,8 +201,6 @@ const FlashcardSetPage = () => {
                     <h1>{setData.title}</h1>
                     {setData.description && <p className="set-page-description">{setData.description}</p>}
                     {setData.university && <p className="set-page-meta-sub">{setData.university}{setData.course ? ` · ${setData.course}` : ''}</p>}
-<<<<<<< Updated upstream
-=======
 
                     {/* Rating row */}
                     <div className="set-page-rating-row">
@@ -237,7 +232,6 @@ const FlashcardSetPage = () => {
                         <button className="set-page-study-btn set-page-study-btn--stats" onClick={() => setShowStats(true)}>📊 View Statistics</button>
                     </div>
 
->>>>>>> Stashed changes
                     <div>
                         <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>

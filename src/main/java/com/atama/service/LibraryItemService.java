@@ -69,12 +69,8 @@ public class LibraryItemService {
 
     private LibraryItemType resolveItemType(LibraryItem item) {
         if (item instanceof FlashcardSet) return LibraryItemType.FLASHCARD_SET;
-<<<<<<< Updated upstream
-        // add other subtypes
-=======
         if (item instanceof PDF) return LibraryItemType.PDF;
         if (item instanceof ConceptMap) return LibraryItemType.CONCEPT_MAP;
->>>>>>> Stashed changes
         throw new IllegalArgumentException("Unknown LibraryItem subtype: " + item.getClass());
     }
 

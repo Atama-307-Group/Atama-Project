@@ -1,15 +1,33 @@
 import {useEffect, useMemo, useRef, useState} from "react";
 import {
-    createFolder, getFolders, renameFolder, deleteFolder, setFolderStarred, getFolderItems, setFolderPrivacy,
-    getLibraryItems, moveItemToFolder, removeItemFromFolder
+    createFolder,
+    getFolders,
+    renameFolder,
+    deleteFolder,
+    setFolderStarred,
+    getFolderItems,
+    setFolderPrivacy,
+    getLibraryItems,
+    moveItemToFolder,
+    removeItemFromFolder,
+    uploadPDF,
+    recordAccess,
+    openPDF,
+    toggleItemStarred,
+    getLibraryContents,
+    getSavedSets,
+    getUserGroups,
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
 
-const FoldersPage = () => {
-    const navigate = useNavigate(); // TODO use
+const FoldersPage = ({ userId }) => {
+    const navigate = useNavigate();
     const [folders, setFolders] = useState([]);
     const [selectedFolderId, setSelectedFolderId] = useState(null);
+
+    const [studyGroups, setStudyGroups] = useState([]);
+    const [studyGroupsLoading, setStudyGroupsLoading] = useState(true);
 
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
@@ -58,27 +76,8 @@ const FoldersPage = () => {
     const [selectedItemIds, setSelectedItemIds] = useState(new Set());
 
     const [openItemMenuId, setOpenItemMenuId] = useState(null);
-
-
-    async function loadFolders() {
-        setError("");
-        setLoading(true);
-        try {
-            const data = await getFolders();
-            const list = Array.isArray(data) ? data : [];
-            setFolders(list);
-            // if (list.length && selectedFolderId == null) setSelectedFolderId(list[0].id);
-        } catch (err) {
-            setError(err.message ?? "Something went wrong");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Load the folders
-    useEffect(() => {
-        loadFolders();
-    }, []);
+    const [savedSets, setSavedSets] = useState([]);
+    const fileInputRef = useRef(null); // PDF Uploads
 
     // Close overflow menu when clicking outside
     useEffect(() => {
@@ -160,18 +159,32 @@ const FoldersPage = () => {
     }, [selectedFolderId]);
 
     // Loading library items
-    useEffect(() => {
-        async function loadLibItems() {
-            try {
-                const data = await getLibraryItems();
-                setLibItems(Array.isArray(data) ? data : []);
-            } catch (err) {
-                setError(err.message ?? "Failed to load items");
-            }
+    async function loadLibrary() {
+        setError("");
+        setLoading(true);
+        try {
+            const data = await getLibraryContents();
+            setFolders(Array.isArray(data.folders) ? data.folders : []);
+            setLibItems(Array.isArray(data.looseItems) ? data.looseItems : []);
+            getSavedSets().then(setSavedSets).catch(() => {});
+        } catch (err) {
+            setError(err.message ?? "Something went wrong");
+        } finally {
+            setLoading(false);
         }
+    }
 
-        loadLibItems();
+    useEffect(() => {
+        loadLibrary();
     }, []);
+
+    useEffect(() => {
+        if (!userId) return;
+        getUserGroups(userId)
+            .then(memberships => setStudyGroups(Array.isArray(memberships) ? memberships : []))
+            .catch(() => setStudyGroups([]))
+            .finally(() => setStudyGroupsLoading(false));
+    }, [userId]);
 
     const filteredFolderItems = useMemo(() => {
         function safeTime(x) {
@@ -325,7 +338,7 @@ const FoldersPage = () => {
         try {
             const created = await createFolder({name});
             setFolders((prev) => [created, ...prev]);
-            setSelectedFolderId(created.id);
+            // setSelectedFolderId(created.id);
             closeModal();
         } catch (err) {
             setError(err.message ?? "Failed to create folder");
@@ -373,20 +386,64 @@ const FoldersPage = () => {
         }
     }
 
+    async function onToggleItemStar(itemId) {
+        const prev = libItems;
+        setLibItems((curr) =>
+            curr.map((i) => (i.id === itemId ? { ...i, starred: !i.starred } : i))
+        );
+
+        try {
+            const updated = await toggleItemStarred(itemId);
+            setLibItems((curr) =>
+                curr.map((i) => (i.id === itemId ? { ...i, starred: updated.starred } : i))
+            );
+        } catch (e) {
+            setError(e.message ?? "Failed to update star");
+            setLibItems(prev);
+        }
+    }
+
     // ── Delete ────────────────────────────────────────────────────────────────
     function openDeleteConfirm(id) {
         setOpenMenuId(null);
         setConfirmDeleteId(id);
     }
 
-    async function confirmDelete() {
+    /*async function confirmDelete() {
         const id = confirmDeleteId;
-        setConfirmDeleteId(null); // close modal immediately
+        setConfirmDeleteId(null);
 
         try {
-            await deleteFolder(id);
+            const freedItems = await deleteFolder(id);
             setFolders((prev) => prev.filter((f) => f.id !== id));
-            if (selectedFolderId === id) setSelectedFolderId(null);
+            await loadLibItems();
+
+            if (freedItems?.length > 0) {
+                const freedIds = new Set(freedItems.map(i => i.id));
+                setLibItems((prev) => [
+                    ...prev.filter(i => !freedIds.has(i.id)),
+                    ...freedItems.map(it => ({ ...it, folderId: null })),
+                ]);
+            }
+
+            if (selectedFolderId === id) {
+                setItems([]);
+                setSelectedFolderId(null);
+            }
+        } catch (err) {
+            setError(err.message ?? "Failed to delete folder");
+        }
+    }*/
+    async function confirmDelete() {
+        const id = confirmDeleteId;
+        setConfirmDeleteId(null);
+        try {
+            await deleteFolder(id);
+            if (selectedFolderId === id) {
+                setItems([]);
+                setSelectedFolderId(null);
+            }
+            await loadLibrary(); // re-syncs both folders and loose items in one shot
         } catch (err) {
             setError(err.message ?? "Failed to delete folder");
         }
@@ -447,6 +504,18 @@ const FoldersPage = () => {
         }
     }
 
+    // Upload handler
+    async function onUploadPDF(e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const newItem = await uploadPDF(file);
+            setLibItems(prev => [{ ...newItem, folderId: null }, ...prev]);
+        } catch (err) {
+            setError(err.message ?? "Failed to upload PDF");
+        }
+    }
+
     // ── Main ──────────────────────────────────────────────────────────
 
     return (
@@ -465,9 +534,16 @@ const FoldersPage = () => {
                     New Flashcard Set
                 </button>
 
-                <button className="btn secondary" type="button">
-                    TODO New Upload
+                <button className="btn secondary" type="button" onClick={() => fileInputRef.current.click()}>
+                    Upload PDF
                 </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    style={{ display: "none" }}
+                    onChange={onUploadPDF}
+                />
 
                 <button className="btn ghost"
                         onClick={() => setShowModal(true)}
@@ -584,9 +660,9 @@ const FoldersPage = () => {
                 <section className="libraryBody">
                     {selectedFolderId == null ? (
                         loading ? (
-                            <div className="emptyState">Gathering folders…</div>
-                        ) : filtered.length === 0 ? (
-                            <div className="emptyState">No folders found.</div>
+                            <div className="emptyState">Gathering your library …</div>
+                        ) : filtered.length === 0 && filteredItems.length === 0 ? (
+                            <div className="emptyState">No items found.</div>
                         ) : (
                             <div className="folderGrid">
                                 {filtered.map((f) => (
@@ -600,7 +676,8 @@ const FoldersPage = () => {
                                                 );
                                                 setLibItems(prev => prev.filter(i => !selectedItemIds.has(i.id)));
                                                 setSelectedItemIds(new Set());
-                                            } else if (!organizeMode) {
+                                            } else {
+                                                //await recordAccess(selectedItemIds.id)
                                                 setSelectedFolderId(f.id);
                                             }
                                         }}
@@ -682,7 +759,9 @@ const FoldersPage = () => {
                                         </div>
                                     </div>
                                 ))}
-
+                                {filteredItems.length > 0 && (
+                                    <div className="sectionDivider">My Sets</div>
+                                )}
                                 {filteredItems // only loose items
                                     .map((item) => (
                                         <div
@@ -700,14 +779,11 @@ const FoldersPage = () => {
                                                     }
                                                     return next;
                                                 });
-<<<<<<< Updated upstream
-=======
                                             }
                                             else if (item.itemType === "PDF") {
                                                 openPDF(item.id);
                                             } else if (item.itemType === "CONCEPT_MAP" || item.item_type === "CONCEPT_MAP") {
                                                 navigate(`/concept-maps/${item.id}`);
->>>>>>> Stashed changes
                                             } else {
                                                 navigate(`/sets/${item.id}`);
                                             }
@@ -716,9 +792,69 @@ const FoldersPage = () => {
                                             <div className="folderName">{item.title}</div>
                                             <div className="folderMeta">
                                                 <span className="itemTypeBadge">{item.itemType}</span>
+                                                <button
+                                                    type="button"
+                                                    className={`iconBtn starBtn ${item.starred ? "starred" : ""}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onToggleItemStar(item.id);
+                                                    }}
+                                                    title={item.starred ? "Unstar" : "Star"}
+                                                >
+                                                    {item.starred ? "★" : "☆"}
+                                                </button>
                                             </div>
                                         </div>
                                     ))}
+                                {savedSets.length > 0 && (
+                                    <>
+                                        <div className="sectionDivider">Saved Sets</div>
+                                        {savedSets.map((set) => (
+                                            <div
+                                                key={set.id}
+                                                className="itemCard"
+                                                onClick={() => navigate(`/sets/${set.id}`)}
+                                            >
+                                                <div className="folderName">{set.title}</div>
+                                                <div className="folderMeta">
+                                                    <span className="itemTypeBadge">SAVED</span>
+                                                    {set.university && <span className="itemTypeBadge">{set.university}</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {!studyGroupsLoading && studyGroups.length > 0 && (
+                                    <>
+                                        <div className="sectionDivider">Study Groups</div>
+                                        {studyGroups.map((membership) => {
+                                            const g = membership.group;
+                                            if (!g) return null;
+                                            const courseName = g.course?.courseCode ?? g.course?.courseName ?? null;
+                                            return (
+                                                <div
+                                                    key={g.id}
+                                                    className="itemCard studyGroupItem"
+                                                    onClick={() => navigate(`/groups/${g.id}`)}
+                                                >
+                                                    <div className="folderName">{g.name}</div>
+                                                    <div className="folderMeta">
+                                                        <span className={`itemTypeBadge studyGroupPrivacy--${g.privacy?.toLowerCase()}`}>
+                                                            {g.privacy}
+                                                        </span>
+                                                        {courseName && (
+                                                            <span className="itemTypeBadge">{courseName}</span>
+                                                        )}
+                                                        {membership.role === "OWNER" && (
+                                                            <span className="itemTypeBadge ownerBadge">Owner</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </>
+                                )}
 
                             </div>
 

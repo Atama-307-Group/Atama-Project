@@ -1,9 +1,35 @@
 const BASE = "http://localhost:8080";
 const API_BASE = "http://localhost:8080";
 
+export async function getLibraryContents() {
+    const res = await fetch(`${API_BASE}/api/libraries/me/contents`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load library contents");
+    return res.json();
+}
+
+export async function toggleItemStarred(itemId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}/star`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Failed to update star");
+    return res.json();
+}
+
+export async function getSavedSets() {
+    const res = await fetch(`${API_BASE}/api/flashcard-sets/saved`, { credentials: 'include' });
+    if (!res.ok) throw new Error('Failed to fetch saved sets');
+    return res.json();
+}
+
 
 export async function getFolders() {
-    const res = await fetch(`${API_BASE}/folders`);
+    const res = await fetch(`${API_BASE}/folders`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to load folders");
     return res.json();
 }
@@ -12,6 +38,7 @@ export async function createFolder({ name }) {
     const res = await fetch(`${API_BASE}/folders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name }),
     });
     if (!res.ok) throw new Error("Failed to create folder");
@@ -21,6 +48,7 @@ export async function createFolder({ name }) {
 export async function deleteFolder(folderId) {
     const res = await fetch(`${API_BASE}/folders/${folderId}`, {
         method: "DELETE",
+        credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to delete folder");
 }
@@ -28,6 +56,7 @@ export async function deleteFolder(folderId) {
 async function request(path, options = {}) {
     const res = await fetch(`${BASE}${path}`, {
         headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        credentials: "include",
         ...options,
     });
 
@@ -65,7 +94,9 @@ export function setFolderStarred(folderId, starred) {
 }
 
 export async function getFolderItems(folderId) {
-    const res = await fetch(`http://localhost:8080/folders/${folderId}/items`);
+    const res = await fetch(`http://localhost:8080/folders/${folderId}/items`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to load folder items");
     return res.json();
 }
@@ -79,6 +110,7 @@ export async function setFolderPrivacy(folderId, isPublic) {
     const res = await fetch(`http://localhost:8080/folders/${folderId}/privacy`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ isPublic }),
     });
     if (!res.ok) throw new Error("Failed to update folder privacy");
@@ -86,7 +118,9 @@ export async function setFolderPrivacy(folderId, isPublic) {
 }
 
 export async function getLibraryItems() {
-    const res = await fetch(`${API_BASE}/library-items`);
+    const res = await fetch(`${API_BASE}/library-items`, {
+        credentials: "include",
+    });
     if (!res.ok) throw new Error("Failed to load library items");
     return res.json();
 }
@@ -180,9 +214,6 @@ export async function removeItemFromFolder(itemId) {
         method: "DELETE",
     });
     if (!res.ok) throw new Error("Failed to remove item from folder");
-<<<<<<< Updated upstream
-}
-=======
 }
 
 /* Countdowns ------------------------------------------- */
@@ -729,4 +760,4 @@ export async function getGroupLeaderboard(groupId) {
     if (!res.ok) throw new Error("Failed to fetch leaderboard");
     return res.json();
 }
->>>>>>> Stashed changes
+
