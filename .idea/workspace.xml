@@ -7,13 +7,7 @@
     <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/DesktopNotification.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/DesktopNotification.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/LeaveAllCoursesModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/LeaveAllCoursesModal.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLeaveDateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLeaveDateController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/CourseLeaveDate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/CourseLeaveDate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/CourseLeaveDateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/CourseLeaveDateRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateScheduler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

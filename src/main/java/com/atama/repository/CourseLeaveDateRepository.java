@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CourseLeaveDateRepository extends JpaRepository<CourseLeaveDate, UUID> {
-    Optional<CourseLeaveDate> findByUserIdAndExecutedAtIsNull(UUID userId);
+    Optional<CourseLeaveDate> findByUserId(UUID userId);
     List<CourseLeaveDate> findAllByScheduledForLessThanEqualAndExecutedAtIsNull(Instant now);
     Optional<CourseLeaveDate> findByUserIdAndExecutedAtIsNotNull(UUID userId);
 }
