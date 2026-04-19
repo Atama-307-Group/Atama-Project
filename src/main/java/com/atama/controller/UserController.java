@@ -280,7 +280,11 @@ public class UserController {
     public ResponseEntity<Void> updateAiDisabled(
             @PathVariable UUID userId,
             @RequestBody Map<String, Boolean> body) {
-        userService.updateAiDisabled(userId, body.get("aiDisabled"));
+        Boolean value = body.get("aiDisabled");
+        if (value == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.updateAiDisabled(userId, value);
         return ResponseEntity.noContent().build();
     }
 }

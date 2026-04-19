@@ -714,7 +714,7 @@ export async function getGroupLeaderboard(groupId) {
 }
 
 export async function updateAiDisabled(userId, aiDisabled) {
-    const res = await fetch(`${API_BASE}/users/${userId}/ai-disabled`, {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/ai-disabled`, {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
