@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getLibraryContents, searchLibrary, getFlashcardSetById, generateConceptMap } from '../api';
+import { getLibraryContents, searchLibrary, getFlashcardSetById, generateConceptMap, createManualConceptMap } from '../api';
 import './ConceptMapModal.css';
 
 const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
@@ -15,6 +15,7 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState(null);
     const [progressLabel, setProgressLabel] = useState("");
+    const [generationMode, setGenerationMode] = useState('AI'); // 'AI' or 'MANUAL'
 
     // Initialize with default cards (from the current set)
     useEffect(() => {
@@ -108,11 +109,26 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
             setError("Please select at least one card.");
             return;
         }
-        if (selectedCards.size > 100) {
+        if (generationMode === 'AI' && selectedCards.size > 100) {
             setError("Please select at most 100 cards for AI generation.");
             return;
         }
         setError(null);
+        
+        if (generationMode === 'MANUAL') {
+            try {
+                setIsGenerating(true);
+                const cardIds = Array.from(selectedCards);
+                const dto = await createManualConceptMap(sourceSetId, cardIds, title);
+                setIsGenerating(false);
+                window.location.href = `/concept-maps/${dto.id}?edit=true`;
+            } catch (e) {
+                setIsGenerating(false);
+                setError(e.message || "Failed to create concept map.");
+            }
+            return;
+        }
+        
         setStep(2);
         setIsGenerating(true);
         
@@ -147,9 +163,20 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
                 
                 {step === 1 && (
                     <>
-                        <h2 className="cmap-modal-title">🧠 Generate Concept Map</h2>
-                        <p className="cmap-modal-subtitle">Pick material from your library to include in the AI map.</p>
+                        <h2 className="cmap-modal-title">🧠 Create Concept Map</h2>
+                        <p className="cmap-modal-subtitle">Pick material from your library to include in the map.</p>
                         
+                        <div className="cmap-toggle-group">
+                            <label className={`cmap-toggle-label ${generationMode === 'AI' ? 'active' : ''}`}>
+                                <input type="radio" value="AI" checked={generationMode === 'AI'} onChange={() => setGenerationMode('AI')} style={{display: 'none'}} />
+                                ✨ Generate with AI
+                            </label>
+                            <label className={`cmap-toggle-label ${generationMode === 'MANUAL' ? 'active' : ''}`}>
+                                <input type="radio" value="MANUAL" checked={generationMode === 'MANUAL'} onChange={() => setGenerationMode('MANUAL')} style={{display: 'none'}} />
+                                🤚 Create Your Own
+                            </label>
+                        </div>
+
                         <input 
                             className="cmap-input" 
                             placeholder="Concept Map Title (optional)"
@@ -222,7 +249,9 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
                             <span className="cmap-total-selected">Total selected: {selectedCards.size} cards</span>
                             <div className="cmap-actions">
                                 <button className="cmap-btn cmap-btn-cancel" onClick={onClose}>Cancel</button>
-                                <button className="cmap-btn cmap-btn-primary" onClick={handleGenerate} disabled={selectedCards.size === 0}>Generate</button>
+                                <button className="cmap-btn cmap-btn-primary" onClick={handleGenerate} disabled={selectedCards.size === 0 || isGenerating}>
+                                    {isGenerating ? 'Working...' : (generationMode === 'AI' ? 'Generate ✨' : 'Create Map')}
+                                </button>
                             </div>
                         </div>
                     </>

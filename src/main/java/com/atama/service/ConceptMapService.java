@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +54,42 @@ public class ConceptMapService {
 
         ConceptMap conceptMap = new ConceptMap();
         conceptMap.setGraphData(graphData);
+        conceptMap.setSourceSetId(setId);
+
+        LibraryItemRequestDTO mockDto = new LibraryItemRequestDTO();
+        mockDto.setTitle(title != null && !title.isBlank() ? title : set.getTitle() + " - Concept Map");
+        
+        libraryItemService.initializeLibraryItem(conceptMap, mockDto, userId);
+
+        ConceptMap saved = conceptMapRepository.save(conceptMap);
+        
+        return toDto(saved);
+    }
+
+    public ConceptMapResponseDTO createManualMap(UUID setId, List<UUID> cardIds, String title, UUID userId) {
+        FlashcardSet set = flashcardSetRepository.findById(setId)
+                .orElseThrow(() -> new RuntimeException("Flashcard set not found"));
+
+        List<Flashcard> selectedCards = flashcardRepository.findAllById(cardIds);
+        
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode rootNode = mapper.createObjectNode();
+        ArrayNode nodesArray = mapper.createArrayNode();
+        
+        for (Flashcard c : selectedCards) {
+            if (c instanceof NormalFlashcard) {
+                ObjectNode n = mapper.createObjectNode();
+                n.put("id", "node_" + UUID.randomUUID().toString().substring(0, 8));
+                n.put("label", ((NormalFlashcard) c).getTerm());
+                n.put("type", "sub");
+                nodesArray.add(n);
+            }
+        }
+        rootNode.set("nodes", nodesArray);
+        rootNode.set("edges", mapper.createArrayNode());
+
+        ConceptMap conceptMap = new ConceptMap();
+        conceptMap.setGraphData(rootNode.toString());
         conceptMap.setSourceSetId(setId);
 
         LibraryItemRequestDTO mockDto = new LibraryItemRequestDTO();

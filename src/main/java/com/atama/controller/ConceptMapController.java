@@ -35,6 +35,17 @@ public class ConceptMapController {
         ConceptMapResponseDTO dto = conceptMapService.generateAndSave(setId, cardIds, title, getAuthenticatedUserId());
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("")
+    public ResponseEntity<ConceptMapResponseDTO> createManual(@RequestBody Map<String, Object> request) {
+        UUID setId = UUID.fromString((String) request.get("setId"));
+        List<String> cardIdStrings = (List<String>) request.get("selectedCardIds");
+        List<UUID> cardIds = cardIdStrings.stream().map(UUID::fromString).toList();
+        String title = (String) request.get("title");
+
+        ConceptMapResponseDTO dto = conceptMapService.createManualMap(setId, cardIds, title, getAuthenticatedUserId());
+        return ResponseEntity.ok(dto);
+    }
     
     @PostMapping("/{id}/png")
     public ResponseEntity<ConceptMapResponseDTO> uploadPng(@PathVariable UUID id, @RequestParam("file") MultipartFile file) throws IOException {

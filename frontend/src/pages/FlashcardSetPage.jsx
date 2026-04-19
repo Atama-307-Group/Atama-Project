@@ -314,7 +314,7 @@ const FlashcardSetPage = ({ currentUser }) => {
                     </div>
 
                     <div className="set-page-study-actions">
-                        <button className="set-page-study-btn" onClick={() => setShowConceptMapModal(true)}>🧠 AI Concept Map</button>
+                        <button className="set-page-study-btn" onClick={() => setShowConceptMapModal(true)}>🧠 Concept Map</button>
                         <button className="set-page-study-btn" onClick={() => handleStudyMode('learn')}>📖 Learn</button>
                         <button className="set-page-study-btn" onClick={() => handleStudyMode('match')}>🔀 Match</button>
                         <button className="set-page-study-btn" onClick={() => handleStudyMode('test')}>📝 Practice Test</button>

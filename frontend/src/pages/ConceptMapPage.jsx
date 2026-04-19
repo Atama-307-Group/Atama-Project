@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getConceptMap, uploadConceptMapPng, updateConceptMapGraph } from '../api';
 import './ConceptMapPage.css';
 
 const ConceptMapPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const canvasRef = useRef(null);
     
     // Core state
@@ -15,7 +16,8 @@ const ConceptMapPage = () => {
     const [uploading, setUploading] = useState(false);
     
     // Editor State
-    const [isEditing, setIsEditing] = useState(false);
+    const searchParams = new URLSearchParams(location.search);
+    const [isEditing, setIsEditing] = useState(searchParams.get('edit') === 'true');
     const [selectedElement, setSelectedElement] = useState(null); // { type: 'node'|'edge', data: object }
     const [isAddingConnection, setIsAddingConnection] = useState(false);
     // Forced re-render trigger for UI
