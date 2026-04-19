@@ -1,0 +1,455 @@
+.sgPage {
+    padding: 24px;
+    min-height: 100vh;
+    background-color: #fdfbf7;
+}
+
+/* Header */
+
+.sgHeader {
+    background: #77BFA3;
+    border: 1px solid rgba(51, 81, 69, 0.14);
+    border-radius: 18px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 20px rgba(30, 53, 47, 0.10);
+    margin-bottom: 24px;
+}
+
+.sgBackBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #1E352F;
+    padding: 4px 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.sgBackBtn:hover {
+    background: rgba(51, 81, 69, 0.08);
+}
+
+.sgHeaderInfo {
+    flex: 1;
+    text-align: center;
+}
+
+.sgGroupName {
+    font-weight: 950;
+    font-size: 24px;
+    letter-spacing: 0.2px;
+    margin: 0 0 2px 0;
+    color: #1E352F;
+}
+
+.sgHeaderMeta {
+    font-size: 13px;
+    color: #2b5c3f;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.sgShareBtn {
+    font-family: inherit;
+    font-weight: 700;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.35);
+    border: 1.5px solid rgba(30, 53, 47, 0.25);
+    color: #1E352F;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.sgShareBtn:hover {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(30, 53, 47, 0.45);
+}
+
+/* Body layout */
+
+.sgBody {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* Chat Panel */
+
+.sgChatPanel {
+    flex: 1;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid rgba(51, 81, 69, 0.12);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 620px;
+    box-shadow: 0 2px 12px rgba(30, 53, 47, 0.06);
+}
+
+.sgPanelTitle {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1E352F;
+    margin: 0 0 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sgMessages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 4px;
+}
+
+.sgMessages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sgMessages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sgMessages::-webkit-scrollbar-thumb {
+    background: rgba(119, 191, 163, 0.4);
+    border-radius: 4px;
+}
+
+.sgEmptyChat {
+    color: #9eb3ab;
+    font-size: 14px;
+    text-align: center;
+    margin: auto 0;
+}
+
+.sgMessage {
+    background: #f4f7f5;
+    border-radius: 10px;
+    padding: 8px 12px;
+    max-width: 80%;
+    align-self: flex-start;
+}
+
+.sgMessage--me {
+    background: #dff0e8;
+    align-self: flex-end;
+}
+
+.sgMsgHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+}
+
+.sgMsgAuthor {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2b5c3f;
+}
+
+.sgMsgTime {
+    font-size: 11px;
+    color: #9eb3ab;
+}
+
+.sgMsgText {
+    font-size: 14px;
+    color: #1E352F;
+    word-break: break-word;
+}
+
+.sgChatForm {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.sgChatInput {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1.5px solid rgba(51, 81, 69, 0.2);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1E352F;
+    background: #fdfbf7;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.sgChatInput:focus {
+    border-color: #77BFA3;
+}
+
+.sgChatSendBtn {
+    padding: 9px 18px;
+    background: #2b5c3f;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.sgChatSendBtn:hover {
+    background: #1E352F;
+}
+
+/* Sidebar */
+
+.sgSidebar {
+    width: 300px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Members Panel */
+
+.sgMembersPanel {
+    background: #fff;
+    border: 1px solid rgba(51, 81, 69, 0.12);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(30, 53, 47, 0.06);
+}
+
+.sgMemberCount {
+    font-size: 13px;
+    font-weight: 600;
+    color: #77BFA3;
+    background: rgba(119, 191, 163, 0.15);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.sgMemberList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.sgMemberList::-webkit-scrollbar {
+    width: 3px;
+}
+
+.sgMemberList::-webkit-scrollbar-thumb {
+    background: rgba(119, 191, 163, 0.4);
+    border-radius: 4px;
+}
+
+.sgMemberItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sgMemberName {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1E352F;
+}
+
+.sgRoleBadge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2b5c3f;
+    background: rgba(119, 191, 163, 0.2);
+    padding: 2px 7px;
+    border-radius: 20px;
+    border: 1px solid rgba(43, 92, 63, 0.2);
+}
+
+/* Avatar */
+
+.sgAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #77BFA3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    color: #1E352F;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.sgAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sgAvatar--sm {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+}
+
+/* Leaderboard Panel */
+
+.sgLeaderboardPanel {
+    background: #fff;
+    border: 1px solid rgba(51, 81, 69, 0.12);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(30, 53, 47, 0.06);
+}
+
+.sgLeaderboard {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.sgLeaderboard::-webkit-scrollbar {
+    width: 3px;
+}
+
+.sgLeaderboard::-webkit-scrollbar-thumb {
+    background: rgba(119, 191, 163, 0.4);
+    border-radius: 4px;
+}
+
+.sgLeaderboardItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: #f9fbf9;
+}
+
+.sgLeaderboardItem--gold {
+    background: rgba(255, 215, 0, 0.12);
+}
+
+.sgLeaderboardItem--silver {
+    background: rgba(192, 192, 192, 0.14);
+}
+
+.sgLeaderboardItem--bronze {
+    background: rgba(205, 127, 50, 0.10);
+}
+
+.sgLeaderboardRank {
+    font-size: 13px;
+    font-weight: 800;
+    color: #2b5c3f;
+    width: 24px;
+    flex-shrink: 0;
+}
+
+.sgLeaderboardName {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1E352F;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sgLeaderboardStat {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2b5c3f;
+    white-space: nowrap;
+    background: rgba(119, 191, 163, 0.18);
+    padding: 2px 7px;
+    border-radius: 99px;
+}
+
+/* Leaderboard tabs */
+
+.sgLeaderboardTabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    background: #f4f7f5;
+    border-radius: 10px;
+    padding: 3px;
+}
+
+.sgLeaderboardTab {
+    flex: 1;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    color: #9eb3ab;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sgLeaderboardTab--active {
+    background: #fff;
+    color: #1E352F;
+    box-shadow: 0 1px 4px rgba(30, 53, 47, 0.1);
+}
+
+/* Loading / Error */
+
+.sgLoading,
+.sgError {
+    text-align: center;
+    margin-top: 80px;
+    font-size: 16px;
+    color: #9eb3ab;
+}
+
+.sgError {
+    color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+    .sgBody {
+        flex-direction: column;
+    }
+
+    .sgSidebar {
+        width: 100%;
+    }
+
+    .sgChatPanel {
+        height: 400px;
+    }
+}

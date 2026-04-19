@@ -32,6 +32,8 @@ import DesktopNotification from "./components/DesktopNotification.jsx";
 import PickSetPage from './pages/PickSetPage.jsx';
 import SearchPage from "./pages/SearchPage.jsx";
 import SettingsPage from './pages/SettingsPage.jsx';
+import StudyGroupPage from "./pages/StudyGroupPage.jsx";
+import StudyGroupsListPage from "./pages/StudyGroupsListPage.jsx";
 
 function App() {
     const { openPopup } = useTimer();
@@ -167,7 +169,7 @@ function App() {
                 {/* Personal Library */}
                 <Route
                     path="/folders"
-                    element={currentUser ? <FoldersPage /> : <Navigate to="/login" />}
+                    element={currentUser ? <FoldersPage userId={currentUser.id} /> : <Navigate to="/login" />}
                 />
 
                 {/* Study Goals Page */}
@@ -194,6 +196,18 @@ function App() {
                     element={<CountdownPage userId={currentUser?.id} />}
                 />
 
+
+                {/* Study Groups list for a course */}
+                <Route
+                    path="/courses/:courseId/groups"
+                    element={currentUser ? <StudyGroupsListPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
+
+                {/* Individual study group */}
+                <Route
+                    path="/groups/:groupId"
+                    element={currentUser ? <StudyGroupPage userId={currentUser.id} /> : <Navigate to="/login" />}
+                />
 
                 {/* Search Page */}
                 <Route
