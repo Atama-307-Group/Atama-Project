@@ -54,7 +54,11 @@ const AdminPage = ({ currentUser, onLogout }) => {
                 method: 'PATCH',
                 credentials: 'include',
             });
-            setCourseRequests(prev => prev.filter(r => r.id !== id));
+            setCourseRequests(prev => prev.map(r =>
+                r.id === id
+                    ? { ...r, status: action === 'approve' ? 'APPROVED' : action === 'reject' ? 'REJECTED' : 'PENDING' }
+                    : r
+            ));
         } catch (err) {
             console.error('Failed to update course request:', err);
         }
@@ -72,8 +76,8 @@ const AdminPage = ({ currentUser, onLogout }) => {
     };
 
     const formatReportTarget = (report) => {
-        if (report.reportedUser) return `Reported user: @${report.reportedUser.username}`;
-        if (report.reportedLibraryItem) return `Reported item: ${report.reportedLibraryItem.title}`;
+        if (report.reportedUsername) return `Reported user: @${report.reportedUsername}`;
+        if (report.reportedItemTitle) return `Reported item: ${report.reportedItemTitle}`;
         return 'Unknown target';
     };
 
@@ -163,15 +167,15 @@ const AdminPage = ({ currentUser, onLogout }) => {
                                         <div className="adm-actions">
                                             <button
                                                 className="adm-btn adm-btn-approve"
-                                                onClick={() => handleReport(report.id, 'dismiss')}
+                                                onClick={() => handleReport(report.id, 'resolve')}
                                             >
-                                                Dismiss
+                                                Mark as Resolved
                                             </button>
                                             <button
                                                 className="adm-btn adm-btn-reject"
-                                                onClick={() => handleReport(report.id, 'remove')}
+                                                onClick={() => handleReport(report.id, 'dismiss')}
                                             >
-                                                Remove
+                                                Dismiss
                                             </button>
                                         </div>
                                     </div>
@@ -191,25 +195,28 @@ const AdminPage = ({ currentUser, onLogout }) => {
                                         <div className="adm-card-info">
                                             <p className="adm-card-title">{req.code} — {req.name}</p>
                                             <p className="adm-card-meta">
-                                                {req.user && `Requested by @${req.user.username}`}
-                                                {req.university && ` · ${req.university.name}`}
+                                                {req.requesterUsername && `Requested by @${req.requesterUsername}`}
+                                                {req.universityName && ` · ${req.universityName}`}
                                                 {` · ${formatTime(req.createdAt)}`}
                                             </p>
                                         </div>
-                                        <span className="adm-pill adm-pill-new">New</span>
+                                        <span className={`adm-pill ${req.status === 'REJECTED' ? 'adm-pill-rejected' : 'adm-pill-new'}`}>
+                                            {req.status === 'REJECTED' ? 'Rejected' : 'New'}
+                                        </span>
                                         <div className="adm-actions">
-                                            <button
-                                                className="adm-btn adm-btn-approve"
-                                                onClick={() => handleCourseRequest(req.id, 'approve')}
-                                            >
-                                                Approve
-                                            </button>
-                                            <button
-                                                className="adm-btn adm-btn-reject"
-                                                onClick={() => handleCourseRequest(req.id, 'reject')}
-                                            >
-                                                Reject
-                                            </button>
+                                            {req.status === 'REJECTED' ? (
+                                                <button
+                                                    className="adm-btn adm-btn-restore"
+                                                    onClick={() => handleCourseRequest(req.id, 'restore')}
+                                                >
+                                                    Restore
+                                                </button>
+                                            ) : (
+                                                <>
+                                                    <button className="adm-btn adm-btn-approve" onClick={() => handleCourseRequest(req.id, 'approve')}>Approve</button>
+                                                    <button className="adm-btn adm-btn-reject" onClick={() => handleCourseRequest(req.id, 'reject')}>Reject</button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 ))}

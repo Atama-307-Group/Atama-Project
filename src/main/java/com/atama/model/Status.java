@@ -1,5 +1,5 @@
 package com.atama.model;
 
 public enum Status {
-    PENDING, APPROVED, REJECTED
+    PENDING, APPROVED, REJECTED, DISMISSED, RESOLVED
 }
