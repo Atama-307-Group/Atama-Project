@@ -31,6 +31,7 @@ import ExamReminderBanner from "./components/ExamReminderBanner.jsx";
 import DesktopNotification from "./components/DesktopNotification.jsx";
 import PickSetPage from './pages/PickSetPage.jsx';
 import SearchPage from "./pages/SearchPage.jsx";
+import SettingsPage from './pages/SettingsPage.jsx';
 import StudyGroupPage from "./pages/StudyGroupPage.jsx";
 import StudyGroupsListPage from "./pages/StudyGroupsListPage.jsx";
 
@@ -42,15 +43,28 @@ function App() {
         return saved ? JSON.parse(saved) : null;
     });
 
-    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
-        const user = { id, username, email, profilePictureUrl, verified };
+    const [aiDisabled, setAiDisabled] = useState(() => {
+        const saved = localStorage.getItem('currentUser');
+        return saved ? JSON.parse(saved).aiDisabled ?? false : false;
+    });
+
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, aiDisabled) => {
+        const user = { id, username, email, profilePictureUrl, verified, aiDisabled };
         setCurrentUser(user);
+        setAiDisabled(aiDisabled ?? false);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
 
     const handleLogout = () => {
         setCurrentUser(null);
         localStorage.removeItem('currentUser');
+    };
+
+    const handleAiDisabledChange = (val) => {
+        setAiDisabled(val);
+        const updated = { ...currentUser, aiDisabled: val };
+        setCurrentUser(updated);
+        localStorage.setItem('currentUser', JSON.stringify(updated));
     };
 
     return (
@@ -123,7 +137,9 @@ function App() {
                 {/* Create Flashcard Set */}
                 <Route
                     path="/create"
-                    element={currentUser ? <CreateFlashcardSetPage /> : <Navigate to="/login" />}
+                    element={currentUser
+                        ? <CreateFlashcardSetPage aiDisabled={aiDisabled} />
+                        : <Navigate to="/login" />}
                 />
 
                 {/* Pick a set to study */}
@@ -197,6 +213,18 @@ function App() {
                 <Route
                     path="/search"
                     element={<SearchPage />}
+                />
+
+                {/* Settings Page */}
+                <Route
+                    path="/settings"
+                    element={currentUser
+                        ? <SettingsPage
+                            currentUser={currentUser}
+                            aiDisabled={aiDisabled}
+                            onAiDisabledChange={handleAiDisabledChange}
+                          />
+                        : <Navigate to="/login" />}
                 />
 
                 {/* Catch-all */}

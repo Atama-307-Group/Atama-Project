@@ -712,3 +712,13 @@ export async function getGroupLeaderboard(groupId) {
     if (!res.ok) throw new Error("Failed to fetch leaderboard");
     return res.json();
 }
+
+export async function updateAiDisabled(userId, aiDisabled) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/ai-disabled`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ aiDisabled }),
+    });
+    if (!res.ok) throw new Error("Failed to update AI preference");
+}
