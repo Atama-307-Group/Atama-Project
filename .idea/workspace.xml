@@ -5,12 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/CourseRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/Report.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/ReportType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/Status.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/admin/CourseRequests.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/admin/CourseRequests.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/admin/ReportsQueue.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/admin/ReportsQueue.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardStartPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LandingPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardStartPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LandingPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/LoginResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/LoginResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/CourseRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/CourseRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +64,8 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Maven.Atama [install,--non-recursive].executor": "Run",
+    "Maven.AtamaApplication.executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
@@ -80,6 +91,7 @@
       <recent name="C:\Users\pawan\IdeaProjects\Atama-Project\src\main\frontend\src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\aquas\IdeaProjects\Atama-Project\frontend\src\pages\admin" />
       <recent name="C:\Users\pawan\IdeaProjects\Atama-Project\frontend\src\pages" />
       <recent name="C:\Users\pawan\IdeaProjects\Atama-Project\frontend\src" />
       <recent name="C:\Users\pawan\IdeaProjects\Atama-Project" />

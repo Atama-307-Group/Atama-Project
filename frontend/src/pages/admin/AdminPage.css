@@ -1,0 +1,284 @@
+.adm {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100vw;
+    background-color: #fdfbf7;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1E352F;
+    box-sizing: border-box;
+}
+
+/* ===== Top bar ===== */
+.adm-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(51, 81, 69, 0.12);
+    background: #fdfbf7;
+}
+
+.adm-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.adm-logo {
+    font-size: 18px;
+    font-weight: 950;
+    color: #1E352F;
+    letter-spacing: 0.2px;
+}
+
+.adm-badge {
+    background: #77BFA3;
+    color: #1E352F;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.adm-logout-btn {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1.5px solid rgba(51, 81, 69, 0.22);
+    background: transparent;
+    color: #335145;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.adm-logout-btn:hover {
+    background: rgba(119, 191, 163, 0.15);
+}
+
+/* ===== Body ===== */
+.adm-body {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 36px 24px 48px;
+    box-sizing: border-box;
+}
+
+/* ===== Greeting ===== */
+.adm-greeting-sub {
+    font-size: 18px;
+    color: #335145;
+    font-weight: 700;
+    margin: 0 0 2px;
+}
+
+.adm-greeting-name {
+    font-size: 26px;
+    font-weight: 950;
+    color: #1E352F;
+    margin: 0 0 28px;
+    letter-spacing: 0.2px;
+}
+
+/* ===== Stat cards ===== */
+.adm-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.adm-stat {
+    background: white;
+    border: 1px solid rgba(51, 81, 69, 0.16);
+    border-radius: 18px;
+    padding: 16px 20px;
+    box-shadow: 0 10px 22px rgba(30, 53, 47, 0.06);
+}
+
+.adm-stat-label {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    color: #7a9e90;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+}
+
+.adm-stat-val {
+    font-size: 28px;
+    font-weight: 950;
+    color: #1E352F;
+    margin: 0 0 2px;
+}
+
+.adm-stat-sub {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7a9e90;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.adm-stat-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ===== Tabs ===== */
+.adm-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.adm-tab {
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 800;
+    border-radius: 10px;
+    border: 1.5px solid rgba(51, 81, 69, 0.22);
+    background: transparent;
+    color: #335145;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.adm-tab.active {
+    background: #1E352F;
+    color: #fdfbf7;
+    border-color: #1E352F;
+}
+
+.adm-tab:not(.active):hover {
+    background: rgba(119, 191, 163, 0.15);
+}
+
+/* ===== Section label ===== */
+.adm-section-label {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    color: #7a9e90;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+}
+
+/* ===== Card list ===== */
+.adm-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.adm-card {
+    background: white;
+    border: 1px solid rgba(51, 81, 69, 0.16);
+    border-radius: 16px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 12px rgba(30, 53, 47, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: border-color 0.15s;
+}
+
+.adm-card:hover {
+    border-color: rgba(119, 191, 163, 0.7);
+}
+
+.adm-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.adm-card-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1E352F;
+    margin: 0 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.adm-card-meta {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7a9e90;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== Pills ===== */
+.adm-pill {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.adm-pill-pending {
+    background: rgba(239, 159, 39, 0.15);
+    color: #854F0B;
+}
+
+.adm-pill-new {
+    background: rgba(119, 191, 163, 0.25);
+    color: #1E352F;
+}
+
+/* ===== Action buttons ===== */
+.adm-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.adm-btn {
+    padding: 6px 13px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+}
+
+.adm-btn:hover {
+    opacity: 0.8;
+}
+
+.adm-btn-approve {
+    background: #77BFA3;
+    color: #1E352F;
+}
+
+.adm-btn-reject {
+    background: rgba(192, 57, 43, 0.1);
+    color: #c0392b;
+}
+
+/* ===== Empty state ===== */
+.adm-empty {
+    text-align: center;
+    padding: 32px;
+    color: #7a9e90;
+    font-size: 14px;
+    font-weight: 600;
+}

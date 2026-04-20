@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './FlashcardStartPage.css';
+import "./LandingPage.css";
 
-const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
+const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -216,4 +216,4 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
   );
 };
 
-export default FlashcardStartPage;
+export default LandingPage;

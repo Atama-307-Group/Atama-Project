@@ -15,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CourseRequest {
     @Id
+
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

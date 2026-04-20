@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import { useTimer } from './context/TimerContext';
 import TimerPopup from './components/TimerPopup.jsx';
 
-import StartPage from './pages/FlashcardStartPage.jsx';
+import AdminDashboard from './pages/admin/AdminPage.jsx';
+import StartPage from './pages/LandingPage.jsx';
 import StudyPage from './pages/StudyPage.jsx';
 import CreateFlashcardSetPage from './pages/CreateFlashcardSetPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
@@ -42,8 +44,8 @@ function App() {
         return saved ? JSON.parse(saved) : null;
     });
 
-    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
-        const user = { id, username, email, profilePictureUrl, verified };
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, isAdmin) => {
+        const user = { id, username, email, profilePictureUrl, verified, isAdmin };
         setCurrentUser(user);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
@@ -197,6 +199,14 @@ function App() {
                 <Route
                     path="/search"
                     element={<SearchPage />}
+                />
+
+
+                <Route
+                    path="/admin"
+                    element={
+                        currentUser?.isAdmin ? <AdminDashboard /> : <Navigate to="/" />
+                    }
                 />
 
                 {/* Catch-all */}

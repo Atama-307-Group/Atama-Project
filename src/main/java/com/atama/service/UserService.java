@@ -29,7 +29,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
-    private final LibraryService libraryService;
     private final JwtService jwtService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -79,7 +78,8 @@ public class UserService {
         }
 
         String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getEmail());
-        return new LoginResult(user, token);
+        boolean isAdmin = user.getEmail().equals("atamacs307@gmail.com");
+        return new LoginResult(user, token, isAdmin);
     }
 
     public User createUser(User user) {
