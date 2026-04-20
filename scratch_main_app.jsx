@@ -31,13 +31,8 @@ import ExamReminderBanner from "./components/ExamReminderBanner.jsx";
 import DesktopNotification from "./components/DesktopNotification.jsx";
 import PickSetPage from './pages/PickSetPage.jsx';
 import SearchPage from "./pages/SearchPage.jsx";
-import SettingsPage from './pages/SettingsPage.jsx';
 import StudyGroupPage from "./pages/StudyGroupPage.jsx";
 import StudyGroupsListPage from "./pages/StudyGroupsListPage.jsx";
-import ConceptMapPage from "./pages/ConceptMapPage.jsx";
-import HostGameView from './pages/game/HostGameView.jsx';
-import ParticipantJoinView from './pages/game/ParticipantJoinView.jsx';
-import ParticipantPlayView from './pages/game/ParticipantPlayView.jsx';
 
 function App() {
     const { openPopup } = useTimer();
@@ -47,28 +42,15 @@ function App() {
         return saved ? JSON.parse(saved) : null;
     });
 
-    const [aiDisabled, setAiDisabled] = useState(() => {
-        const saved = localStorage.getItem('currentUser');
-        return saved ? JSON.parse(saved).aiDisabled ?? false : false;
-    });
-
-    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, aiDisabled) => {
-        const user = { id, username, email, profilePictureUrl, verified, aiDisabled };
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified) => {
+        const user = { id, username, email, profilePictureUrl, verified };
         setCurrentUser(user);
-        setAiDisabled(aiDisabled ?? false);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
 
     const handleLogout = () => {
         setCurrentUser(null);
         localStorage.removeItem('currentUser');
-    };
-
-    const handleAiDisabledChange = (val) => {
-        setAiDisabled(val);
-        const updated = { ...currentUser, aiDisabled: val };
-        setCurrentUser(updated);
-        localStorage.setItem('currentUser', JSON.stringify(updated));
     };
 
     return (
@@ -141,9 +123,7 @@ function App() {
                 {/* Create Flashcard Set */}
                 <Route
                     path="/create"
-                    element={currentUser
-                        ? <CreateFlashcardSetPage aiDisabled={aiDisabled} />
-                        : <Navigate to="/login" />}
+                    element={currentUser ? <CreateFlashcardSetPage /> : <Navigate to="/login" />}
                 />
 
                 {/* Pick a set to study */}
@@ -169,13 +149,6 @@ function App() {
 
                 <Route path="/sets/:id" element={<FlashcardSetPage currentUser={currentUser} />} />
                 <Route path="/shared/:token" element={<SharedSetPage />} />
-                <Route path="/concept-maps/:id" element={currentUser ? <ConceptMapPage /> : <Navigate to="/login" />} />
-                
-                {/* Multiplayer Games */}
-                <Route path="/game/host/:joinCode" element={currentUser ? <HostGameView currentUser={currentUser} /> : <Navigate to="/login" />} />
-                <Route path="/game/play/:joinCode" element={<ParticipantPlayView currentUser={currentUser} />} />
-                <Route path="/game/join" element={<ParticipantJoinView currentUser={currentUser} />} />
-                <Route path="/game/join/:joinCode" element={<ParticipantJoinView currentUser={currentUser} />} />
 
                 {/* Personal Library */}
                 <Route
@@ -224,18 +197,6 @@ function App() {
                 <Route
                     path="/search"
                     element={<SearchPage />}
-                />
-
-                {/* Settings Page */}
-                <Route
-                    path="/settings"
-                    element={currentUser
-                        ? <SettingsPage
-                            currentUser={currentUser}
-                            aiDisabled={aiDisabled}
-                            onAiDisabledChange={handleAiDisabledChange}
-                          />
-                        : <Navigate to="/login" />}
                 />
 
                 {/* Catch-all */}

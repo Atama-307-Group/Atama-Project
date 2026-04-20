@@ -69,6 +69,84 @@ public class GeminiService {
         }
     }
 
+    /**
+     * Sends flashcard content to Gemini and asks it to produce a concept map
+     * as a JSON object with "nodes" and "edges" arrays.
+     *
+     * @param flashcardContent formatted string of "term: definition" lines
+     * @return raw JSON string like { "nodes": [...], "edges": [...] }
+     */
+    public String generateConceptMap(String flashcardContent) {
+        if (apiKey == null || apiKey.trim().isEmpty() || apiKey.equals("YOUR_API_KEY_HERE")) {
+            throw new IllegalStateException(
+                    "Gemini API Key is missing. Please set gemini.api.key in application.properties.");
+        }
+
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
+                + apiKey;
+
+        String prompt = "You are an expert at building concept maps from study material. " +
+                "Given the following flashcard terms and definitions, create a concept map that shows how concepts relate to each other.\n\n" +
+                "Return ONLY a raw JSON object (no markdown, no code fences) with exactly this structure:\n" +
+                "{\n" +
+                "  \"nodes\": [\n" +
+                "    { \"id\": \"1\", \"label\": \"Concept Name\", \"type\": \"main\" },\n" +
+                "    { \"id\": \"2\", \"label\": \"Sub-concept\", \"type\": \"sub\" }\n" +
+                "  ],\n" +
+                "  \"edges\": [\n" +
+                "    { \"from\": \"1\", \"to\": \"2\", \"label\": \"includes\" }\n" +
+                "  ]\n" +
+                "}\n\n" +
+                "Node types: use 'main' for top-level concepts, 'sub' for secondary, 'detail' for specifics.\n" +
+                "Edge labels should be short relationship verbs (e.g., 'includes', 'causes', 'defines', 'is a', 'requires', 'leads to').\n" +
+                "Create between 5-20 nodes and 5-30 edges. Connect related concepts meaningfully.\n\n" +
+                "Flashcard content:\n" + flashcardContent;
+
+        Map<String, Object> part = new HashMap<>();
+        part.put("text", prompt);
+
+        Map<String, Object> content = new HashMap<>();
+        content.put("parts", List.of(part));
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("contents", List.of(content));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            return parseConceptMapResponse(response.getBody());
+        } catch (Exception e) {
+            throw new RuntimeException("Error communicating with Gemini API: " + e.getMessage(), e);
+        }
+    }
+
+    private String parseConceptMapResponse(String responseBody) {
+        try {
+            JsonNode root = objectMapper.readTree(responseBody);
+            JsonNode candidates = root.path("candidates");
+            if (!candidates.isMissingNode() && candidates.isArray() && candidates.size() > 0) {
+                JsonNode parts = candidates.get(0).path("content").path("parts");
+                if (!parts.isMissingNode() && parts.isArray() && parts.size() > 0) {
+                    String jsonText = parts.get(0).path("text").asText();
+                    // Strip optional markdown code fences
+                    jsonText = jsonText.replaceAll("(?s)^```(?:json)?\\s*", "").replaceAll("(?s)```\\s*$", "").trim();
+                    // Validate it's parseable JSON
+                    objectMapper.readTree(jsonText);
+                    return jsonText;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to parse Gemini concept map response: " + e.getMessage());
+            System.err.println("Raw response: " + responseBody);
+            throw new RuntimeException("Failed to parse concept map from Gemini API response.");
+        }
+        throw new RuntimeException("No concept map data in Gemini response.");
+    }
+
     private List<FlashcardRequestDTO> parseGeminiResponse(String responseBody) {
         List<FlashcardRequestDTO> flashcards = new ArrayList<>();
         try {
