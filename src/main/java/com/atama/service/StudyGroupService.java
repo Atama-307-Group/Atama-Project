@@ -11,6 +11,8 @@ import com.atama.repository.StudyGroupRepository;
 import com.atama.repository.StudySessionRepository;
 import com.atama.repository.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,15 +35,18 @@ public class StudyGroupService {
     private final GroupMembershipRepository membershipRepository;
     private final UserRepository userRepository;
     private final StudySessionRepository studySessionRepository;
+    private final JavaMailSender mailSender;
 
     public StudyGroupService(StudyGroupRepository studyGroupRepository,
                              GroupMembershipRepository membershipRepository,
                              UserRepository userRepository,
-                             StudySessionRepository studySessionRepository) {
+                             StudySessionRepository studySessionRepository,
+                             JavaMailSender mailSender) {
         this.studyGroupRepository = studyGroupRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.studySessionRepository = studySessionRepository;
+        this.mailSender = mailSender;
     }
 
     public record LeaderboardEntry(
@@ -170,6 +175,36 @@ public class StudyGroupService {
                 })
                 .sorted(Comparator.comparingLong(LeaderboardEntry::weeklyMinutes).reversed())
                 .collect(Collectors.toList());
+    }
+
+    public void sendNudge(UUID groupId, UUID targetUserId, UUID senderId) {
+        StudyGroup group = getGroupById(groupId);
+
+        User target = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Target user not found"));
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+
+        if (target.getEmail() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user has no email address");
+        }
+
+        String courseName = group.getCourse() != null
+                ? (group.getCourse().getCourseName() != null ? group.getCourse().getCourseName() : group.getCourse().getCourseCode())
+                : "your course";
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(target.getEmail());
+        message.setSubject("Atama – " + sender.getUsername() + " wants you to study!");
+        message.setText(
+                "Hi " + target.getUsername() + ",\n\n" +
+                sender.getUsername() + " is thinking of you and wants you to join them in the \"" +
+                group.getName() + "\" study group for " + courseName + "!\n\n" +
+                "Your group is waiting! Study together and keep those streaks going.\n\n" +
+                "Head over to Atama to join.\n\n" +
+                "— Atama Team"
+        );
+        mailSender.send(message);
     }
 
     private GroupMembership addMember(StudyGroup group, UUID userId) {

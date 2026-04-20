@@ -712,3 +712,11 @@ export async function getGroupLeaderboard(groupId) {
     if (!res.ok) throw new Error("Failed to fetch leaderboard");
     return res.json();
 }
+
+export async function nudgeMember(groupId, targetUserId, senderId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/nudge/${targetUserId}?senderId=${senderId}`, {
+        method: "POST",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to send nudge");
+}

@@ -287,6 +287,37 @@
     border: 1px solid rgba(43, 92, 63, 0.2);
 }
 
+.sgNudgeBtn {
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    background: rgba(119, 191, 163, 0.15);
+    border: 1.5px solid rgba(43, 92, 63, 0.25);
+    color: #2b5c3f;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.sgNudgeBtn:hover:not(:disabled) {
+    background: rgba(119, 191, 163, 0.35);
+    border-color: rgba(43, 92, 63, 0.45);
+}
+
+.sgNudgeBtn:disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+.sgNudgeBtn--sent {
+    background: rgba(119, 191, 163, 0.3);
+    border-color: #77BFA3;
+    color: #1E352F;
+}
+
 /* Avatar */
 
 .sgAvatar {

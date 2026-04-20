@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard } from "../api.js";
+import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, nudgeMember } from "../api.js";
 import "./StudyGroupPage.css";
 
 const StudyGroupPage = ({ userId }) => {
@@ -21,6 +21,7 @@ const StudyGroupPage = ({ userId }) => {
     const chatEndRef = useRef(null);
 
     const [copiedInvite, setCopiedInvite] = useState(false);
+    const [nudgedMembers, setNudgedMembers] = useState({});
 
     useEffect(() => {
         async function load() {
@@ -61,6 +62,17 @@ const StudyGroupPage = ({ userId }) => {
             isMe: true,
         }]);
         setChatInput("");
+    }
+
+    async function handleNudge(targetUserId) {
+        setNudgedMembers(prev => ({ ...prev, [targetUserId]: "sending" }));
+        try {
+            await nudgeMember(groupId, targetUserId, userId);
+            setNudgedMembers(prev => ({ ...prev, [targetUserId]: "sent" }));
+            setTimeout(() => setNudgedMembers(prev => ({ ...prev, [targetUserId]: null })), 3000);
+        } catch {
+            setNudgedMembers(prev => ({ ...prev, [targetUserId]: null }));
+        }
     }
 
     function handleShareInvite() {
@@ -134,18 +146,32 @@ const StudyGroupPage = ({ userId }) => {
                             </span>
                         </h2>
                         <ul className="sgMemberList">
-                            {members.map(m => (
-                                <li key={m.id} className="sgMemberItem">
-                                    <div className="sgAvatar">
-                                        {m.user?.profilePictureUrl
-                                            ? <img src={m.user.profilePictureUrl} alt={m.user.username} />
-                                            : <span>{m.user?.username?.[0]?.toUpperCase() ?? "?"}</span>
-                                        }
-                                    </div>
-                                    <span className="sgMemberName">{m.user?.username}</span>
-                                    {m.role === "OWNER" && <span className="sgRoleBadge">Owner</span>}
-                                </li>
-                            ))}
+                            {members.map(m => {
+                                const isMe = String(m.user?.id) === String(userId);
+                                const nudgeState = nudgedMembers[m.user?.id];
+                                return (
+                                    <li key={m.id} className="sgMemberItem">
+                                        <div className="sgAvatar">
+                                            {m.user?.profilePictureUrl
+                                                ? <img src={m.user.profilePictureUrl} alt={m.user.username} />
+                                                : <span>{m.user?.username?.[0]?.toUpperCase() ?? "?"}</span>
+                                            }
+                                        </div>
+                                        <span className="sgMemberName">{m.user?.username}</span>
+                                        {m.role === "OWNER" && <span className="sgRoleBadge">Owner</span>}
+                                        {!isMe && (
+                                            <button
+                                                className={`sgNudgeBtn${nudgeState === "sent" ? " sgNudgeBtn--sent" : ""}`}
+                                                onClick={() => handleNudge(m.user?.id)}
+                                                disabled={!!nudgeState}
+                                                title="Send a nudge email"
+                                            >
+                                                {nudgeState === "sending" ? "..." : nudgeState === "sent" ? "Sent!" : "Nudge"}
+                                            </button>
+                                        )}
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </section>
 

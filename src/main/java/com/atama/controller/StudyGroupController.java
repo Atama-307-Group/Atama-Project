@@ -77,4 +77,13 @@ public class StudyGroupController {
     public ResponseEntity<List<LeaderboardEntry>> getLeaderboard(@PathVariable UUID groupId) {
         return ResponseEntity.ok(studyGroupService.getLeaderboard(groupId));
     }
+
+    @PostMapping("/groups/{groupId}/nudge/{targetUserId}")
+    public ResponseEntity<Void> nudgeMember(
+            @PathVariable UUID groupId,
+            @PathVariable UUID targetUserId,
+            @RequestParam UUID senderId) {
+        studyGroupService.sendNudge(groupId, targetUserId, senderId);
+        return ResponseEntity.noContent().build();
+    }
 }
