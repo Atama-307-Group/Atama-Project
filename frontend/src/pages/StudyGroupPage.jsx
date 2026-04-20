@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, nudgeMember } from "../api.js";
+import { Client } from "@stomp/stompjs";
+import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember } from "../api.js";
 import "./StudyGroupPage.css";
 
 const StudyGroupPage = ({ userId }) => {
@@ -19,6 +20,8 @@ const StudyGroupPage = ({ userId }) => {
     const [messages, setMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
     const chatEndRef = useRef(null);
+    const stompClientRef = useRef(null);
+    const sentClientIds = useRef(new Set());
 
     const [copiedInvite, setCopiedInvite] = useState(false);
     const [nudgedMembers, setNudgedMembers] = useState({});
@@ -26,16 +29,25 @@ const StudyGroupPage = ({ userId }) => {
     useEffect(() => {
         async function load() {
             try {
-                const [groupData, membersData, uniData, leaderboardData] = await Promise.all([
+                const [groupData, membersData, uniData, leaderboardData, historyData] = await Promise.all([
                     getGroup(groupId),
                     getGroupMembers(groupId),
                     getUniversity(),
                     getGroupLeaderboard(groupId),
+                    getGroupMessages(groupId),
                 ]);
                 setGroup(groupData);
                 setMembers(membersData);
                 setUniversity(uniData);
                 setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : []);
+                setMessages(historyData.map(m => ({
+                    id: m.id,
+                    author: m.username,
+                    text: m.text,
+                    time: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                    isMe: String(m.userId) === String(userId),
+                    clientId: m.clientId,
+                })));
             } catch (e) {
                 setError(e.message);
             } finally {
@@ -43,6 +55,31 @@ const StudyGroupPage = ({ userId }) => {
             }
         }
         load();
+
+        const client = new Client({
+            brokerURL: "ws://localhost:8080/ws",
+            onConnect: () => {
+                client.subscribe(`/topic/groups/${groupId}`, (frame) => {
+                    const msg = JSON.parse(frame.body);
+                    if (msg.clientId && sentClientIds.current.has(msg.clientId)) {
+                        sentClientIds.current.delete(msg.clientId);
+                        return;
+                    }
+                    setMessages(prev => [...prev, {
+                        id: msg.id,
+                        author: msg.username,
+                        text: msg.text,
+                        time: new Date(msg.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                        isMe: String(msg.userId) === String(userId),
+                        clientId: msg.clientId,
+                    }]);
+                });
+            },
+        });
+        client.activate();
+        stompClientRef.current = client;
+
+        return () => { client.deactivate(); };
     }, [groupId]);
 
     useEffect(() => {
@@ -51,16 +88,28 @@ const StudyGroupPage = ({ userId }) => {
 
     function sendMessage(e) {
         e.preventDefault();
-        if (!chatInput.trim()) return;
+        const text = chatInput.trim();
+        if (!text || !stompClientRef.current?.connected) return;
+
         const me = members.find(m => String(m.user?.id) === String(userId));
         const username = me?.user?.username ?? "You";
+        const clientId = crypto.randomUUID();
+
+        sentClientIds.current.add(clientId);
         setMessages(prev => [...prev, {
-            id: Date.now(),
+            id: clientId,
             author: username,
-            text: chatInput.trim(),
+            text,
             time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
             isMe: true,
+            clientId,
         }]);
+
+        stompClientRef.current.publish({
+            destination: `/app/groups/${groupId}/chat`,
+            body: JSON.stringify({ userId, username, text, clientId }),
+        });
+
         setChatInput("");
     }
 

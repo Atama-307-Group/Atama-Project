@@ -5,13 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Implementation for study group frontend and completed leaderboard">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/StudyGroupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/StudyGroupController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/StudyGroupService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/StudyGroupService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/config/SecurityConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +128,7 @@
       <workItem from="1775164716618" duration="44000" />
       <workItem from="1776038811093" duration="3284000" />
       <workItem from="1776363080570" duration="3479000" />
-      <workItem from="1776453193611" duration="2201000" />
+      <workItem from="1776453193611" duration="4200000" />
     </task>
     <task id="LOCAL-00001" summary="Added model java files for User and Flashcards, implemented basics for Flashcard types that extend Flashcard interface.">
       <option name="closed" value="true" />
