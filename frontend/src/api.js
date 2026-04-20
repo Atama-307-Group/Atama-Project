@@ -713,6 +713,14 @@ export async function getGroupLeaderboard(groupId) {
     return res.json();
 }
 
+export async function getGroupMessages(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/messages`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch messages");
+    return res.json();
+}
+
 export async function nudgeMember(groupId, targetUserId, senderId) {
     const res = await fetch(`${API_BASE}/api/groups/${groupId}/nudge/${targetUserId}?senderId=${senderId}`, {
         method: "POST",
