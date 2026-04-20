@@ -275,4 +275,16 @@ public class UserController {
         userService.unenrollFromAllCourses(userId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{userId}/ai-disabled")
+    public ResponseEntity<Void> updateAiDisabled(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean value = body.get("aiDisabled");
+        if (value == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.updateAiDisabled(userId, value);
+        return ResponseEntity.noContent().build();
+    }
 }
