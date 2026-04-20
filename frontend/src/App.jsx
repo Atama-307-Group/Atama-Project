@@ -48,10 +48,16 @@ function App() {
         return saved ? JSON.parse(saved).aiDisabled ?? false : false;
     });
 
+    const [recommendationsEnabled, setRecommendationsEnabled] = useState(() => {
+        const saved = localStorage.getItem('currentUser');
+        return saved ? JSON.parse(saved).recommendationsEnabled ?? true : true;
+    });
+
     const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, aiDisabled) => {
         const user = { id, username, email, profilePictureUrl, verified, aiDisabled };
         setCurrentUser(user);
         setAiDisabled(aiDisabled ?? false);
+        setRecommendationsEnabled(recommendationsEnabled ?? true);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
 
@@ -63,6 +69,13 @@ function App() {
     const handleAiDisabledChange = (val) => {
         setAiDisabled(val);
         const updated = { ...currentUser, aiDisabled: val };
+        setCurrentUser(updated);
+        localStorage.setItem('currentUser', JSON.stringify(updated));
+    };
+
+    const handleRecsEnabledChange = (val) => {
+        setRecommendationsEnabled(val);
+        const updated = { ...currentUser, recommendationsEnabled: val };
         setCurrentUser(updated);
         localStorage.setItem('currentUser', JSON.stringify(updated));
     };
@@ -222,7 +235,9 @@ function App() {
                         ? <SettingsPage
                             currentUser={currentUser}
                             aiDisabled={aiDisabled}
+                            recommendationsEnabled={recommendationsEnabled}
                             onAiDisabledChange={handleAiDisabledChange}
+                            onRecsEnabledChange={handleRecsEnabledChange}
                           />
                         : <Navigate to="/login" />}
                 />

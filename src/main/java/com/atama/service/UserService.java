@@ -209,4 +209,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void updateRecommendationsEnabled(UUID userId, boolean enabled) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setRecommendationsEnabled(enabled);
+        userRepository.save(user);
+    }
 }

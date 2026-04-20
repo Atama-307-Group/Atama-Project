@@ -287,4 +287,16 @@ public class UserController {
         userService.updateAiDisabled(userId, value);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{userId}/recommendations-enabled")
+    public ResponseEntity<Void> updateRecommendationsEnabled(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean value = body.get("recommendationsEnabled");
+        if (value == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.updateRecommendationsEnabled(userId, value);
+        return ResponseEntity.noContent().build();
+    }
 }

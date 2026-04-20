@@ -1,12 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './FlashcardStartPage.css';
+import RecommendationBanner from '../components/RecommendationBanner.jsx';
+import { getRecommendation } from '../api.js';
 
 const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [recommendation, setRecommendation] = useState(null);
 
 
   useEffect(() => {
@@ -18,6 +21,31 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+      if (!currentUser || currentUser.recommendationsEnabled === false) {
+          setRecommendation(null);
+          return;
+      }
+
+      const dismissedKey = `dismissed_rec`;
+      const dismissedId = localStorage.getItem(dismissedKey);
+
+      getRecommendation(currentUser.id)
+          .then(rec => {
+              if (rec && rec.setId !== dismissedId) {
+                  setRecommendation(rec);
+              }
+          })
+          .catch(console.error);
+  }, [currentUser]);
+
+  const handleDismissRecommendation = () => {
+      if (recommendation) {
+          localStorage.setItem('dismissed_rec', recommendation.setId);
+      }
+      setRecommendation(null);
+  };
 
   function onSearch(e) {
     e.preventDefault();
@@ -76,6 +104,10 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
 
       {currentUser ? (
         <div className="dashboard">
+            <RecommendationBanner
+                    recommendation={recommendation}
+                    onDismiss={handleDismissRecommendation}
+                />
           <div className="dashboard-header">
             <div>
               <p className="greeting-sub">Hello,</p>
