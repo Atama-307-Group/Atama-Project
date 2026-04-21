@@ -16,7 +16,6 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -35,6 +34,9 @@ public class User {
 
     @Column
     private boolean verified = false;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean aiDisabled = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")

@@ -29,7 +29,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
-    private final LibraryService libraryService;
     private final JwtService jwtService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -69,18 +68,6 @@ public class UserService {
         return savedUser;
     }
 
-//    public User loginUser(String identifier, String password) {
-//        // Try finding by username first, then by email
-//        User user = userRepository.findByUsername(identifier)
-//                .orElseGet(() -> userRepository.findByEmail(identifier)
-//                        .orElseThrow(() -> new IllegalArgumentException("Invalid username/email or password.")));
-//
-//        if (!passwordEncoder.matches(password, user.getPassword())) {
-//            throw new IllegalArgumentException("Invalid username/email or password.");
-//        }
-//
-//        return user;
-//    }
     public LoginResult loginUser(String identifier, String password) {
         User user = userRepository.findByUsername(identifier)
                 .orElseGet(() -> userRepository.findByEmail(identifier)
@@ -90,8 +77,9 @@ public class UserService {
             throw new IllegalArgumentException("Invalid username/email or password.");
         }
 
-        String token = jwtService.generateToken(user.getId(), user.getUsername());
-        return new LoginResult(user, token);
+        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getEmail());
+        boolean isAdmin = user.getEmail().equals("atamacs307@gmail.com");
+        return new LoginResult(user, token, isAdmin);
     }
 
     public User createUser(User user) {
@@ -181,7 +169,7 @@ public class UserService {
         }
     }
 
-    public void unenrollFromCourse(UUID userId, UUID courseId) {
+    public void unenrollFromCourse(UUID userId, UUID courseId) {    // One course
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         Course course = courseRepository.findById(courseId)
@@ -195,11 +183,14 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        // Clear all courses
         user.getEnrolledCourses().clear();
-
-        // Save the user — Hibernate deletes all join table entries
         userRepository.save(user);
     }
 
+    public void updateAiDisabled(UUID userId, boolean aiDisabled) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setAiDisabled(aiDisabled);
+        userRepository.save(user);
+    }
 }

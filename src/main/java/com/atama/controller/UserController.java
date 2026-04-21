@@ -48,6 +48,7 @@ public class UserController {
             responseBody.put("email", user.getEmail());
             responseBody.put("profilePictureUrl", user.getProfilePictureUrl());
             responseBody.put("verified", user.isVerified());
+            responseBody.put("isAdmin", result.isAdmin());
 
             return ResponseEntity.ok(responseBody);
 
@@ -273,6 +274,18 @@ public class UserController {
     @DeleteMapping("/{userId}/unenroll-all")
     public ResponseEntity<Void> unenrollFromAllCourses(@PathVariable UUID userId) {
         userService.unenrollFromAllCourses(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{userId}/ai-disabled")
+    public ResponseEntity<Void> updateAiDisabled(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean value = body.get("aiDisabled");
+        if (value == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.updateAiDisabled(userId, value);
         return ResponseEntity.noContent().build();
     }
 }

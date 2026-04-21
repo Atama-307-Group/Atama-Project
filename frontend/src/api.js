@@ -713,6 +713,7 @@ export async function getGroupLeaderboard(groupId) {
     return res.json();
 }
 
+
 export async function getGroupMessages(groupId) {
     const res = await fetch(`${API_BASE}/api/groups/${groupId}/messages`, {
         credentials: "include",
@@ -727,4 +728,113 @@ export async function nudgeMember(groupId, targetUserId, senderId) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to send nudge");
+}
+/* Concept Maps ------------------------------------------- */
+
+export async function generateConceptMap(setId, selectedCardIds, title) {
+    const res = await fetch(`${API_BASE}/api/concept-maps/generate`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setId, selectedCardIds, title }),
+    });
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "Failed to generate concept map");
+    }
+    return res.json();
+}
+
+export async function createManualConceptMap(setId, selectedCardIds, title) {
+    const res = await fetch(`${API_BASE}/api/concept-maps`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setId, selectedCardIds, title }),
+    });
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "Failed to create concept map");
+    }
+    return res.json();
+}
+
+export async function uploadConceptMapPng(mapId, file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    const res = await fetch(`${API_BASE}/api/concept-maps/${mapId}/png`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+    });
+    if (!res.ok) throw new Error("Failed to upload PNG");
+    return res.json();
+}
+
+export async function getConceptMap(id) {
+    const res = await fetch(`${API_BASE}/api/concept-maps/${id}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load concept map");
+    return res.json();
+}
+
+export const updateConceptMapGraph = async (id, newGraphData) => {
+    const res = await fetch(`${API_BASE}/api/concept-maps/${id}/graph`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ graphData: JSON.stringify(newGraphData) }),
+    });
+    if (!res.ok) throw new Error("Failed to update concept map graph");
+    return res.json();
+};
+
+export async function getMyConceptMaps() {
+    const res = await fetch(`${API_BASE}/api/concept-maps/my-maps`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to load concept maps");
+    return res.json();
+}
+
+/* Multiplayer Games ------------------------------------------- */
+
+export async function hostGame(flashcardSetId) {
+    const res = await fetch(`${API_BASE}/api/games/host`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ flashcardSetId }),
+    });
+    if (!res.ok) throw new Error("Failed to host game");
+    return res.json();
+}
+
+export async function validateGame(joinCode) {
+    const res = await fetch(`${API_BASE}/api/games/${joinCode}/validate`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Invalid join code");
+    return res.text();
+}
+
+export async function fetchGameState(joinCode) {
+    const res = await fetch(`${API_BASE}/api/games/${joinCode}/state`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Could not fetch game state");
+    return res.json();
+}
+
+export async function updateAiDisabled(userId, aiDisabled) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/ai-disabled`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ aiDisabled }),
+    });
+    if (!res.ok) throw new Error("Failed to update AI preference");
+
 }

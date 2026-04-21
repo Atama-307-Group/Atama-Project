@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FlashcardInput from '../components/FlashcardInput.jsx';
 import TextImportModal from '../components/TextImportModal.jsx';
+import AiDisabledModal from '../components/AiDisabledModal.jsx';
 import { createFlashcardSet, uploadFlashcardSet, recordAccess } from '../api.js';
 import './CreateFlashcardSetPage.css';
 
 const newNormalCard = () => ({ type: 'NORMAL', term: '', definition: '' });
 
-const CreateFlashcardSetPage = () => {
+const CreateFlashcardSetPage = ({ aiDisabled }) => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -15,6 +16,7 @@ const CreateFlashcardSetPage = () => {
   const [university, setUniversity] = useState('');
   const [course, setCourse] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
@@ -212,7 +214,6 @@ const CreateFlashcardSetPage = () => {
           Create Set
         </button>
       </div>
-
       {showImportModal && (
         <TextImportModal
           onClose={() => setShowImportModal(false)}
@@ -220,8 +221,11 @@ const CreateFlashcardSetPage = () => {
           onFileUpload={handleFileUpload}
           isUploading={isUploading}
           isUploadingPdf={isUploadingPdf}
+          aiDisabled={aiDisabled}
+          onAiDisabledClick={() => setShowAiModal(true)}
         />
       )}
+      {showAiModal && <AiDisabledModal onClose={() => setShowAiModal(false)} />}
     </div>
   );
 };

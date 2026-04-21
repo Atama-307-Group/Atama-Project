@@ -2,3 +2,4 @@
 .agents/
 target/
 node_modules/
+.idea/
