@@ -918,6 +918,133 @@
     color: #335145;
 }
 
+/* ── Schedule / Calendar ── */
+.scheduleToggleRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.scheduleToggleRow input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #77BFA3;
+}
+
+.scheduleToggleRow label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #335145;
+    cursor: pointer;
+    user-select: none;
+}
+
+.calendarWrap {
+    border: 1px solid rgba(51, 81, 69, 0.18);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    min-height: 320px;
+}
+
+.calHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(119, 191, 163, 0.12);
+    border-bottom: 1px solid rgba(51, 81, 69, 0.10);
+}
+
+.calMonthLabel {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1E352F;
+}
+
+.calNavBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #335145;
+    padding: 4px 8px;
+    border-radius: 8px;
+    line-height: 1;
+    transition: background 100ms ease;
+}
+
+.calNavBtn:hover {
+    background: rgba(51, 81, 69, 0.10);
+}
+
+.calDayNames {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 8px 10px 2px;
+}
+
+.calDayName {
+    font-size: 11px;
+    font-weight: 800;
+    color: #7a9e90;
+    text-align: center;
+    padding: 2px 0;
+}
+
+.calGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding: 4px 10px 10px;
+    min-height: 204px;
+    align-content: start;
+}
+
+.calDay {
+    height: 34px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    background: transparent;
+    color: #1E352F;
+    transition: background 80ms ease;
+}
+
+.calDay:hover:not(:disabled) {
+    background: rgba(119, 191, 163, 0.25);
+}
+
+.calDay--selected {
+    background: #77BFA3 !important;
+    color: #1E352F;
+}
+
+.calDay--disabled {
+    color: #c0b9aa;
+    cursor: default;
+}
+
+.calSelectedInfo {
+    padding: 8px 14px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #335145;
+    border-top: 1px solid rgba(51, 81, 69, 0.10);
+}
+
+.scheduleSetNote {
+    margin: -6px 0 10px 24px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #335145;
+}
+
 /* ── Request course button ── */
 .searchGroup {
     margin-left: auto;
