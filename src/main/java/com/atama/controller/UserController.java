@@ -258,8 +258,12 @@ public class UserController {
             UUID courseId = UUID.fromString(request.get("courseId"));
             userService.enrollInCourse(id, courseId);
             return ResponseEntity.ok(Map.of("message", "Enrolled successfully."));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        } catch (Exception e) {
+            System.err.println("ENROLL ERROR: " + e.getMessage());
+            for (StackTraceElement el : e.getStackTrace()) {
+                System.err.println("\t" + el.toString());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", e.getMessage()));
         }
     }
