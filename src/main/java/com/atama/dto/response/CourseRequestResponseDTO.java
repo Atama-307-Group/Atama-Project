@@ -1,11 +1,11 @@
-package com.atama.dto.request;
+package com.atama.dto.response;
 
 import com.atama.model.CourseRequest;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record CourseRequestDTO(
+public record CourseRequestResponseDTO(
         UUID id,
         String code,
         String name,
@@ -14,8 +14,8 @@ public record CourseRequestDTO(
         String requesterUsername,
         String universityName
 ) {
-    public static CourseRequestDTO from(CourseRequest r) {
-        return new CourseRequestDTO(
+    public static CourseRequestResponseDTO from(CourseRequest r) {
+        return new CourseRequestResponseDTO(
                 r.getId(),
                 r.getCode(),
                 r.getName(),

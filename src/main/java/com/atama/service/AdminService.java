@@ -1,6 +1,6 @@
 package com.atama.service;
 
-import com.atama.dto.request.CourseRequestDTO;
+import com.atama.dto.response.CourseRequestResponseDTO;
 import com.atama.dto.request.ReportDTO;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.Course;
@@ -40,9 +40,9 @@ public class AdminService {
         reportRepository.save(report);
     }
 
-    public List<CourseRequestDTO> getPendingCourseRequests() {
+    public List<CourseRequestResponseDTO> getPendingCourseRequests() {
         return courseRequestRepository.findByStatus(Status.PENDING)
-                .stream().map(CourseRequestDTO::from).toList();
+                .stream().map(CourseRequestResponseDTO::from).toList();
     }
 
     public void resolveCourseRequest(UUID id, Status status) {

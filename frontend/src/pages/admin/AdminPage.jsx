@@ -203,7 +203,7 @@ const AdminPage = ({ currentUser, onLogout }) => {
                                 {pendingCourseRequests.map(req => (
                                     <div key={req.id} className="adm-card">
                                         <div className="adm-card-info">
-                                            <p className="adm-card-title">{req.code} — {req.name}</p>
+                                            <p className="adm-card-title">{req.code} - {req.name}</p>
                                             <p className="adm-card-meta">
                                                 {req.requesterUsername && `Requested by @${req.requesterUsername}`}
                                                 {req.universityName && ` · ${req.universityName}`}

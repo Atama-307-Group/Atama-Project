@@ -1,6 +1,6 @@
 package com.atama.controller;
 
-import com.atama.dto.request.CourseRequestDTO;
+import com.atama.dto.response.CourseRequestResponseDTO;
 import com.atama.dto.request.ReportDTO;
 import com.atama.model.Status;
 import com.atama.service.AdminService;
@@ -36,7 +36,7 @@ public class AdminController {
     }
 
     @GetMapping("/course-requests")
-    public ResponseEntity<List<CourseRequestDTO>> getCourseRequests() {
+    public ResponseEntity<List<CourseRequestResponseDTO>> getCourseRequests() {
         return ResponseEntity.ok(adminService.getPendingCourseRequests());
     }
 
