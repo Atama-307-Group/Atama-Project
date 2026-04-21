@@ -21,6 +21,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from "react-router-dom";
 import { TimerProvider } from './context/TimerContext';
+import { GameProvider } from './context/GameContext';
 import './index.css'
 import App from './App.jsx'
 
@@ -28,7 +29,9 @@ createRoot(document.getElementById('root')).render(
     <StrictMode>
         <BrowserRouter>
             <TimerProvider>
-                <App />
+                <GameProvider>
+                    <App />
+                </GameProvider>
             </TimerProvider>
         </BrowserRouter>
     </StrictMode>,

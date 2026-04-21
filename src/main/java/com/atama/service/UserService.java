@@ -169,7 +169,7 @@ public class UserService {
         }
     }
 
-    public void unenrollFromCourse(UUID userId, UUID courseId) {
+    public void unenrollFromCourse(UUID userId, UUID courseId) {    // One course
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         Course course = courseRepository.findById(courseId)
@@ -184,6 +184,13 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         user.getEnrolledCourses().clear();
+        userRepository.save(user);
+    }
+
+    public void updateAiDisabled(UUID userId, boolean aiDisabled) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setAiDisabled(aiDisabled);
         userRepository.save(user);
     }
 }

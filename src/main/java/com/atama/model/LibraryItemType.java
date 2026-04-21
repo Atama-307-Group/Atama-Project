@@ -3,5 +3,6 @@ package com.atama.model;
 public enum LibraryItemType {
     FLASHCARD_SET,
     PDF,
-    PRACTICE_TEST
+    PRACTICE_TEST,
+    CONCEPT_MAP
 }

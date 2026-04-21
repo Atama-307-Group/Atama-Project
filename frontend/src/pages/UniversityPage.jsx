@@ -1,71 +1,42 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUniversity, getCourses, getEnrolledCourses, enrollInCourse, unenrollFromAllCourses, unenrollFromCourse } from "../api.js";
 import "./UniversityPage.css";
+import { useCourseEnrollment } from "../hooks/useCourseEnrollment.js";
+import { useSearch } from "../hooks/useSearch.jsx";
+import EnrollFromScheduleModal from "../components/EnrollFromScheduleModal";
 
 const UniversityPage = ({ userId }) => {
+    const {
+        university, courses, enrolledIds,
+        selectedCourse, setSelectedCourse,
+        enrolling, handleEnroll,
+        showLeaveAllModal, setShowLeaveAllModal, leavingAll, handleLeaveAll,
+        leaveOneCourse, setLeaveOneCourse, leavingOne, handleLeaveOne,
+    } = useCourseEnrollment(userId);
+
+    const {
+        searchOpen, searchQuery, setSearchQuery,
+        activeIndex, setActiveIndex,
+        searchResults, searchInputRef,
+        handleSearchKeyDown, handleSearchSelect,
+        highlightMatch, closeSearch, openSearch,
+    } = useSearch(courses, enrolledIds);
+
     const navigate = useNavigate();
-    const [university, setUniversity] = useState(null);
-    const [courses, setCourses] = useState([]);
-    const [enrolledIds, setEnrolledIds] = useState(new Set());
-    const [selectedCourse, setSelectedCourse] = useState(null);
-    const [enrolling, setEnrolling] = useState(false);
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
-    const [showLeaveAllModal, setShowLeaveAllModal] = useState(false);
-    const [leavingAll, setLeavingAll] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
-    const [leaveOneCourse, setLeaveOneCourse] = useState(null);
-    const [leavingOne, setLeavingOne] = useState(false);
-
-    const [searchOpen, setSearchOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [activeIndex, setActiveIndex] = useState(0);
     const menuRef = useRef(null);
-    const searchInputRef = useRef(null);
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
 
-    useEffect(() => {
-        getUniversity()
-            .then(uni => {
-                console.log("uni:", uni);
-                setUniversity(uni);
-                return Promise.all([getCourses(uni.id), getEnrolledCourses(userId)]);
-            })
-            .then(([allCourses, enrolled]) => {
-                        console.log("courses:", allCourses); // check this isn't empty
-                        console.log("enrolled:", enrolled);
-                setCourses(allCourses);
-                setEnrolledIds(new Set(enrolled.map(c => c.id)));
-            })
-            .catch(console.error);
-    }, [userId]);
+    const visibleCourses = view === "enrolled"
+        ? courses.filter(c => enrolledIds.has(c.id))
+        : courses;
 
-    // Global keyboard shortcut: Cmd/Ctrl+K to open search
-    useEffect(() => {
-        function onKeyDown(e) {
-            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-                e.preventDefault();
-                setSearchOpen(true);
-            }
-            if (e.key === "Escape" && searchOpen) {
-                setSearchOpen(false);
-                setSearchQuery("");
-            }
-        }
-        document.addEventListener("keydown", onKeyDown);
-        return () => document.removeEventListener("keydown", onKeyDown);
-    }, [searchOpen]);
+    function handleSetView(v) {
+        setView(v);
+        localStorage.setItem("universityView", v);
+    }
 
-    // Focus input when overlay opens
-    useEffect(() => {
-        if (searchOpen) {
-            setTimeout(() => searchInputRef.current?.focus(), 50);
-            setActiveIndex(0);
-        } else {
-            setSearchQuery("");
-        }
-    }, [searchOpen]);
-
-    // Close dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(e) {
             if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -77,106 +48,6 @@ const UniversityPage = ({ userId }) => {
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [openMenuId]);
-
-    // Filtered search results
-    const searchResults = searchQuery.trim().length === 0 ? [] : courses.filter(c => {
-        const q = searchQuery.toLowerCase();
-        return (
-            c.courseCode.toLowerCase().includes(q) ||
-            c.courseName.toLowerCase().includes(q)
-        );
-    }).slice(0, 8);
-
-    useEffect(() => { setActiveIndex(0); }, [searchQuery]);
-
-    function handleSearchKeyDown(e) {
-        if (e.key === "ArrowDown") {
-            e.preventDefault();
-            setActiveIndex(i => Math.min(i + 1, searchResults.length - 1));
-        } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            setActiveIndex(i => Math.max(i - 1, 0));
-        } else if (e.key === "Enter") {
-            if (searchResults[activeIndex]) handleSearchSelect(searchResults[activeIndex]);
-        }
-    }
-
-    function handleSearchSelect(course) {
-        setSearchOpen(false);
-        setSearchQuery("");
-        if (enrolledIds.has(course.id)) {
-            navigate(`/course/${course.id}`);
-        } else {
-            setSelectedCourse(course);
-        }
-    }
-
-    function highlightMatch(text, query) {
-        if (!query.trim()) return text;
-        const idx = text.toLowerCase().indexOf(query.toLowerCase());
-        if (idx === -1) return text;
-        return (
-            <>
-                {text.slice(0, idx)}
-                <mark className="searchHighlight">{text.slice(idx, idx + query.length)}</mark>
-                {text.slice(idx + query.length)}
-            </>
-        );
-    }
-
-    async function handleEnroll() {
-        if (!selectedCourse) return;
-        setEnrolling(true);
-        try {
-            await enrollInCourse(userId, selectedCourse.id);
-            setEnrolledIds(prev => new Set([...prev, selectedCourse.id]));
-            setSelectedCourse(null);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setEnrolling(false);
-        }
-    }
-
-    async function handleLeaveAll() {
-        setLeavingAll(true);
-        try {
-            await Promise.all([...enrolledIds].map(courseId => unenrollFromAllCourses(userId, courseId)));
-            setEnrolledIds(new Set());
-            setShowLeaveAllModal(false);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLeavingAll(false);
-        }
-    }
-
-    async function handleLeaveOne() {
-        if (!leaveOneCourse) return;
-        setLeavingOne(true);
-        try {
-            await unenrollFromCourse(userId, leaveOneCourse.id);
-            setEnrolledIds(prev => {
-                const next = new Set(prev);
-                next.delete(leaveOneCourse.id);
-                return next;
-            });
-            setLeaveOneCourse(null);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLeavingOne(false);
-        }
-    }
-
-    const visibleCourses = view === "enrolled"
-        ? courses.filter(c => enrolledIds.has(c.id))
-        : courses;
-
-    function handleSetView(v) {
-        setView(v);
-        localStorage.setItem("universityView", v);
-    }
 
     return (
         <div className="universityPage">
@@ -203,7 +74,18 @@ const UniversityPage = ({ userId }) => {
                 >
                     Your Enrolled Courses
                 </button>
-                <button className="searchTriggerBtn" onClick={() => setSearchOpen(true)} aria-label="Search courses">
+
+                {view === "enrolled" && (
+                    <button className="enrollFromScheduleBtn" onClick={() => setShowScheduleModal(true)}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        Enroll from Schedule
+                    </button>
+                )}
+
+                <button className="searchTriggerBtn" onClick={openSearch} aria-label="Search courses">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -277,7 +159,7 @@ const UniversityPage = ({ userId }) => {
 
             {/* Search overlay */}
             {searchOpen && (
-                <div className="searchOverlay" onClick={() => { setSearchOpen(false); setSearchQuery(""); }}>
+                <div className="searchOverlay" onClick={closeSearch}>
                     <div className="searchPanel" onClick={e => e.stopPropagation()}>
                         <div className="searchInputRow">
                             <svg className="searchIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -294,8 +176,7 @@ const UniversityPage = ({ userId }) => {
                                 autoComplete="off"
                                 spellCheck="false"
                             />
-                            <kbd className="searchEscKbd" onClick={() => { setSearchOpen(false); setSearchQuery(""); }}>esc</kbd>
-                        </div>
+                            <kbd className="searchEscKbd" onClick={closeSearch}>esc</kbd>                        </div>
                         <div className="searchResults">
                             {searchQuery.trim().length === 0 ? (
                                 <div className="searchEmpty">Start typing to search from {courses.length} courses…</div>
@@ -362,6 +243,20 @@ const UniversityPage = ({ userId }) => {
                 </div>
             )}
 
+            {/* Enroll from schedule modal */}
+            {showScheduleModal && (
+                <EnrollFromScheduleModal
+                    onClose={() => setShowScheduleModal(false)}
+                    courses={courses}
+                    onEnroll={async (foundCourses) => {
+                        for (const course of foundCourses) {
+                            await handleEnroll(course);
+                        }
+                        setShowScheduleModal(false);
+                    }}
+                />
+            )}
+
             {/* Leave one course modal */}
             {leaveOneCourse && (
                 <div className="modalOverlay" onClick={() => setLeaveOneCourse(null)}>
@@ -401,6 +296,8 @@ const UniversityPage = ({ userId }) => {
                     </div>
                 </div>
             )}
+
+
         </div>
     );
 };
