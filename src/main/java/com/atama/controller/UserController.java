@@ -48,6 +48,7 @@ public class UserController {
             responseBody.put("email", user.getEmail());
             responseBody.put("profilePictureUrl", user.getProfilePictureUrl());
             responseBody.put("verified", user.isVerified());
+            responseBody.put("isAdmin", result.isAdmin());
 
             return ResponseEntity.ok(responseBody);
 

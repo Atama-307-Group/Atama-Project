@@ -810,6 +810,8 @@ export async function fetchGameState(joinCode) {
     });
     if (!res.ok) throw new Error("Could not fetch game state");
     return res.json();
+}
+
 export async function updateAiDisabled(userId, aiDisabled) {
     const res = await fetch(`${API_BASE}/api/users/${userId}/ai-disabled`, {
         method: "PATCH",
