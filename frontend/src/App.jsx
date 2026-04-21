@@ -205,7 +205,9 @@ function App() {
                 <Route
                     path="/admin"
                     element={
-                        currentUser?.isAdmin ? <AdminDashboard /> : <Navigate to="/" />
+                        currentUser?.isAdmin
+                            ? <AdminDashboard currentUser={currentUser} onLogout={handleLogout} />
+                            : <Navigate to="/" />
                     }
                 />
 

@@ -8,6 +8,8 @@ const AdminPage = ({ currentUser, onLogout }) => {
     const [reports, setReports] = useState([]);
     const [courseRequests, setCourseRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [successModal, setSuccessModal] = useState(null); // { name, university }
+
 
     const API_BASE = 'http://localhost:8080';
 
@@ -59,6 +61,14 @@ const AdminPage = ({ currentUser, onLogout }) => {
                     ? { ...r, status: action === 'approve' ? 'APPROVED' : action === 'reject' ? 'REJECTED' : 'PENDING' }
                     : r
             ));
+
+            // Show success modal on approve
+            if (action === 'approve') {
+                const approved = courseRequests.find(r => r.id === id);
+                if (approved) {
+                    setSuccessModal({ name: `${approved.code} — ${approved.name}`, university: approved.universityName });
+                }
+            }
         } catch (err) {
             console.error('Failed to update course request:', err);
         }
@@ -225,6 +235,23 @@ const AdminPage = ({ currentUser, onLogout }) => {
                     </>
                 )}
             </div>
+
+            {successModal && (
+                <div className="adm-modal-overlay" onClick={() => setSuccessModal(null)}>
+                    <div className="adm-modal" onClick={e => e.stopPropagation()}>
+                        <div className="adm-modal-icon">✓</div>
+                        <p className="adm-modal-title">Course Added Successfully</p>
+                        <p className="adm-modal-body">
+                            <strong>{successModal.name}</strong> has been approved and added to{' '}
+                            <strong>{successModal.university}</strong>.
+                        </p>
+                        <button className="adm-btn adm-btn-approve adm-modal-close" onClick={() => setSuccessModal(null)}>
+                            Done
+                        </button>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
