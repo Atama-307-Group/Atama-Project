@@ -442,25 +442,6 @@ export async function recordAccess(itemId) {
     });
 }
 
-export async function updateCourseLibraryItem(id, year, semester, description) {
-    const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ year, semester, description }),
-    });
-    if (!res.ok) throw new Error("Failed to update item");
-    return res.json();
-}
-
-export async function deleteCourseLibraryItem(id) {
-    const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to remove item");
-}
-
 export function openPDF(itemId) {
     window.open(`${API_BASE}/library-items/${itemId}/file`, "_blank");
 }
@@ -598,7 +579,6 @@ export async function getCourseItems(courseId) {
     });
     if (!res.ok) throw new Error("Failed to fetch course items");
       console.log("fetching course items for:", courseId);
-
 
     return res.json();
 }
@@ -863,6 +843,8 @@ export async function fetchGameState(joinCode) {
     });
     if (!res.ok) throw new Error("Could not fetch game state");
     return res.json();
+}
+
 export async function updateAiDisabled(userId, aiDisabled) {
     const res = await fetch(`${API_BASE}/api/users/${userId}/ai-disabled`, {
         method: "PATCH",

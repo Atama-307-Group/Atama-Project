@@ -27,15 +27,9 @@ const UniversityPage = ({ userId }) => {
     const navigate = useNavigate();
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
     const [showLeaveAllCoursesModal, setShowLeaveAllCoursesModal] = useState(false);
-    const [leavingAll, setLeavingAll] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
-    const [leaveOneCourse, setLeaveOneCourse] = useState(null);
-    const [leavingOne, setLeavingOne] = useState(false);
     const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
 
-    const [searchOpen, setSearchOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [activeIndex, setActiveIndex] = useState(0);
     const menuRef = useRef(null);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
 
@@ -76,106 +70,8 @@ const UniversityPage = ({ userId }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [openMenuId]);
 
-    // Filtered search results
-    const searchResults = searchQuery.trim().length === 0 ? [] : courses.filter(c => {
-        const q = searchQuery.toLowerCase();
-        return (
-            c.courseCode.toLowerCase().includes(q) ||
-            c.courseName.toLowerCase().includes(q)
-        );
-    }).slice(0, 8);
 
     useEffect(() => { setActiveIndex(0); }, [searchQuery]);
-
-    function handleSearchKeyDown(e) {
-        if (e.key === "ArrowDown") {
-            e.preventDefault();
-            setActiveIndex(i => Math.min(i + 1, searchResults.length - 1));
-        } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            setActiveIndex(i => Math.max(i - 1, 0));
-        } else if (e.key === "Enter") {
-            if (searchResults[activeIndex]) handleSearchSelect(searchResults[activeIndex]);
-        }
-    }
-
-    function handleSearchSelect(course) {
-        setSearchOpen(false);
-        setSearchQuery("");
-        if (enrolledIds.has(course.id)) {
-            navigate(`/course/${course.id}`);
-        } else {
-            setSelectedCourse(course);
-        }
-    }
-
-    function highlightMatch(text, query) {
-        if (!query.trim()) return text;
-        const idx = text.toLowerCase().indexOf(query.toLowerCase());
-        if (idx === -1) return text;
-        return (
-            <>
-                {text.slice(0, idx)}
-                <mark className="searchHighlight">{text.slice(idx, idx + query.length)}</mark>
-                {text.slice(idx + query.length)}
-            </>
-        );
-    }
-
-    async function handleEnroll() {
-        if (!selectedCourse) return;
-        setEnrolling(true);
-        try {
-            await enrollInCourse(userId, selectedCourse.id);
-            setEnrolledIds(prev => new Set([...prev, selectedCourse.id]));
-            setSelectedCourse(null);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setEnrolling(false);
-        }
-    }
-
-    async function handleLeaveAll(scheduleDate) {
-        setLeavingAll(true);
-        try {
-            if (scheduleDate) {
-                await fetch(`/api/users/${userId}/schedule-leave`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ scheduledFor: scheduleDate.toISOString() })
-                });
-                setScheduledLeaveDate(scheduleDate);
-            } else {
-                await Promise.all([...enrolledIds].map(courseId => unenrollFromAllCourses(userId, courseId)));
-                setEnrolledIds(new Set());
-                setScheduledLeaveDate(null);
-            }
-            setShowLeaveAllCoursesModal(false);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLeavingAll(false);
-        }
-    }
-
-    async function handleLeaveOne() {
-        if (!leaveOneCourse) return;
-        setLeavingOne(true);
-        try {
-            await unenrollFromCourse(userId, leaveOneCourse.id);
-            setEnrolledIds(prev => {
-                const next = new Set(prev);
-                next.delete(leaveOneCourse.id);
-                return next;
-            });
-            setLeaveOneCourse(null);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLeavingOne(false);
-        }
-    }
 
     const visibleCourses = view === "enrolled"
         ? courses.filter(c => enrolledIds.has(c.id))

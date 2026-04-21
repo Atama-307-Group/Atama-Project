@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, openPDF, downloadPDF,
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF,
     addLibraryItemToCourse, updateCourseLibraryItem, deleteCourseLibraryItem, getGroupsByCourse } from "../api.js";
 import "./CoursePage.css";
 
@@ -84,6 +84,14 @@ const CoursePage = ({ userId }) => {
 
     const { items, setItems, loading: itemsLoading, error: itemsError } = useCourseItems(courseId);
 
+    useEffect(() => {
+        if (!courseId) return;
+        getGroupsByCourse(courseId)
+            .then(data => setGroups(Array.isArray(data) ? data : []))
+            .catch(() => setGroups([]))
+            .finally(() => setGroupsLoading(false));
+    }, [courseId]);
+
     const filteredItems = useFilteredItems(items, query, sortBy, {
         filterTypes,
         filterSemesters,
@@ -109,7 +117,7 @@ const CoursePage = ({ userId }) => {
     useEffect(() => {
         if (!openMenuId) return;
         function handlePointerDown(e) {
-            if (e.target.closest(".cardMenuWrap")) return; // 👈 ignore clicks inside menu
+            if (e.target.closest(".cardMenuWrap")) return;
             setOpenMenuId(null);
         }
         window.addEventListener("pointerdown", handlePointerDown);
@@ -259,35 +267,33 @@ const CoursePage = ({ userId }) => {
         setEditTitle(cli.libraryItem?.title ?? "");
     }
 
-async function handleEditSave() {
-    if (!editingItem) return;
-    setEditSaving(true);
-    try {
-        const promises = [
-            updateCourseLibraryItem(editingItem.id, editYear, editSemester, editDescription || null)
-        ];
+    async function handleEditSave() {
+        if (!editingItem) return;
+        setEditSaving(true);
+        try {
+            const promises = [
+                updateCourseLibraryItem(editingItem.id, editYear, editSemester, editDescription || null)
+            ];
 
-        // Only fire title update if it changed and item supports it
-        const titleChanged = editTitle !== editingItem.libraryItem?.title;
-        const canEditTitle = editingItem.libraryItem?.itemType !== "FLASHCARD";
-        if (canEditTitle && titleChanged) {
-            promises.push(updateLibraryItem(editingItem.libraryItem.id, { title: editTitle }));
+            const titleChanged = editTitle !== editingItem.libraryItem?.title;
+            const canEditTitle = editingItem.libraryItem?.itemType !== "FLASHCARD";
+            if (canEditTitle && titleChanged) {
+                promises.push(updateLibraryItem(editingItem.libraryItem.id, { title: editTitle }));
+            }
+
+            const [updated] = await Promise.all(promises);
+
+            setItems(prev => prev.map(i => i.id === updated.id ? {
+                ...updated,
+                libraryItem: { ...updated.libraryItem, title: editTitle }
+            } : i));
+            setEditingItem(null);
+        } catch (err) {
+            setError(err.message ?? "Failed to save changes");
+        } finally {
+            setEditSaving(false);
         }
-
-        const [updated] = await Promise.all(promises);
-
-        // Merge the potentially-updated title back into local state
-        setItems(prev => prev.map(i => i.id === updated.id ? {
-            ...updated,
-            libraryItem: { ...updated.libraryItem, title: editTitle }
-        } : i));
-        setEditingItem(null);
-    } catch (err) {
-        setError(err.message ?? "Failed to save changes");
-    } finally {
-        setEditSaving(false);
     }
-}
 
     async function handleDeleteConfirm() {
         if (!deletingItem) return;
@@ -302,9 +308,6 @@ async function handleEditSave() {
             setDeleteConfirming(false);
         }
     }
-
-    const yearMin = NUMERIC_YEARS[NUMERIC_YEARS.length - 1];
-    const yearMax = NUMERIC_YEARS[0];
 
     return (
         <div className="coursePage">
@@ -368,10 +371,14 @@ async function handleEditSave() {
                                     key={cli.id}
                                     className={`itemCard ${isOwner ? "itemCard--mine" : ""}`}
                                     onClick={() => {
-                                        if (cli.libraryItem?.itemType === "PDF") openPDF(cli.libraryItem.id);
+                                        if (cli.libraryItem?.itemType === "PDF") {
+                                            openPDF(cli.libraryItem.id);
+                                        } else if (cli.libraryItem?.itemType === "FLASHCARD_SET") {
+                                            navigate(`/sets/${cli.libraryItem.id}`);
+                                        }
                                     }}
                                 >
-                                    {/* Owner icon — visible on hover */}
+                                    {/* Owner badge — visible on hover */}
                                     {isOwner && (
                                         <div className="ownerBadge" title="Added by you">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -437,41 +444,6 @@ async function handleEditSave() {
                                                 >
                                                     ⭳
                                                 </button>
-                        {filteredItems.map(cli => (
-                            <div
-                                key={cli.id}
-                                className="itemCard"
-                                onClick={() => {
-                                    if (cli.libraryItem?.itemType === "PDF") {
-                                        openPDF(cli.libraryItem.id);
-                                    } else if (cli.libraryItem?.itemType === "FLASHCARD_SET") {
-                                        navigate(`/sets/${cli.libraryItem.id}`);
-                                    }
-                                }}
-                            >
-                                <div className="folderName">
-                                    <Highlighted text={cli.libraryItem?.title ?? "Untitled"} query={query.trim()} />
-                                </div>
-                                <div className="folderMeta">
-                                    <span className="itemTypeBadge">{cli.libraryItem?.itemType ?? "PDF"}</span>
-                                    <div className="cliMeta">
-                                        {cli.semester && cli.semester !== "Unknown" && (
-                                            <span className="cliTag">{cli.semester}</span>
-                                        )}
-                                        {cli.year && cli.year !== "Unknown" && (
-                                            <span className="cliTag">{cli.year}</span>
-                                        )}
-                                        {cli.libraryItem?.itemType === "PDF" && (
-                                            <button
-                                                className="downloadBtn"
-                                                title="Download PDF"
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
-                                                }}
-                                            >
-                                                ⭳
-                                            </button>
                                             )}
                                         </div>
                                     </div>
@@ -539,20 +511,19 @@ async function handleEditSave() {
             {/* PDF metadata modal */}
             {showPDFModal && (
                 <MetadataModal
-                                title="Save PDF to Course"
-                                year={pdfYear}
-                                setYear={setPdfYear}
-                                semester={pdfSemester}
-                                setSemester={setPdfSemester}
-                                description={pdfDescription}
-                                setDescription={setPdfDescription}
-                                onCancel={() => setShowPDFModal(false)}
-                                onConfirm={handlePDFConfirm}
-                                confirmText="Save to Course"
-                                loading={uploading}
-                            />
+                    title="Save PDF to Course"
+                    year={pdfYear}
+                    setYear={setPdfYear}
+                    semester={pdfSemester}
+                    setSemester={setPdfSemester}
+                    description={pdfDescription}
+                    setDescription={setPdfDescription}
+                    onCancel={() => setShowPDFModal(false)}
+                    onConfirm={handlePDFConfirm}
+                    confirmText="Save to Course"
+                    loading={uploading}
+                />
             )}
-
 
             {/* Leave course modal */}
             {showLeaveModal && (
@@ -636,45 +607,41 @@ async function handleEditSave() {
             )}
 
             {/* Library item metadata modal */}
-            { showLibMetaModal && (<MetadataModal
-                title="Add to Course"
-                year={libMetaYear}
-                setYear={setLibMetaYear}
-                semester={libMetaSemester}
-                setSemester={setLibMetaSemester}
-                description={libMetaDescription}
-                setDescription={setLibMetaDescription}
-                onCancel={() => setShowLibMetaModal(false)}
-                onConfirm={handleLibMetaConfirm}
-                onBack={handleLibMetaBack}
-                confirmText="Add to Course"
-                loading={libMetaAdding}
-            />
+            {showLibMetaModal && (
+                <MetadataModal
+                    title="Add to Course"
+                    year={libMetaYear}
+                    setYear={setLibMetaYear}
+                    semester={libMetaSemester}
+                    setSemester={setLibMetaSemester}
+                    description={libMetaDescription}
+                    setDescription={setLibMetaDescription}
+                    onCancel={() => setShowLibMetaModal(false)}
+                    onConfirm={handleLibMetaConfirm}
+                    onBack={handleLibMetaBack}
+                    confirmText="Add to Course"
+                    loading={libMetaAdding}
+                />
             )}
 
             {/* Edit modal */}
-            { editingItem  && (<MetadataModal
-
-                title="Edit Details"
-                year={editYear}
-                setYear={setEditYear}
-                semester={editSemester}
-                setSemester={setEditSemester}
-                description={editDescription}
-                setDescription={setEditDescription}
-                onCancel={() => setEditingItem(null)}
-                onConfirm={handleEditSave}
-                confirmText="Save Changes"
-                loading={editSaving}
-
-                // Only allow title editing if NOT flashcards
-                allowTitleEdit={editingItem?.libraryItem?.itemType !== "FLASHCARD"}
-                itemTitle={editingItem?.libraryItem?.title ?? ""}
-                setItemTitle={(val) => {
-                    // optional: only if you support title updates in backend
-                    console.log("update title:", val);
-                }}
-            />
+            {editingItem && (
+                <MetadataModal
+                    title="Edit Details"
+                    year={editYear}
+                    setYear={setEditYear}
+                    semester={editSemester}
+                    setSemester={setEditSemester}
+                    description={editDescription}
+                    setDescription={setEditDescription}
+                    onCancel={() => setEditingItem(null)}
+                    onConfirm={handleEditSave}
+                    confirmText="Save Changes"
+                    loading={editSaving}
+                    allowTitleEdit={editingItem?.libraryItem?.itemType !== "FLASHCARD"}
+                    itemTitle={editTitle}
+                    setItemTitle={setEditTitle}
+                />
             )}
 
             {/* Delete confirmation modal */}
