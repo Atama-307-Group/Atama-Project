@@ -74,6 +74,26 @@
     border-color: rgba(30, 53, 47, 0.45);
 }
 
+.sgLeaveBtn {
+    font-family: inherit;
+    font-weight: 700;
+    padding: 8px 16px;
+    background: rgba(231, 76, 60, 0.12);
+    border: 1.5px solid rgba(231, 76, 60, 0.35);
+    color: #c0392b;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.sgLeaveBtn:hover {
+    background: rgba(231, 76, 60, 0.22);
+    border-color: rgba(231, 76, 60, 0.6);
+}
+
 /* Body layout */
 
 .sgBody {

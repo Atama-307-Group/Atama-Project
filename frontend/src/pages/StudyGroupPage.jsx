@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
-import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember } from "../api.js";
+import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember, leaveGroup } from "../api.js";
 import "./StudyGroupPage.css";
 
 const StudyGroupPage = ({ userId }) => {
@@ -124,6 +124,16 @@ const StudyGroupPage = ({ userId }) => {
         }
     }
 
+    async function handleLeave() {
+        if (!window.confirm("Are you sure you want to leave this group?")) return;
+        try {
+            await leaveGroup(groupId, userId);
+            navigate(-1);
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+
     function handleShareInvite() {
         const token = group?.inviteToken;
         const link = token
@@ -155,6 +165,9 @@ const StudyGroupPage = ({ userId }) => {
                 <button className="sgShareBtn" onClick={handleShareInvite}>
                     {copiedInvite ? "Copied!" : "Share Invite"}
                 </button>
+                {members.find(m => String(m.user?.id) === String(userId) && m.role !== "OWNER") && (
+                    <button className="sgLeaveBtn" onClick={handleLeave}>Leave</button>
+                )}
             </header>
 
             <div className="sgBody">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { getGoal, getCountdowns } from "../api.js";
+import { getGoal, getCountdowns, getPendingNudges } from "../api.js";
 import "./DesktopNotification.css";
 
 /**
@@ -109,19 +109,39 @@ const DesktopNotification = ({ userId }) => {
         }
     }, [userId, addNotification]);
 
+    /* ── Nudge notification check ── */
+
+    const checkNudgeNotifications = useCallback(async () => {
+        if (!userId) return;
+        try {
+            const nudges = await getPendingNudges(userId);
+            for (const n of nudges) {
+                addNotification(
+                    "Study nudge from " + n.senderUsername + "! 👋",
+                    `${n.senderUsername} wants you to join them in "${n.groupName}". Open Atama and get studying!`,
+                    "👥"
+                );
+            }
+        } catch {
+            /* silent */
+        }
+    }, [userId, addNotification]);
+
     /* ── Polling ── */
 
     useEffect(() => {
         checkStudyReminder();
         checkExamReminders();
+        checkNudgeNotifications();
 
         const interval = setInterval(() => {
             checkStudyReminder();
             checkExamReminders();
+            checkNudgeNotifications();
         }, 30000); // check every 30 seconds
 
         return () => clearInterval(interval);
-    }, [checkStudyReminder, checkExamReminders]);
+    }, [checkStudyReminder, checkExamReminders, checkNudgeNotifications]);
 
     /* ── Render ── */
 

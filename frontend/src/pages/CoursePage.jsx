@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems, addLibraryItemToCourse, getGroupsByCourse } from "../api.js";
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryItems, addLibraryItemToCourse, getGroupsByCourse, getUserGroups, joinPublicGroup } from "../api.js";
 import "./CoursePage.css";
 
 const YEARS = ["Unknown", ...Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - i))];
@@ -85,6 +85,8 @@ const CoursePage = ({ userId }) => {
     // Study groups preview
     const [groups, setGroups] = useState([]);
     const [groupsLoading, setGroupsLoading] = useState(true);
+    const [joinedGroupIds, setJoinedGroupIds] = useState(new Set());
+    const [joiningGroupId, setJoiningGroupId] = useState(null);
 
     const activeFilterCount = useMemo(() => {
         let n = 0;
@@ -125,12 +127,15 @@ const CoursePage = ({ userId }) => {
     }, [courseId]);
 
     useEffect(() => {
-        if (!courseId) return;
-        getGroupsByCourse(courseId)
-            .then(data => setGroups(Array.isArray(data) ? data : []))
+        if (!courseId || !userId) return;
+        Promise.all([getGroupsByCourse(courseId), getUserGroups(userId)])
+            .then(([groupsData, membershipsData]) => {
+                setGroups(Array.isArray(groupsData) ? groupsData : []);
+                setJoinedGroupIds(new Set((membershipsData ?? []).map(m => String(m.group?.id))));
+            })
             .catch(() => setGroups([]))
             .finally(() => setGroupsLoading(false));
-    }, [courseId]);
+    }, [courseId, userId]);
 
     // Close sort menu on outside click
     useEffect(() => {
@@ -604,21 +609,50 @@ const CoursePage = ({ userId }) => {
                     </p>
                 ) : (
                     <div className="studyGroupsRow">
-                        {groups.slice(0, 4).map(g => (
-                            <div
-                                key={g.id}
-                                className="studyGroupCard"
-                                onClick={() => navigate(`/groups/${g.id}`)}
-                            >
-                                <div className="studyGroupCardName">{g.name}</div>
-                                {g.description && (
-                                    <div className="studyGroupCardDesc">{g.description}</div>
-                                )}
-                                <span className={`studyGroupPrivacyBadge studyGroupPrivacyBadge--${g.privacy?.toLowerCase()}`}>
-                                    {g.privacy}
-                                </span>
-                            </div>
-                        ))}
+                        {groups.slice(0, 4).map(g => {
+                            const joined = joinedGroupIds.has(String(g.id));
+                            return (
+                                <div key={g.id} className="studyGroupCard">
+                                    <div className="studyGroupCardName">{g.name}</div>
+                                    {g.description && (
+                                        <div className="studyGroupCardDesc">{g.description}</div>
+                                    )}
+                                    <span className={`studyGroupPrivacyBadge studyGroupPrivacyBadge--${g.privacy?.toLowerCase()}`}>
+                                        {g.privacy}
+                                    </span>
+                                    <div className="studyGroupCardAction">
+                                        {joined ? (
+                                            <button
+                                                className="studyGroupOpenBtn"
+                                                onClick={() => navigate(`/groups/${g.id}`)}
+                                            >
+                                                Open →
+                                            </button>
+                                        ) : g.privacy === "PUBLIC" ? (
+                                            <button
+                                                className="studyGroupJoinBtn"
+                                                disabled={joiningGroupId === g.id}
+                                                onClick={async () => {
+                                                    setJoiningGroupId(g.id);
+                                                    try {
+                                                        await joinPublicGroup(g.id, userId);
+                                                        setJoinedGroupIds(prev => new Set([...prev, String(g.id)]));
+                                                    } catch (e) {
+                                                        console.error(e);
+                                                    } finally {
+                                                        setJoiningGroupId(null);
+                                                    }
+                                                }}
+                                            >
+                                                {joiningGroupId === g.id ? "Joining…" : "Join"}
+                                            </button>
+                                        ) : (
+                                            <span className="studyGroupInviteOnly">Invite only</span>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
                         {groups.length > 4 && (
                             <div
                                 className="studyGroupCard studyGroupCard--more"

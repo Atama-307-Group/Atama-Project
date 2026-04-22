@@ -722,6 +722,14 @@ export async function getGroupMessages(groupId) {
     return res.json();
 }
 
+export async function getPendingNudges(userId) {
+    const res = await fetch(`${API_BASE}/api/notifications/nudges/${userId}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch nudge notifications");
+    return res.json();
+}
+
 export async function nudgeMember(groupId, targetUserId, senderId) {
     const res = await fetch(`${API_BASE}/api/groups/${groupId}/nudge/${targetUserId}?senderId=${senderId}`, {
         method: "POST",
