@@ -98,11 +98,25 @@ public class UserController {
     @PostMapping("/{id}/delete-account")
     public ResponseEntity<?> deleteAccount(@PathVariable UUID id, @RequestBody Map<String, String> request) {
         String password = request.get("password");
+        String dataOption = request.get("dataOption");
+
+        if (password == null || password.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Password is required."));
+        }
+        if (!List.of("delete", "transfer").contains(dataOption)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Invalid data option."));
+        }
+
         try {
-            userService.deleteAccountWithPassword(id, password);
+            userService.deleteAccountWithPassword(id, password, dataOption);
             return ResponseEntity.ok(Map.of("message", "Account deleted successfully."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", e.getMessage()));
         }
     }
