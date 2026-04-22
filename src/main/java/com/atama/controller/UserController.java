@@ -2,6 +2,7 @@ package com.atama.controller;
 
 import com.atama.dto.request.UserRegistrationRequest;
 import com.atama.dto.response.LoginResult;
+import com.atama.dto.response.UserProfileDTO;
 import com.atama.model.Course;
 import com.atama.model.User;
 import com.atama.service.JwtService;
@@ -287,5 +288,10 @@ public class UserController {
         }
         userService.updateAiDisabled(userId, value);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/profile")
+    public ResponseEntity<UserProfileDTO> getProfile(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.getPublicProfile(id));
     }
 }

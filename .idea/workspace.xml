@@ -5,18 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/RequestCourseModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseRequestController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/request/CreateCourseRequestDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseRequestService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/UserProfilePage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/UserProfilePage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/UserProfileDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/UserSearchDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/EnrollFromScheduleModal.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/RequestCourseModal.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/AdminController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/request/CourseRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/CourseRequestResponseDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/AdminService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/AdminService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/SearchResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/SearchResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryItemRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +73,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "feature/admin__mode",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Users/pawan/IdeaProjects/Atama-Project/pom.xml",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

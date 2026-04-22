@@ -821,3 +821,4 @@ export async function updateAiDisabled(userId, aiDisabled) {
     });
     if (!res.ok) throw new Error("Failed to update AI preference");
 }
+

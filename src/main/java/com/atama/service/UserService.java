@@ -1,16 +1,15 @@
 package com.atama.service;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.dto.response.FlashcardSetSearchDTO;
 import com.atama.dto.response.LoginResult;
+import com.atama.dto.response.UserProfileDTO;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.Library;
 import com.atama.model.University;
 import com.atama.model.User;
 import com.atama.model.Course;
-import com.atama.repository.CourseRepository;
-import com.atama.repository.LibraryRepository;
-import com.atama.repository.UniversityRepository;
-import com.atama.repository.UserRepository;
+import com.atama.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +29,8 @@ public class UserService {
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
     private final JwtService jwtService;
+    private final LibraryItemRepository libraryItemRepository;
+    private final FlashcardSetReviewService flashcardSetReviewService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CourseRepository courseRepository;
@@ -192,5 +193,26 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setAiDisabled(aiDisabled);
         userRepository.save(user);
+    }
+
+    public UserProfileDTO getPublicProfile(UUID profileUserId) {
+        User user = userRepository.findById(profileUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<FlashcardSetSearchDTO> publicSets = libraryItemRepository
+                .findPublicSetsByUser(profileUserId)
+                .stream()
+                .map(i -> {
+                    FlashcardSetReviewService.ReviewAggregate agg = flashcardSetReviewService.getAggregate(i.getId());
+                    return new FlashcardSetSearchDTO(
+                            i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
+                            i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
+                            i.getFolder() != null ? i.getFolder().getId() : null,
+                            agg.averageStars(), agg.topTags()
+                    );
+                })
+                .toList();
+
+        return new UserProfileDTO(user.getId(), user.getUsername(), user.getProfilePictureUrl(), publicSets);
     }
 }
