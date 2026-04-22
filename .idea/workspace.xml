@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js" />
+    <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,7 +66,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "feature/merge__leave__courses",
+    "git-widget-placeholder": "feature/leave__courses",
     "last_opened_file_path": "C:/Users/pawan/IdeaProjects/Atama-Project/pom.xml",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -82,6 +89,36 @@
     </key>
   </component>
   <component name="RunManager" selected="Spring Boot.AtamaApplication">
+    <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list />
+            </option>
+            <option name="multimoduleDir" />
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="main.jsx" type="NodeJSConfigurationType" nameIsGenerated="true" path-to-js-file="main.jsx" working-dir="$PROJECT_DIR$/src/main/frontend/src">
       <method v="2" />
     </configuration>

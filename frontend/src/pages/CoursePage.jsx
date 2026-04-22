@@ -259,35 +259,35 @@ const CoursePage = ({ userId }) => {
         setEditTitle(cli.libraryItem?.title ?? "");
     }
 
-async function handleEditSave() {
-    if (!editingItem) return;
-    setEditSaving(true);
-    try {
-        const promises = [
-            updateCourseLibraryItem(editingItem.id, editYear, editSemester, editDescription || null)
-        ];
+    async function handleEditSave() {
+        if (!editingItem) return;
+        setEditSaving(true);
+        try {
+            const promises = [
+                updateCourseLibraryItem(editingItem.id, editYear, editSemester, editDescription || null)
+            ];
 
-        // Only fire title update if it changed and item supports it
-        const titleChanged = editTitle !== editingItem.libraryItem?.title;
-        const canEditTitle = editingItem.libraryItem?.itemType !== "FLASHCARD";
-        if (canEditTitle && titleChanged) {
-            promises.push(updateLibraryItem(editingItem.libraryItem.id, { title: editTitle }));
+            // Only fire title update if it changed and item supports it
+            const titleChanged = editTitle !== editingItem.libraryItem?.title;
+            const canEditTitle = editingItem.libraryItem?.itemType !== "FLASHCARD";
+            if (canEditTitle && titleChanged) {
+                promises.push(updateLibraryItem(editingItem.libraryItem.id, { title: editTitle }));
+            }
+
+            const [updated] = await Promise.all(promises);
+
+            // Merge the potentially-updated title back into local state
+            setItems(prev => prev.map(i => i.id === updated.id ? {
+                ...updated,
+                libraryItem: { ...updated.libraryItem, title: editTitle }
+            } : i));
+            setEditingItem(null);
+        } catch (err) {
+            setError(err.message ?? "Failed to save changes");
+        } finally {
+            setEditSaving(false);
         }
-
-        const [updated] = await Promise.all(promises);
-
-        // Merge the potentially-updated title back into local state
-        setItems(prev => prev.map(i => i.id === updated.id ? {
-            ...updated,
-            libraryItem: { ...updated.libraryItem, title: editTitle }
-        } : i));
-        setEditingItem(null);
-    } catch (err) {
-        setError(err.message ?? "Failed to save changes");
-    } finally {
-        setEditSaving(false);
     }
-}
 
     async function handleDeleteConfirm() {
         if (!deletingItem) return;
@@ -437,55 +437,21 @@ async function handleEditSave() {
                                                 >
                                                     ⭳
                                                 </button>
-                        {filteredItems.map(cli => (
-                            <div
-                                key={cli.id}
-                                className="itemCard"
-                                onClick={() => {
-                                    if (cli.libraryItem?.itemType === "PDF") {
-                                        openPDF(cli.libraryItem.id);
-                                    } else if (cli.libraryItem?.itemType === "FLASHCARD_SET") {
-                                        navigate(`/sets/${cli.libraryItem.id}`);
-                                    }
-                                }}
-                            >
-                                <div className="folderName">
-                                    <Highlighted text={cli.libraryItem?.title ?? "Untitled"} query={query.trim()} />
-                                </div>
-                                <div className="folderMeta">
-                                    <span className="itemTypeBadge">{cli.libraryItem?.itemType ?? "PDF"}</span>
-                                    <div className="cliMeta">
-                                        {cli.semester && cli.semester !== "Unknown" && (
-                                            <span className="cliTag">{cli.semester}</span>
-                                        )}
-                                        {cli.year && cli.year !== "Unknown" && (
-                                            <span className="cliTag">{cli.year}</span>
-                                        )}
-                                        {cli.libraryItem?.itemType === "PDF" && (
-                                            <button
-                                                className="downloadBtn"
-                                                title="Download PDF"
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    downloadPDF(cli.libraryItem.id, cli.libraryItem.title);
-                                                }}
-                                            >
-                                                ⭳
-                                            </button>
-                                            )}
+                                             )}
+                                            </div>
                                         </div>
+                                        {cli.description && (
+                                            <div className="cliDescription">
+                                                <Highlighted text={cli.description} query={query.trim()} />
+                                            </div>
+                                        )}
                                     </div>
-                                    {cli.description && (
-                                        <div className="cliDescription">
-                                            <Highlighted text={cli.description} query={query.trim()} />
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
 
             {/* Study Groups section */}
             <div className="studyGroupsSection">

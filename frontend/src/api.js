@@ -344,7 +344,10 @@ export async function enrollInCourse(userId, courseId) {
         body: JSON.stringify({ courseId }),
         credentials: "include",
     });
-    if (!res.ok) throw new Error("Failed to enroll in course");
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Enroll failed");
+    }
     return res.json();
 }
 
@@ -440,25 +443,6 @@ export async function recordAccess(itemId) {
         method: "POST",
         credentials: "include",
     });
-}
-
-export async function updateCourseLibraryItem(id, year, semester, description) {
-    const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ year, semester, description }),
-    });
-    if (!res.ok) throw new Error("Failed to update item");
-    return res.json();
-}
-
-export async function deleteCourseLibraryItem(id) {
-    const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to remove item");
 }
 
 export function openPDF(itemId) {

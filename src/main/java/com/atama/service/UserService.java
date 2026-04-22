@@ -12,6 +12,8 @@ import com.atama.repository.LibraryRepository;
 import com.atama.repository.UniversityRepository;
 import com.atama.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -158,14 +161,21 @@ public class UserService {
     }
 
     public void enrollInCourse(UUID userId, UUID courseId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+            Course course = courseRepository.findById(courseId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
 
-        if (!user.getEnrolledCourses().contains(course)) {
-            user.getEnrolledCourses().add(course);
-            userRepository.save(user);
+            if (!user.getEnrolledCourses().contains(course)) {
+                user.getEnrolledCourses().add(course);
+                userRepository.save(user);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
