@@ -4,10 +4,7 @@ import com.atama.dto.request.UserRegistrationRequest;
 import com.atama.dto.response.LoginResult;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.*;
-import com.atama.repository.CourseRepository;
-import com.atama.repository.LibraryRepository;
-import com.atama.repository.UniversityRepository;
-import com.atama.repository.UserRepository;
+import com.atama.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +24,7 @@ public class UserService {
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
     private final JwtService jwtService;
+    private final ReportRepository reportRepository;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CourseRepository courseRepository;
@@ -112,6 +110,8 @@ public class UserService {
         if ("transfer".equals(dataOption)) {
             transferUserContentToAnonymous(user);
         }
+
+        reportRepository.nullifyUser(id);
 
         user.getEnrolledCourses().clear();
         userRepository.save(user);
