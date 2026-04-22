@@ -26,7 +26,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
-    private final LibraryService libraryService;
     private final JwtService jwtService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -66,18 +65,6 @@ public class UserService {
         return savedUser;
     }
 
-//    public User loginUser(String identifier, String password) {
-//        // Try finding by username first, then by email
-//        User user = userRepository.findByUsername(identifier)
-//                .orElseGet(() -> userRepository.findByEmail(identifier)
-//                        .orElseThrow(() -> new IllegalArgumentException("Invalid username/email or password.")));
-//
-//        if (!passwordEncoder.matches(password, user.getPassword())) {
-//            throw new IllegalArgumentException("Invalid username/email or password.");
-//        }
-//
-//        return user;
-//    }
     public LoginResult loginUser(String identifier, String password) {
         User user = userRepository.findByUsername(identifier)
                 .orElseGet(() -> userRepository.findByEmail(identifier)
@@ -87,8 +74,9 @@ public class UserService {
             throw new IllegalArgumentException("Invalid username/email or password.");
         }
 
-        String token = jwtService.generateToken(user.getId(), user.getUsername());
-        return new LoginResult(user, token);
+        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getEmail());
+        boolean isAdmin = user.getEmail().equals("atamacs307@gmail.com");
+        return new LoginResult(user, token, isAdmin);
     }
 
     public User createUser(User user) {
@@ -196,19 +184,14 @@ public class UserService {
     }
 
     public void enrollInCourse(UUID userId, UUID courseId) {
-        try {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-            Course course = courseRepository.findById(courseId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
 
-            if (!user.getEnrolledCourses().contains(course)) {
-                user.getEnrolledCourses().add(course);
-                userRepository.save(user);
-            }
-        } catch (Exception e) {
-            e.printStackTrace(); // force prints regardless of logging config
-            throw e;
+        if (!user.getEnrolledCourses().contains(course)) {
+            user.getEnrolledCourses().add(course);
+            userRepository.save(user);
         }
     }
 

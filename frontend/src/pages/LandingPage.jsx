@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './FlashcardStartPage.css';
+import "./LandingPage.css";
 import { hostGame, getLibraryContents, validateGame } from '../api.js';
 
 /* ── Collab Game Modal ─────────────────────────────────────────── */
@@ -157,7 +157,7 @@ function CollabGameModal({ onClose, navigate }) {
 }
 
 /* ── Main Page ─────────────────────────────────────────────────── */
-const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
+const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -397,4 +397,4 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
   );
 };
 
-export default FlashcardStartPage;
+export default LandingPage;

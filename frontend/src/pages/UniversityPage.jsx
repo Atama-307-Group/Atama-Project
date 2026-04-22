@@ -6,6 +6,8 @@ import LeaveAllCoursesModal from "../components/LeaveAllCoursesModal.jsx"
 import { useCourseEnrollment } from "../hooks/useCourseEnrollment.js";
 import { useSearch } from "../hooks/useSearch.jsx";
 import EnrollFromScheduleModal from "../components/EnrollFromScheduleModal";
+import RequestCourseModal from "../components/RequestCourseModal";
+
 
 const UniversityPage = ({ userId }) => {
     const {
@@ -32,6 +34,7 @@ const UniversityPage = ({ userId }) => {
 
     const menuRef = useRef(null);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
+    const [showRequestModal, setShowRequestModal] = useState(false);
 
     // Global keyboard shortcut: Cmd/Ctrl+K to open search
     useEffect(() => {
@@ -118,14 +121,29 @@ const UniversityPage = ({ userId }) => {
                     </button>
                 )}
 
-                <button className="searchTriggerBtn" onClick={openSearch} aria-label="Search courses">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    <span className="searchTriggerLabel">Search courses</span>
-                    <kbd className="searchKbd">⌘K</kbd>
-                </button>
+
+
+                <div className="searchGroup">
+                    <button
+                        className="requestCourseBtn"
+                        onClick={() => setShowRequestModal(true)}
+                        aria-label="Request a course"
+                        title="Request a course to be added"
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </button>
+                    <button className="searchTriggerBtn" onClick={openSearch} aria-label="Search courses">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <span className="searchTriggerLabel">Search courses</span>
+                        <kbd className="searchKbd">⌘K</kbd>
+                    </button>
+                </div>
             </div>
 
             <div className="coursesBody">
@@ -309,6 +327,14 @@ const UniversityPage = ({ userId }) => {
                     />
             )}
 
+            {/* Request course modal */}
+            {showRequestModal && (
+                <RequestCourseModal
+                    university={university}
+                    userId={userId}
+                    onClose={() => setShowRequestModal(false)}
+                />
+            )}
 
         </div>
     );

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import { useTimer } from './context/TimerContext';
 import TimerPopup from './components/TimerPopup.jsx';
 
-import StartPage from './pages/FlashcardStartPage.jsx';
+import AdminDashboard from './pages/admin/AdminPage.jsx';
+import StartPage from './pages/LandingPage.jsx';
 import StudyPage from './pages/StudyPage.jsx';
 import CreateFlashcardSetPage from './pages/CreateFlashcardSetPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
@@ -52,8 +54,8 @@ function App() {
         return saved ? JSON.parse(saved).aiDisabled ?? false : false;
     });
 
-    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, aiDisabled) => {
-        const user = { id, username, email, profilePictureUrl, verified, aiDisabled };
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, isAdmin) => {
+        const user = { id, username, email, profilePictureUrl, verified, isAdmin };
         setCurrentUser(user);
         setAiDisabled(aiDisabled ?? false);
         localStorage.setItem('currentUser', JSON.stringify(user));
@@ -170,7 +172,7 @@ function App() {
                 <Route path="/sets/:id" element={<FlashcardSetPage currentUser={currentUser} />} />
                 <Route path="/shared/:token" element={<SharedSetPage />} />
                 <Route path="/concept-maps/:id" element={currentUser ? <ConceptMapPage /> : <Navigate to="/login" />} />
-                
+
                 {/* Multiplayer Games */}
                 <Route path="/game/host/:joinCode" element={currentUser ? <HostGameView currentUser={currentUser} /> : <Navigate to="/login" />} />
                 <Route path="/game/play/:joinCode" element={<ParticipantPlayView currentUser={currentUser} />} />
@@ -236,6 +238,16 @@ function App() {
                             onAiDisabledChange={handleAiDisabledChange}
                           />
                         : <Navigate to="/login" />}
+                />
+
+
+                <Route
+                    path="/admin"
+                    element={
+                        currentUser?.isAdmin
+                            ? <AdminDashboard currentUser={currentUser} onLogout={handleLogout} />
+                            : <Navigate to="/" />
+                    }
                 />
 
                 {/* Catch-all */}
