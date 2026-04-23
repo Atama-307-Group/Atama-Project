@@ -822,3 +822,13 @@ export async function updateAiDisabled(userId, aiDisabled) {
     if (!res.ok) throw new Error("Failed to update AI preference");
 }
 
+export async function updateDarkMode(userId, darkMode) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/dark-mode`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ darkMode }),
+    });
+    if (!res.ok) throw new Error("Failed to update dark mode preference");
+}
+

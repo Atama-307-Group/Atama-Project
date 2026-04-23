@@ -195,6 +195,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void updateDarkMode(UUID userId, boolean darkMode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setDarkMode(darkMode);
+        userRepository.save(user);
+    }
+
     public UserProfileDTO getPublicProfile(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
