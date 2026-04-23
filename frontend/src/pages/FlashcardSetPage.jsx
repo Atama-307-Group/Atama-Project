@@ -468,6 +468,7 @@ const FlashcardSetPage = ({ currentUser }) => {
                     sourceSetId={id} 
                     defaultCards={setData.flashcards} 
                     onClose={() => setShowConceptMapModal(false)}
+                    aiDisabled={currentUser?.aiDisabled}
                 />
             )}
         </div>
