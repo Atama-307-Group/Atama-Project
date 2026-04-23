@@ -39,4 +39,16 @@ public class ChatMessage {
     // echoed back so the sender can deduplicate against its optimistic update
     @Column(name = "client_id")
     private String clientId;
+
+    @Column(name = "message_type")
+    private String messageType = "TEXT";
+
+    @Column(name = "material_id")
+    private UUID materialId;
+
+    @Column(name = "material_title", length = 500)
+    private String materialTitle;
+
+    @Column(name = "material_type", length = 50)
+    private String materialType;
 }

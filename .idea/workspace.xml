@@ -6,12 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/StudyGroupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/StudyGroupController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/StudyGroupService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/StudyGroupService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/LibraryItemResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/LibraryItemResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/ChatMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/ChatMessage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,7 +143,7 @@
       <workItem from="1775164613189" duration="76000" />
       <workItem from="1775164716618" duration="44000" />
       <workItem from="1776038811093" duration="2342000" />
-      <workItem from="1776871627293" duration="3517000" />
+      <workItem from="1776871627293" duration="5120000" />
     </task>
     <task id="LOCAL-00001" summary="Added model java files for User and Flashcards, implemented basics for Flashcard types that extend Flashcard interface.">
       <option name="closed" value="true" />

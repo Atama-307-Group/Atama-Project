@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
-import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember, leaveGroup } from "../api.js";
+import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember, leaveGroup, getLibraryItems, openPDF } from "../api.js";
 import "./StudyGroupPage.css";
 
 const StudyGroupPage = ({ userId }) => {
@@ -26,6 +26,11 @@ const StudyGroupPage = ({ userId }) => {
     const [copiedInvite, setCopiedInvite] = useState(false);
     const [nudgedMembers, setNudgedMembers] = useState({});
 
+    const [showPicker, setShowPicker] = useState(false);
+    const [pickerItems, setPickerItems] = useState([]);
+    const [pickerLoading, setPickerLoading] = useState(false);
+    const pickerRef = useRef(null);
+
     useEffect(() => {
         async function load() {
             try {
@@ -44,6 +49,10 @@ const StudyGroupPage = ({ userId }) => {
                     id: m.id,
                     author: m.username,
                     text: m.text,
+                    messageType: m.messageType ?? "TEXT",
+                    materialId: m.materialId,
+                    materialTitle: m.materialTitle,
+                    materialType: m.materialType,
                     time: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                     isMe: String(m.userId) === String(userId),
                     clientId: m.clientId,
@@ -69,6 +78,10 @@ const StudyGroupPage = ({ userId }) => {
                         id: msg.id,
                         author: msg.username,
                         text: msg.text,
+                        messageType: msg.messageType ?? "TEXT",
+                        materialId: msg.materialId,
+                        materialTitle: msg.materialTitle,
+                        materialType: msg.materialType,
                         time: new Date(msg.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
                         isMe: String(msg.userId) === String(userId),
                         clientId: msg.clientId,
@@ -85,6 +98,17 @@ const StudyGroupPage = ({ userId }) => {
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    useEffect(() => {
+        if (!showPicker) return;
+        function onPointerDown(e) {
+            if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+                setShowPicker(false);
+            }
+        }
+        window.addEventListener("pointerdown", onPointerDown);
+        return () => window.removeEventListener("pointerdown", onPointerDown);
+    }, [showPicker]);
 
     function sendMessage(e) {
         e.preventDefault();
@@ -131,6 +155,64 @@ const StudyGroupPage = ({ userId }) => {
             navigate(-1);
         } catch (e) {
             alert(e.message);
+        }
+    }
+
+    async function handleOpenPicker() {
+        setShowPicker(true);
+        if (pickerItems.length > 0) return;
+        setPickerLoading(true);
+        try {
+            const items = await getLibraryItems();
+            setPickerItems(Array.isArray(items) ? items.filter(i => i.isPublic) : []);
+        } catch {
+            setPickerItems([]);
+        } finally {
+            setPickerLoading(false);
+        }
+    }
+
+    function handleSendMaterial(item) {
+        if (!stompClientRef.current?.connected) return;
+        const me = members.find(m => String(m.user?.id) === String(userId));
+        const username = me?.user?.username ?? "You";
+        const clientId = crypto.randomUUID();
+
+        sentClientIds.current.add(clientId);
+        setMessages(prev => [...prev, {
+            id: clientId,
+            author: username,
+            text: "",
+            messageType: "MATERIAL",
+            materialId: item.id,
+            materialTitle: item.title,
+            materialType: item.itemType,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            isMe: true,
+            clientId,
+        }]);
+
+        stompClientRef.current.publish({
+            destination: `/app/groups/${groupId}/chat`,
+            body: JSON.stringify({
+                userId, username, text: "", clientId,
+                messageType: "MATERIAL",
+                materialId: item.id,
+                materialTitle: item.title,
+                materialType: item.itemType,
+            }),
+        });
+
+        setShowPicker(false);
+    }
+
+    function handleNavigateMaterial(type, id) {
+        if (type === "PDF") {
+            openPDF(id);
+        } else if (type === "CONCEPT_MAP") {
+            navigate(`/concept-maps/${id}`);
+        } else {
+            navigate(`/sets/${id}`);
         }
     }
 
@@ -183,20 +265,71 @@ const StudyGroupPage = ({ userId }) => {
                                     <span className="sgMsgAuthor">{msg.author}</span>
                                     <span className="sgMsgTime">{msg.time}</span>
                                 </div>
-                                <span className="sgMsgText">{msg.text}</span>
+                                {msg.messageType === "MATERIAL" ? (
+                                    <div
+                                        className="sgMaterialCard"
+                                        onClick={() => handleNavigateMaterial(msg.materialType, msg.materialId)}
+                                    >
+                                        <div className="sgMaterialCardName">{msg.materialTitle}</div>
+                                        <div className="sgMaterialCardMeta">
+                                            <span className={`sgMaterialTypeBadge sgMaterialTypeBadge--${msg.materialType?.toLowerCase()}`}>
+                                                {msg.materialType?.replace(/_/g, " ")}
+                                            </span>
+                                            <span className="sgMaterialCardHint">Click to open →</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <span className="sgMsgText">{msg.text}</span>
+                                )}
                             </div>
                         ))}
                         <div ref={chatEndRef} />
                     </div>
-                    <form className="sgChatForm" onSubmit={sendMessage}>
-                        <input
-                            className="sgChatInput"
-                            value={chatInput}
-                            onChange={e => setChatInput(e.target.value)}
-                            placeholder="Type a message..."
-                        />
-                        <button className="sgChatSendBtn" type="submit">Send</button>
-                    </form>
+                    <div className="sgChatFormWrap" ref={pickerRef}>
+                        {showPicker && (
+                            <div className="sgPicker">
+                                <div className="sgPickerHeader">
+                                    <span>Share from Library</span>
+                                    <button className="sgPickerClose" onClick={() => setShowPicker(false)}>✕</button>
+                                </div>
+                                {pickerLoading ? (
+                                    <p className="sgPickerEmpty">Loading…</p>
+                                ) : pickerItems.length === 0 ? (
+                                    <p className="sgPickerEmpty">No public items in your library.</p>
+                                ) : (
+                                    <div className="sgPickerGrid">
+                                        {pickerItems.map(item => (
+                                            <div
+                                                key={item.id}
+                                                className="sgPickerItem"
+                                                onClick={() => handleSendMaterial(item)}
+                                            >
+                                                <div className="sgPickerItemName">{item.title}</div>
+                                                <span className={`sgMaterialTypeBadge sgMaterialTypeBadge--${item.itemType?.toLowerCase()}`}>
+                                                    {item.itemType?.replace(/_/g, " ")}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <form className="sgChatForm" onSubmit={sendMessage}>
+                            <button
+                                className="sgPickerBtn"
+                                type="button"
+                                onClick={handleOpenPicker}
+                                title="Share a library item"
+                            >+</button>
+                            <input
+                                className="sgChatInput"
+                                value={chatInput}
+                                onChange={e => setChatInput(e.target.value)}
+                                placeholder="Type a message..."
+                            />
+                            <button className="sgChatSendBtn" type="submit">Send</button>
+                        </form>
+                    </div>
                 </section>
 
                 <aside className="sgSidebar">
