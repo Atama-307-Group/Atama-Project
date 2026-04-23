@@ -1,0 +1,934 @@
+{
+  "name": "My First Folder",
+  "createdAt": "2026-02-22T19:00:58.369062Z",
+  "id": 1,
+  "items": [],
+  "lastAccessed": "2026-02-22T19:00:58.348782800Z",
+  "library": {
+    "user": {
+      "hibernateLazyInitializer": {},
+      "id": 1,
+      "library": {
+        "user": {
+          "hibernateLazyInitializer": {},
+          "id": 1,
+          "library": {
+            "user": {
+              "hibernateLazyInitializer": {},
+              "id": 1,
+              "library": {
+                "user": {
+                  "hibernateLazyInitializer": {},
+                  "id": 1,
+                  "library": {
+                    "user": {
+                      "hibernateLazyInitializer": {},
+                      "id": 1,
+                      "library": {
+                        "user": {
+                          "hibernateLazyInitializer": {},
+                          "id": 1,
+                          "library": {
+                            "user": {
+                              "hibernateLazyInitializer": {},
+                              "id": 1,
+                              "library": {
+                                "user": {
+                                  "hibernateLazyInitializer": {},
+                                  "id": 1,
+                                  "library": {
+                                    "user": {
+                                      "hibernateLazyInitializer": {},
+                                      "id": 1,
+                                      "library": {
+                                        "user": {
+                                          "hibernateLazyInitializer": {},
+                                          "id": 1,
+                                          "library": {
+                                            "user": {
+                                              "hibernateLazyInitializer": {},
+                                              "id": 1,
+                                              "library": {
+                                                "user": {
+                                                  "hibernateLazyInitializer": {},
+                                                  "id": 1,
+                                                  "library": {
+                                                    "user": {
+                                                      "hibernateLazyInitializer": {},
+                                                      "id": 1,
+                                                      "library": {
+                                                        "user": {
+                                                          "hibernateLazyInitializer": {},
+                                                          "id": 1,
+                                                          "library": {
+                                                            "user": {
+                                                              "hibernateLazyInitializer": {},
+                                                              "id": 1,
+                                                              "library": {
+                                                                "user": {
+                                                                  "hibernateLazyInitializer": {},
+                                                                  "id": 1,
+                                                                  "library": {
+                                                                    "user": {
+                                                                      "hibernateLazyInitializer": {},
+                                                                      "id": 1,
+                                                                      "library": {
+                                                                        "user": {
+                                                                          "hibernateLazyInitializer": {},
+                                                                          "id": 1,
+                                                                          "library": {
+                                                                            "user": {
+                                                                              "hibernateLazyInitializer": {},
+                                                                              "id": 1,
+                                                                              "library": {
+                                                                                "user": {
+                                                                                  "hibernateLazyInitializer": {},
+                                                                                  "id": 1,
+                                                                                  "library": {
+                                                                                    "user": {
+                                                                                      "hibernateLazyInitializer": {},
+                                                                                      "id": 1,
+                                                                                      "library": {
+                                                                                        "user": {
+                                                                                          "hibernateLazyInitializer": {},
+                                                                                          "id": 1,
+                                                                                          "library": {
+                                                                                            "user": {
+                                                                                              "hibernateLazyInitializer": {},
+                                                                                              "id": 1,
+                                                                                              "library": {
+                                                                                                "user": {
+                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                  "id": 1,
+                                                                                                  "library": {
+                                                                                                    "user": {
+                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                      "id": 1,
+                                                                                                      "library": {
+                                                                                                        "user": {
+                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                          "id": 1,
+                                                                                                          "library": {
+                                                                                                            "user": {
+                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                              "id": 1,
+                                                                                                              "library": {
+                                                                                                                "user": {
+                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                  "id": 1,
+                                                                                                                  "library": {
+                                                                                                                    "user": {
+                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                      "id": 1,
+                                                                                                                      "library": {
+                                                                                                                        "user": {
+                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                          "id": 1,
+                                                                                                                          "library": {
+                                                                                                                            "user": {
+                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                              "id": 1,
+                                                                                                                              "library": {
+                                                                                                                                "user": {
+                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                  "id": 1,
+                                                                                                                                  "library": {
+                                                                                                                                    "user": {
+                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                      "id": 1,
+                                                                                                                                      "library": {
+                                                                                                                                        "user": {
+                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                          "id": 1,
+                                                                                                                                          "library": {
+                                                                                                                                            "user": {
+                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                              "id": 1,
+                                                                                                                                              "library": {
+                                                                                                                                                "user": {
+                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                  "id": 1,
+                                                                                                                                                  "library": {
+                                                                                                                                                    "user": {
+                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                      "id": 1,
+                                                                                                                                                      "library": {
+                                                                                                                                                        "user": {
+                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                          "id": 1,
+                                                                                                                                                          "library": {
+                                                                                                                                                            "user": {
+                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                              "id": 1,
+                                                                                                                                                              "library": {
+                                                                                                                                                                "user": {
+                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                  "id": 1,
+                                                                                                                                                                  "library": {
+                                                                                                                                                                    "user": {
+                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                      "id": 1,
+                                                                                                                                                                      "library": {
+                                                                                                                                                                        "user": {
+                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                          "id": 1,
+                                                                                                                                                                          "library": {
+                                                                                                                                                                            "user": {
+                                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                                              "id": 1,
+                                                                                                                                                                              "library": {
+                                                                                                                                                                                "user": {
+                                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                                  "id": 1,
+                                                                                                                                                                                  "library": {
+                                                                                                                                                                                    "user": {
+                                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                                      "id": 1,
+                                                                                                                                                                                      "library": {
+                                                                                                                                                                                        "user": {
+                                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                                          "id": 1,
+                                                                                                                                                                                          "library": {
+                                                                                                                                                                                            "user": {
+                                                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                                                              "id": 1,
+                                                                                                                                                                                              "library": {
+                                                                                                                                                                                                "user": {
+                                                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                                                  "id": 1,
+                                                                                                                                                                                                  "library": {
+                                                                                                                                                                                                    "user": {
+                                                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                                                      "id": 1,
+                                                                                                                                                                                                      "library": {
+                                                                                                                                                                                                        "user": {
+                                                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                                                          "id": 1,
+                                                                                                                                                                                                          "library": {
+                                                                                                                                                                                                            "user": {
+                                                                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                                                                              "id": 1,
+                                                                                                                                                                                                              "library": {
+                                                                                                                                                                                                                "user": {
+                                                                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                  "id": 1,
+                                                                                                                                                                                                                  "library": {
+                                                                                                                                                                                                                    "user": {
+                                                                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                      "id": 1,
+                                                                                                                                                                                                                      "library": {
+                                                                                                                                                                                                                        "user": {
+                                                                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                          "id": 1,
+                                                                                                                                                                                                                          "library": {
+                                                                                                                                                                                                                            "user": {
+                                                                                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                              "id": 1,
+                                                                                                                                                                                                                              "library": {
+                                                                                                                                                                                                                                "user": {
+                                                                                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                  "id": 1,
+                                                                                                                                                                                                                                  "library": {
+                                                                                                                                                                                                                                    "user": {
+                                                                                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                      "id": 1,
+                                                                                                                                                                                                                                      "library": {
+                                                                                                                                                                                                                                        "user": {
+                                                                                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                          "id": 1,
+                                                                                                                                                                                                                                          "library": {
+                                                                                                                                                                                                                                            "user": {
+                                                                                                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                              "id": 1,
+                                                                                                                                                                                                                                              "library": {
+                                                                                                                                                                                                                                                "user": {
+                                                                                                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                  "id": 1,
+                                                                                                                                                                                                                                                  "library": {
+                                                                                                                                                                                                                                                    "user": {
+                                                                                                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                      "id": 1,
+                                                                                                                                                                                                                                                      "library": {
+                                                                                                                                                                                                                                                        "user": {
+                                                                                                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                          "id": 1,
+                                                                                                                                                                                                                                                          "library": {
+                                                                                                                                                                                                                                                            "user": {
+                                                                                                                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                              "id": 1,
+                                                                                                                                                                                                                                                              "library": {
+                                                                                                                                                                                                                                                                "user": {
+                                                                                                                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                                  "id": 1,
+                                                                                                                                                                                                                                                                  "library": {
+                                                                                                                                                                                                                                                                    "user": {
+                                                                                                                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                                      "id": 1,
+                                                                                                                                                                                                                                                                      "library": {
+                                                                                                                                                                                                                                                                        "user": {
+                                                                                                                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                                          "id": 1,
+                                                                                                                                                                                                                                                                          "library": {
+                                                                                                                                                                                                                                                                            "user": {
+                                                                                                                                                                                                                                                                              "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                                              "id": 1,
+                                                                                                                                                                                                                                                                              "library": {
+                                                                                                                                                                                                                                                                                "user": {
+                                                                                                                                                                                                                                                                                  "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                                                  "id": 1,
+                                                                                                                                                                                                                                                                                  "library": {
+                                                                                                                                                                                                                                                                                    "user": {
+                                                                                                                                                                                                                                                                                      "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                                                      "id": 1,
+                                                                                                                                                                                                                                                                                      "library": {
+                                                                                                                                                                                                                                                                                        "user": {
+                                                                                                                                                                                                                                                                                          "hibernateLazyInitializer": {},
+                                                                                                                                                                                                                                                                                          "id": 1,
+                                                                                                                                                                                                                                                                                          "library": {
+                                                                                                                                                                                                                                                                                            "user": {
+                                                                                                                                                                                                                                                                                              "hibernateLazyInitializer"
+                                                                                                                                                                                                                                                                                            :{},"id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{
+"user":{
+"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":{"hibernateLazyInitializer":{}, "id": 1, "library":{"user":}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}{"timestamp": "2026-02-22T19:00:58.524076900Z", "status": 500, "error":"Internal Server Error", "message": "Could not write JSON: Document nesting depth (501) exceeds the maximum allowed (500, from `StreamWriteConstraints.getMaxNestingDepth()`)"}

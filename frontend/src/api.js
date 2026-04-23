@@ -30,6 +30,24 @@ export async function deleteFolder(folderId) {
     if (!res.ok) throw new Error("Failed to delete folder");
 }
 
+export async function deleteLibraryItem(itemId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to delete library item");
+}
+
+export async function renameLibraryItem(itemId, title) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+    });
+    if (!res.ok) throw new Error("Failed to rename item");
+}
+
 async function request(path, options = {}) {
     const res = await fetch(`${BASE}${path}`, {
         credentials: "include",
@@ -96,14 +114,6 @@ export async function setFolderPrivacy(folderId, isPublic) {
         body: JSON.stringify({ isPublic }),
     });
     if (!res.ok) throw new Error("Failed to update folder privacy");
-    return res.json();
-}
-
-export async function getLibraryItems() {
-    const res = await fetch(`${API_BASE}/library-items`, {
-        credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to load library items");
     return res.json();
 }
 
@@ -195,6 +205,15 @@ export async function updateSetPrivacy(id, isPublic) {
     if (!res.ok) throw new Error('Failed to update privacy');
     return res.json();
 }
+
+export async function deleteFlashcardSet(setId) {
+    const res = await fetch(`${API_BASE}/flashcard-sets/${setId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to delete flashcard set");
+}
+
 /* Goals ------------------------------------------- */
 
 export async function getGoal(userId) {
@@ -325,7 +344,10 @@ export async function enrollInCourse(userId, courseId) {
         body: JSON.stringify({ courseId }),
         credentials: "include",
     });
-    if (!res.ok) throw new Error("Failed to enroll in course");
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Enroll failed");
+    }
     return res.json();
 }
 
@@ -385,13 +407,6 @@ export async function uploadPDFToCourse(file, title, year, semester, description
     return res.json();
 }
 
-export async function recordAccess(itemId) {
-    await fetch(`${API_BASE}/library-items/${itemId}/access`, {
-        method: "POST",
-        credentials: "include",
-    });
-}
-
 export async function updateCourseLibraryItem(id, year, semester, description) {
     const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
         method: "PATCH",
@@ -403,12 +418,31 @@ export async function updateCourseLibraryItem(id, year, semester, description) {
     return res.json();
 }
 
+export async function updateCourseLibraryItemTitle(id, { title }) {
+    const res = await fetch(`${API_BASE}/library-items/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+    });
+    if (!res.ok) throw new Error("Failed to update library item");
+    return res.json();
+}
+
+
 export async function deleteCourseLibraryItem(id) {
     const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
         method: "DELETE",
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to remove item");
+}
+
+export async function recordAccess(itemId) {
+    await fetch(`${API_BASE}/library-items/${itemId}/access`, {
+        method: "POST",
+        credentials: "include",
+    });
 }
 
 export function openPDF(itemId) {
@@ -547,6 +581,9 @@ export async function getCourseItems(courseId) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to fetch course items");
+      console.log("fetching course items for:", courseId);
+
+
     return res.json();
 }
 
