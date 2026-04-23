@@ -34,4 +34,8 @@ public class CourseLeaveDateService {
     public Optional<CourseLeaveDate> getRecentlyExecuted(UUID userId) {
         return courseLeaveDateRepository.findByUserIdAndExecutedAtIsNotNull(userId);
     }
+
+    public Optional<CourseLeaveDate> findByUserId(UUID userId) {
+        return courseLeaveDateRepository.findByUserId(userId);
+    }
 }

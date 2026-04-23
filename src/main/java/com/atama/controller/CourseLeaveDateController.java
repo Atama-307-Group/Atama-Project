@@ -1,13 +1,14 @@
 package com.atama.controller;
 
 import com.atama.model.CourseLeaveDate;
+import com.atama.repository.CourseLeaveDateRepository;
 import com.atama.service.CourseLeaveDateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,12 +36,16 @@ public class CourseLeaveDateController {
 
     @GetMapping("/{userId}/schedule-leave/status")
     public ResponseEntity<Map<String, Object>> getLeaveStatus(@PathVariable UUID userId) {
-        Optional<CourseLeaveDate> recent = courseLeaveDateService.getRecentlyExecuted(userId);
-        if (recent.isPresent()) {
-            return ResponseEntity.ok(Map.of(
-                    "executed", true,
-                    "executedAt", recent.get().getExecutedAt()
-            ));
+        Optional<CourseLeaveDate> record = courseLeaveDateService.findByUserId(userId);
+        if (record.isPresent()) {
+            CourseLeaveDate leave = record.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("executed", leave.getExecutedAt() != null);
+            response.put("scheduledFor", leave.getScheduledFor());
+            if (leave.getExecutedAt() != null) {
+                response.put("executedAt", leave.getExecutedAt());
+            }
+            return ResponseEntity.ok(response);
         }
         return ResponseEntity.ok(Map.of("executed", false));
     }

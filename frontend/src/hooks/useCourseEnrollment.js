@@ -14,6 +14,8 @@ export function useCourseEnrollment(userId) {
 
     const [leaveOneCourse, setLeaveOneCourse] = useState(null);
     const [leavingOne, setLeavingOne] = useState(false);
+    const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
+
 
     useEffect(() => {
         getUniversity()
@@ -24,6 +26,16 @@ export function useCourseEnrollment(userId) {
             .then(([allCourses, enrolled]) => {
                 setCourses(allCourses);
                 setEnrolledIds(new Set(enrolled.map(c => c.id)));
+            })
+            .catch(console.error);
+    }, [userId]);
+
+    useEffect(() => {
+        if (!userId) return;
+        fetch(`/api/users/${userId}/schedule-leave/status`, { credentials: "include" })
+            .then(res => res.json())
+            .then(data => {
+                if (data.scheduledFor) setScheduledLeaveDate(new Date(data.scheduledFor));
             })
             .catch(console.error);
     }, [userId]);
@@ -43,11 +55,22 @@ export function useCourseEnrollment(userId) {
         }
     }
 
-    async function handleLeaveAll() {
+    async function handleLeaveAll(scheduleDate) {
         setLeavingAll(true);
         try {
-            await Promise.all([...enrolledIds].map(courseId => unenrollFromAllCourses(userId, courseId)));
-            setEnrolledIds(new Set());
+            if (scheduleDate) {
+                await fetch(`/api/users/${userId}/schedule-leave`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ scheduledFor: scheduleDate.toISOString() })
+                });
+                setScheduledLeaveDate(scheduleDate);
+            } else {
+                await Promise.all([...enrolledIds].map(courseId => unenrollFromAllCourses(userId, courseId)));
+                setEnrolledIds(new Set());
+                setScheduledLeaveDate(null);
+            }
             setShowLeaveAllModal(false);
         } catch (err) {
             console.error(err);
