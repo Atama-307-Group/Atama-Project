@@ -22,6 +22,7 @@ import PostMatchPage from "./pages/PostMatchPage.jsx";
 import PreLearnPage from "./pages/PreLearnPage.jsx";
 import PostLearnPage from "./pages/PostLearnPage.jsx";
 import PreTestPage from "./pages/PreTestPage.jsx";
+import PracticeTestOptionsPage from "./pages/PracticeTestOptionsPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
 import GoalsPage from "./pages/StudyGoal.jsx"
@@ -188,6 +189,10 @@ function App() {
                 <Route path="/post_match" element={<PostMatchPage />} />
 
                 {/* Test Flow */}
+                <Route
+                    path="/practice-test-options"
+                    element={currentUser ? <PracticeTestOptionsPage /> : <Navigate to="/login" />}
+                />
                 <Route path="/pre_test" element={<PreTestPage />} />
                 <Route path="/practice_test" element={<PracticeTestPage userId={currentUser?.id} />} />
                 <Route path="/post_test" element={<PostTestPage />} />

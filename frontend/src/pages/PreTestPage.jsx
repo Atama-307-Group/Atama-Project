@@ -1,72 +1,165 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { generatePracticeTest, getFlashcardSetById } from '../api.js';
 
 const PreTestPage = () => {
     const { state } = useLocation();
-    const flashcards = state?.flashcards || [];
-    const setTitle = state?.setTitle || '';
-
-    const [promptType, setPromptType] = useState('term');
-    const [favoritesOnly, setFavoritesOnly] = useState(false);
-    const [numQuestions, setNumQuestions] = useState(flashcards.length);
     const navigate = useNavigate();
 
-    if (flashcards.length === 0) {
-        return (
-            <div style={{ textAlign: 'center', marginTop: '100px' }}>
-                <p>No flashcards found. Please go back and select a set.</p>
-                <button onClick={() => navigate('/')}>Return Home</button>
-            </div>
-        );
-    }
+    // From PickSetPage we have selectedItems (array of LibraryItem objects)
+    const selectedItems = state?.selectedItems || [];
+    const forceManual = state?.forceManual || false;
 
-    const handleStart = () => {
-        let cardsPool = favoritesOnly ? flashcards.filter((c) => c.favorite) : flashcards;
+    const hasStudyMaterial = selectedItems.some(i => {
+        const t = i.itemType || i.item_type;
+        return t !== 'FLASHCARD_SET' && t !== 'flashcard_set';
+    });
 
-        if (cardsPool.length === 0) {
-            alert('No cards available for the test!');
-            return;
+    const [types, setTypes] = useState(['MCQ']);
+    const [numQuestions, setNumQuestions] = useState(10);
+    const [maxCards, setMaxCards] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const [aiDisabled, setAiDisabled] = useState(false);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('currentUser');
+        if (saved) {
+            const user = JSON.parse(saved);
+            setAiDisabled(user.aiDisabled === true);
         }
 
-        navigate('/practice_test', {
-            state: {
-                promptType,
-                cards: cardsPool,
-                numQuestions: Math.min(numQuestions, cardsPool.length),
-                setId: state?.setId,
+        const fetchCards = async () => {
+            const flashcardSetIds = selectedItems
+                .filter(i => { const t = i.itemType || i.item_type; return t === 'FLASHCARD_SET' || t === 'flashcard_set'; })
+                .map(i => i.id);
+
+            if (flashcardSetIds.length > 0) {
+                try {
+                    const promises = flashcardSetIds.map(id => getFlashcardSetById(id));
+                    const sets = await Promise.all(promises);
+                    const totalCardCount = sets.reduce((sum, s) => sum + (s.flashcards?.length || 0), 0);
+                    setMaxCards(totalCardCount);
+                    if (totalCardCount < numQuestions && totalCardCount > 0) {
+                        setNumQuestions(totalCardCount);
+                    }
+                } catch (e) {
+                    console.error("Failed to load flashcard sets", e);
+                }
+            } else {
+                setMaxCards(50); // Fallback for pure PDF configurations
             }
+        };
+        fetchCards();
+    }, [selectedItems]);
+
+    const toggleType = (type) => {
+        setTypes(prev => {
+            if (prev.includes(type)) {
+                if (prev.length === 1) return prev; // keep at least 1
+                return prev.filter(t => t !== type);
+            }
+            return [...prev, type];
         });
     };
 
+    const handleStart = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            
+            const flashcardSetIds = selectedItems
+                .filter(i => { const t = i.itemType || i.item_type; return t === 'FLASHCARD_SET' || t === 'flashcard_set'; })
+                .map(i => i.id);
+            const documentIds = selectedItems
+                .filter(i => { const t = i.itemType || i.item_type; return t !== 'FLASHCARD_SET' && t !== 'flashcard_set'; })
+                .map(i => i.id);
+
+            const useAi = !forceManual && !aiDisabled;
+
+            const payload = {
+                flashcardSetIds,
+                documentIds,
+                formattedText: '',
+                useAi,
+                questionTypes: types,
+                numQuestions
+            };
+
+            const questions = await generatePracticeTest(payload);
+            if (!questions || questions.length === 0) {
+                setError('No questions could be generated. Please provide valid text or flashcards.');
+                return;
+            }
+
+            navigate('/practice_test', {
+                state: { questions, setId: flashcardSetIds.length > 0 ? flashcardSetIds[0] : null }
+            });
+        } catch (err) {
+            setError(err.message || 'Error generating test');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const showTextarea = (aiDisabled && hasStudyMaterial) || selectedItems.length === 0;
+
     return (
-        <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
+        <div style={{ maxWidth: '600px', margin: '50px auto', fontFamily: 'sans-serif', padding: '20px' }}>
             <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginBottom: '1rem' }}>← Back</button>
-            <h2>Practice Test Settings</h2>
-            {setTitle && <p style={{ color: '#666', marginTop: 0 }}>{setTitle}</p>}
-            <div>
-                <h3>Prompt Type</h3>
-                <label>
-                    <input type="radio" value="term" checked={promptType === 'term'} onChange={() => setPromptType('term')} /> Term
+            <h2 style={{ textAlign: 'center' }}>Practice Test Settings</h2>
+            
+            {aiDisabled && (
+                <div style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '12px', borderRadius: '4px', marginBottom: '20px' }}>
+                    <strong>Warning: AI Study is disabled.</strong> Tests will be generated manually using flashcards or your formatted text.
+                </div>
+            )}
+
+            <div style={{ marginBottom: '20px' }}>
+                <p style={{ fontWeight: 'bold' }}>Question Types:</p>
+                <label style={{ marginRight: '15px' }}>
+                    <input type="checkbox" checked={types.includes('MCQ')} onChange={() => toggleType('MCQ')} /> Multiple Choice
                 </label>
-                <br />
-                <label>
-                    <input type="radio" value="definition" checked={promptType === 'definition'} onChange={() => setPromptType('definition')} /> Definition
+                <label style={{ marginRight: '15px' }}>
+                    <input type="checkbox" checked={types.includes('TRUE_FALSE')} onChange={() => toggleType('TRUE_FALSE')} /> True/False
                 </label>
-            </div>
-            <div style={{ marginTop: '20px' }}>
                 <label>
-                    <input type="checkbox" checked={favoritesOnly} onChange={() => setFavoritesOnly(!favoritesOnly)} /> Favorited cards only
-                </label>
-            </div>
-            <div style={{ marginTop: '20px' }}>
-                <label>
-                    Number of questions:
-                    <input type="number" min="1" max={flashcards.length} value={numQuestions} onChange={(e) => setNumQuestions(Number(e.target.value))} />
+                    <input type="checkbox" checked={types.includes('SHORT_ANSWER')} onChange={() => toggleType('SHORT_ANSWER')} /> Short Answer
                 </label>
             </div>
-            <button onClick={handleStart} style={{ borderRadius: '5px', marginTop: '30px', padding: '10px 20px', fontSize: '16px' }}>
-                Start Test
-            </button>
+
+            <div style={{ marginBottom: '20px' }}>
+                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Number of questions:</label>
+                <input 
+                    type="number"
+                    list="questions-options"
+                    value={numQuestions} 
+                    onChange={(e) => setNumQuestions(Number(e.target.value))} 
+                    min="1"
+                    max={maxCards > 0 ? maxCards : 50}
+                    style={{ padding: '8px', width: '150px' }}
+                />
+                <datalist id="questions-options">
+                    {Array.from({ length: maxCards > 0 ? maxCards : 50 }, (_, i) => i + 1).map(n => (
+                        <option key={n} value={n} />
+                    ))}
+                </datalist>
+            </div>
+
+
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+
+            <div style={{ textAlign: 'center', marginTop: '30px' }}>
+                <button 
+                    onClick={handleStart} 
+                    disabled={loading}
+                    style={{ borderRadius: '5px', padding: '12px 24px', fontSize: '18px', backgroundColor: '#335145', color: '#fff', border: 'none', cursor: 'pointer' }}
+                >
+                    {loading ? 'Generating...' : 'Start Test'}
+                </button>
+            </div>
         </div>
     );
 };
