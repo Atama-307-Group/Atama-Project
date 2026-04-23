@@ -58,7 +58,7 @@ const SearchPage = () => {
                                 <div key={item.id} className="recent-item"
                                      onClick={() => navigate(`/sets/${item.id}`)}
                                      style={{ cursor: "pointer" }}>
-                                    <p className="recent-title">🃏 {item.title}</p>
+                                    <p className="recent-title">{item.title}</p>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
                                         {item.averageRating != null ? (
                                             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f59e0b' }}>
@@ -105,7 +105,7 @@ const SearchPage = () => {
                             <h3 style={{ marginBottom: 12 }}>Users</h3>
                             {results.users.map(user => (
                                 <div key={user.id} className="recent-item"
-                                     onClick={() => navigate(`/users/${user.id}`)}
+                                     onClick={() => navigate(`/users/${user.username}`)}
                                      style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }}>
                                     {user.profilePictureUrl
                                         ? <img src={user.profilePictureUrl} alt="" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />

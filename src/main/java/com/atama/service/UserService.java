@@ -195,12 +195,12 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public UserProfileDTO getPublicProfile(UUID profileUserId) {
-        User user = userRepository.findById(profileUserId)
+    public UserProfileDTO getPublicProfile(String username) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         List<FlashcardSetSearchDTO> publicSets = libraryItemRepository
-                .findPublicSetsByUser(profileUserId)
+                .findPublicSetsByUser(user.getId())
                 .stream()
                 .map(i -> {
                     FlashcardSetReviewService.ReviewAggregate agg = flashcardSetReviewService.getAggregate(i.getId());

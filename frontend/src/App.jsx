@@ -40,6 +40,7 @@ import ConceptMapPage from "./pages/ConceptMapPage.jsx";
 import HostGameView from './pages/game/HostGameView.jsx';
 import ParticipantJoinView from './pages/game/ParticipantJoinView.jsx';
 import ParticipantPlayView from './pages/game/ParticipantPlayView.jsx';
+import UserProfilePage from './pages/UserProfilePage';
 
 function App() {
     const { openPopup } = useTimer();
@@ -240,7 +241,7 @@ function App() {
                         : <Navigate to="/login" />}
                 />
 
-
+                {/* Admin Dashboard */}
                 <Route
                     path="/admin"
                     element={
@@ -249,6 +250,11 @@ function App() {
                             : <Navigate to="/" />
                     }
                 />
+
+                {/* User profile pages */}
+                <Route
+                    path="/users/:username"
+                    element={<UserProfilePage />} />
 
                 {/* Catch-all */}
                 <Route

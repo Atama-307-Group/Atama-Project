@@ -290,8 +290,8 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/profile")
-    public ResponseEntity<UserProfileDTO> getProfile(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getPublicProfile(id));
+    @GetMapping("/{username}/profile")
+    public ResponseEntity<UserProfileDTO> getProfile(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getPublicProfile(username));
     }
 }
