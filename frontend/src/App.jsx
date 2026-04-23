@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { useTimer } from './context/TimerContext';
@@ -55,21 +55,43 @@ function App() {
         return saved ? JSON.parse(saved).aiDisabled ?? false : false;
     });
 
-    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, isAdmin) => {
-        const user = { id, username, email, profilePictureUrl, verified, isAdmin };
+    const [darkMode, setDarkMode] = useState(() => {
+        const saved = localStorage.getItem('currentUser');
+        return saved ? JSON.parse(saved).darkMode ?? false : false;
+    });
+
+    useEffect(() => {
+        if (darkMode) {
+            document.body.setAttribute('data-theme', 'dark');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+    }, [darkMode]);
+
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, isAdmin, userDarkMode) => {
+        const user = { id, username, email, profilePictureUrl, verified, isAdmin, aiDisabled, darkMode: userDarkMode };
         setCurrentUser(user);
         setAiDisabled(aiDisabled ?? false);
+        setDarkMode(userDarkMode ?? false);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
 
     const handleLogout = () => {
         setCurrentUser(null);
+        setDarkMode(false);
         localStorage.removeItem('currentUser');
     };
 
     const handleAiDisabledChange = (val) => {
         setAiDisabled(val);
         const updated = { ...currentUser, aiDisabled: val };
+        setCurrentUser(updated);
+        localStorage.setItem('currentUser', JSON.stringify(updated));
+    };
+
+    const handleDarkModeChange = (val) => {
+        setDarkMode(val);
+        const updated = { ...currentUser, darkMode: val };
         setCurrentUser(updated);
         localStorage.setItem('currentUser', JSON.stringify(updated));
     };
@@ -237,6 +259,8 @@ function App() {
                             currentUser={currentUser}
                             aiDisabled={aiDisabled}
                             onAiDisabledChange={handleAiDisabledChange}
+                            darkMode={darkMode}
+                            onDarkModeChange={handleDarkModeChange}
                           />
                         : <Navigate to="/login" />}
                 />
