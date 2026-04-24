@@ -236,7 +236,14 @@ public class GeminiService {
                 JsonNode parts = candidates.get(0).path("content").path("parts");
                 if (!parts.isMissingNode() && parts.isArray() && parts.size() > 0) {
                     String jsonText = parts.get(0).path("text").asText();
-                    jsonText = jsonText.replaceAll("(?s)^```(?:json)?\\s*", "").replaceAll("(?s)```\\s*$", "").trim();
+                    
+                    int startIdx = jsonText.indexOf('[');
+                    int endIdx = jsonText.lastIndexOf(']');
+                    if (startIdx != -1 && endIdx != -1 && endIdx >= startIdx) {
+                        jsonText = jsonText.substring(startIdx, endIdx + 1);
+                    } else {
+                        throw new RuntimeException("Could not find JSON array bounds in the response. Raw text: " + jsonText);
+                    }
 
                     JsonNode arrayNode = objectMapper.readTree(jsonText);
                     if (arrayNode.isArray()) {
@@ -269,7 +276,11 @@ public class GeminiService {
         } catch (Exception e) {
             System.err.println("Failed to parse Gemini response for practice test: " + e.getMessage());
             System.err.println("Raw response: " + responseBody);
-            throw new RuntimeException("Failed to parse Gemini API response into practice test.");
+            throw new RuntimeException("Failed to parse Gemini API response into practice test: " + e.getMessage());
+        }
+        
+        if (questions.isEmpty()) {
+            throw new RuntimeException("Gemini returned a valid response but it contained no questions.");
         }
         return questions;
     }
