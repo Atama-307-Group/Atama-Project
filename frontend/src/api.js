@@ -750,6 +750,15 @@ export async function getGroupLeaderboard(groupId) {
     return res.json();
 }
 
+export async function getRecommendation(userId) {
+    const res = await fetch(`${API_BASE}/api/recommendations/${userId}`, {
+        credentials: "include",
+    });
+    if (res.status === 204) return null;
+    if (!res.ok) throw new Error("Failed to fetch recommendation");
+    return res.json();
+}
+
 /* Concept Maps ------------------------------------------- */
 
 export async function generateConceptMap(setId, selectedCardIds, title) {
@@ -783,7 +792,7 @@ export async function createManualConceptMap(setId, selectedCardIds, title) {
 export async function uploadConceptMapPng(mapId, file) {
     const formData = new FormData();
     formData.append("file", file);
-    
+
     const res = await fetch(`${API_BASE}/api/concept-maps/${mapId}/png`, {
         method: "POST",
         credentials: "include",
@@ -857,6 +866,19 @@ export async function updateAiDisabled(userId, aiDisabled) {
         body: JSON.stringify({ aiDisabled }),
     });
     if (!res.ok) throw new Error("Failed to update AI preference");
+}
+
+export async function updateRecommendationsEnabled(userId, recommendationsEnabled) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/recommendations-enabled`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recommendationsEnabled }),
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to update recommendation preference");
+    }
 }
 
 export async function updateDarkMode(userId, darkMode) {
