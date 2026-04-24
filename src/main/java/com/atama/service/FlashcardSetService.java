@@ -31,19 +31,12 @@ public class FlashcardSetService {
     // TODO: the services should return the DTO not the entity
     public FlashcardSetResponseDTO createFlashcardSet(FlashcardSetRequestDTO dto, UUID userId) {
         FlashcardSet entity = mapper.toEntity(dto);
-        entity.setOwnerId(userId);
         entity.setPublic(dto.isPublic());
         libraryItemService.initializeLibraryItem(entity, dto, userId); // resolve library, folder, item_type
         FlashcardSet saved = flashcardSetRepository.save(entity);
         return mapper.toResponseDTO(saved);
     }
 
-    /*@Transactional(readOnly = true)
-    public FlashcardSetResponseDTO getFlashcardSetById(UUID id) {
-        FlashcardSet entity = flashcardSetRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
-        return mapper.toResponseDTO(entity);
-    }*/
     @Transactional(readOnly = true)
     public FlashcardSetResponseDTO getFlashcardSetById(UUID id, UUID requesterId) {
         FlashcardSet entity = flashcardSetRepository.findById(id)
@@ -52,7 +45,7 @@ public class FlashcardSetService {
         FlashcardSetResponseDTO dto = mapper.toResponseDTO(entity);
 
         // From HEAD: owner/saved metadata
-        dto.setIsOwner(requesterId != null && requesterId.equals(entity.getOwnerId()));
+        dto.setIsOwner(requesterId != null && requesterId.equals(entity.getOwner().getId()));
         dto.setIsSaved(requesterId != null && userSavedSetRepository.existsByUserIdAndFlashcardSetId(requesterId, entity.getId()));
 
         // From main: review aggregates
@@ -63,6 +56,7 @@ public class FlashcardSetService {
 
         return dto;
     }
+
     @Transactional(readOnly = true)
     public List<FlashcardSetResponseDTO> getFlashcardSetsByOwner(UUID ownerId) {
         return flashcardSetRepository.findByOwnerId(ownerId)
@@ -131,7 +125,7 @@ public class FlashcardSetService {
     public FlashcardSetResponseDTO updatePrivacy(UUID id, boolean isPublic, UUID requesterId) throws AccessDeniedException {
         FlashcardSet entity = flashcardSetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", id));
-        if (!entity.getOwnerId().equals(requesterId)) {
+        if (!entity.getOwner().getId().equals(requesterId)) {
             throw new AccessDeniedException("Not the owner of this set");
         }
         entity.setPublic(isPublic);

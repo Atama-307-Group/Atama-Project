@@ -168,7 +168,8 @@ const AdminPage = ({ currentUser, onLogout }) => {
                                             <p className="adm-card-title">{formatReportTarget(report)}</p>
                                             <p className="adm-card-meta">
                                                 {formatReportType(report.type)}
-                                                {report.user && ` · Reported by @${report.user.username}`}
+                                                {report.user ? ` · Reported by @${report.user.username}` :
+                                                               ' · Reported by Deleted account'}
                                                 {report.description && ` · "${report.description}"`}
                                                 {` · ${formatTime(report.createdAt)}`}
                                             </p>

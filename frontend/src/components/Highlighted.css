@@ -1,0 +1,7 @@
+.searchHighlight {
+    background: rgba(255, 213, 79, 0.65);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 1px;
+    font-style: normal;
+}

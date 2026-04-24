@@ -4,6 +4,7 @@ import com.atama.repository.*;
 import com.atama.model.*;
 import com.atama.dto.request.*;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LibraryItemService {
 
+    private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
     private final FolderRepository folderRepository;
     private final LibraryItemRepository libraryItemRepository;
@@ -29,24 +31,19 @@ public class LibraryItemService {
     private final CourseLibraryItemRepository courseLibraryItemRepository;
     private final RecommendationService recommendationService;
 
-//    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto) {
-//        item.setTitle(dto.getTitle());
-//
-////        item.setItem_type(resolveItemType(item));
-//    }
 
     public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto, UUID userId) {
-        // TODO need to fix so that the user UUID is sent
-        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
         Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
 
         item.setTitle(dto.getTitle());
         item.setLibrary(library);
         item.setItemType(resolveItemType(item));
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        item.setOwner(owner);
         System.out.println("Found library: " + library.getId());
         System.out.println("Setting library on item: " + item.getClass().getSimpleName());
-
 
         if (dto.getFolderID() != null) {
             Folder folder = folderRepository.findById(dto.getFolderID())
@@ -69,7 +66,6 @@ public class LibraryItemService {
     }
 
     public List<LibraryItem> getAllItems(UUID userId) {
-        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
         Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         return libraryItemRepository.findAllByLibraryId(library.getId());
@@ -91,26 +87,6 @@ public class LibraryItemService {
         return libraryItemRepository.save(item);
     }
 
-    /*public LibraryItem uploadPDF(MultipartFile file, UUID userId) throws IOException {
-        String uploadsDir = "uploads/";
-        Files.createDirectories(Paths.get(uploadsDir));
-
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(uploadsDir + fileName);
-        Files.write(filePath, file.getBytes());
-
-        PDF pdf = new PDF();
-        pdf.setTitle(file.getOriginalFilename());
-        pdf.setFilePath(filePath.toString());
-        pdf.setItemType(LibraryItemType.PDF);
-
-        //Library library = libraryRepository.findByUserId(UUID.fromString("85a98b1e-9ef8-4615-9d5c-66d3e5c391a1"))
-        Library library = libraryRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Library not found"));
-        pdf.setLibrary(library);
-
-        return pdfRepository.save(pdf);
-    }*/
     private PDF createPDF(MultipartFile file, String title, UUID userId) throws IOException {
         String uploadsDir = "uploads/";
         Files.createDirectories(Paths.get(uploadsDir));
@@ -121,6 +97,9 @@ public class LibraryItemService {
         pdf.setTitle(title != null ? title : file.getOriginalFilename());
         pdf.setFilePath(filePath.toString());
         pdf.setItemType(LibraryItemType.PDF);
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        pdf.setOwner(owner);
         Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         pdf.setLibrary(library);
@@ -163,4 +142,18 @@ public class LibraryItemService {
         return item;
     }
 
+    @Transactional
+    public void deleteLibraryItem(UUID itemId) {
+        LibraryItem item = libraryItemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found: " + itemId));
+
+        if (item.getCourseAssignments() != null && !item.getCourseAssignments().isEmpty()) {
+            // Linked to one or more courses — soft delete
+            item.setHidden(true);
+            libraryItemRepository.save(item);
+        } else {
+            // No course links — safe to hard delete
+            libraryItemRepository.delete(item);
+        }
+    }
 }
