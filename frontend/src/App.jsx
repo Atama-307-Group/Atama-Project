@@ -127,6 +127,7 @@ function App() {
                         <StartPage
                             currentUser={currentUser}
                             onLogout={handleLogout}
+                            recommendationsEnabled={recommendationsEnabled}
                         />
                     }
                 />

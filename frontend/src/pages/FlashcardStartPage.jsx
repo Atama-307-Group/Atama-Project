@@ -4,13 +4,13 @@ import './FlashcardStartPage.css';
 import RecommendationBanner from '../components/RecommendationBanner.jsx';
 import { getRecommendation } from '../api.js';
 
-const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
+const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [], recommendationsEnabled = true }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [recommendation, setRecommendation] = useState(null);
-
+  const [dismissedSetId, setDismissedSetId] = useState(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -23,26 +23,38 @@ const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [] }) => {
   }, []);
 
   useEffect(() => {
-      if (!currentUser || currentUser.recommendationsEnabled === false) {
+      if (!currentUser || !recommendationsEnabled) {
           setRecommendation(null);
           return;
       }
 
-      const dismissedKey = `dismissed_rec`;
-      const dismissedId = localStorage.getItem(dismissedKey);
+      const fetchRecommendation = () => {
+          getRecommendation(currentUser.id)
+              .then(rec => {
+                  if (rec && rec.setId !== dismissedSetId) {
+                      setRecommendation(rec);
+                  }
+              })
+              .catch(console.error);
+      };
 
-      getRecommendation(currentUser.id)
-          .then(rec => {
-              if (rec && rec.setId !== dismissedId) {
-                  setRecommendation(rec);
-              }
-          })
-          .catch(console.error);
-  }, [currentUser]);
+      // Fetch on mount
+      fetchRecommendation();
+
+      // Re-fetch when user tabs back in
+      const handleVisibilityChange = () => {
+          if (document.visibilityState === 'visible') {
+              fetchRecommendation();
+          }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [currentUser, recommendationsEnabled, dismissedSetId]);
 
   const handleDismissRecommendation = () => {
       if (recommendation) {
-          localStorage.setItem('dismissed_rec', recommendation.setId);
+          setDismissedSetId(recommendation.setId);
       }
       setRecommendation(null);
   };

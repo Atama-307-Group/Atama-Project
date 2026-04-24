@@ -14,6 +14,7 @@ public class RecommendationService {
 
     private final RecentlyStudiedRepository recentlyStudiedRepository;
     private final LibraryItemRepository libraryItemRepository;
+    private final FlashcardRepository flashcardRepository;
 
     private static final int MAX_RECENT = 10;
 
@@ -70,10 +71,9 @@ public class RecommendationService {
         }
 
         // Find all public flashcard sets not already studied
-        List<LibraryItem> candidates = libraryItemRepository.findAll().stream()
-                .filter(item -> item.isPublic())
-                .filter(item -> !recentIds.contains(item.getId()))
-                .filter(item -> item instanceof FlashcardSet)
+        List<FlashcardSet> candidates = libraryItemRepository.findAllPublicFlashcardSets()
+                .stream()
+                .filter(fs -> !recentIds.contains(fs.getId()))
                 .collect(Collectors.toList());
 
         if (candidates.isEmpty()) return Optional.empty();
@@ -84,23 +84,21 @@ public class RecommendationService {
         String bestReason = null;
         String triggerTitle = null;
 
-        for (LibraryItem candidate : candidates) {
-            FlashcardSet fs = (FlashcardSet) candidate;
+        for (FlashcardSet fs : candidates) {
             int score = 0;
             String reason = null;
             String trigger = null;
 
             if (fs.getCourse() != null && recentCourses.contains(fs.getCourse())) {
                 score += 3;
-                reason = "Because you recently studied " + fs.getCourse() + " material";
-                // Find which recent item triggered this
                 trigger = recentTitles.isEmpty() ? null : recentTitles.get(0);
+                reason = "Because you recently studied \"" + trigger + "\"";  // use trigger title, not course code
             }
             if (fs.getUniversity() != null && recentUniversities.contains(fs.getUniversity())) {
                 score += 2;
                 if (reason == null) {
-                    reason = "Because you study at " + fs.getUniversity();
                     trigger = recentTitles.isEmpty() ? null : recentTitles.get(0);
+                    reason = "Because you recently studied \"" + trigger + "\"";
                 }
             }
             // Keyword match on title
@@ -133,8 +131,7 @@ public class RecommendationService {
         result.put("title", best.getTitle());
         result.put("course", best.getCourse());
         result.put("university", best.getUniversity());
-        result.put("cardCount", best.getFlashcards().size());
-        result.put("reason", bestReason != null ? bestReason : "We think you might like this");
+        result.put("cardCount", flashcardRepository.countByFlashcardSetId(best.getId()));        result.put("reason", bestReason != null ? bestReason : "We think you might like this");
         return Optional.of(result);
     }
 }

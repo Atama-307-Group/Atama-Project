@@ -17,8 +17,13 @@ public class RecommendationController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<Map<String, Object>> getRecommendation(@PathVariable UUID userId) {
-        return recommendationService.getRecommendation(userId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+        try {
+            return recommendationService.getRecommendation(userId)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.noContent().build());
+        } catch (Exception e) {
+            e.printStackTrace(); // will appear in Spring logs
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
