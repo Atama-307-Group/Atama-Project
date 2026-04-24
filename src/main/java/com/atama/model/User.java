@@ -62,4 +62,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
     private List<Course> enrolledCourses = new ArrayList<>();
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean recommendationsEnabled = true;
 }

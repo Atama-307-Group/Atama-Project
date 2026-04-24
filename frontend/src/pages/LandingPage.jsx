@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import "./LandingPage.css";
-import { hostGame, getLibraryContents, validateGame } from '../api.js';
+import './LandingPage.css';
+import RecommendationBanner from '../components/RecommendationBanner.jsx';
+import { getRecommendation, hostGame, getLibraryContents, validateGame } from '../api.js';
 
 /* ── Collab Game Modal ─────────────────────────────────────────── */
 function CollabGameModal({ onClose, navigate }) {
-  const [tab, setTab] = useState('host'); // 'host' | 'join'
+  const [tab, setTab] = useState('host');
   const [sets, setSets] = useState([]);
   const [loadingSets, setLoadingSets] = useState(true);
   const [hostingId, setHostingId] = useState(null);
@@ -59,7 +60,6 @@ function CollabGameModal({ onClose, navigate }) {
     }
   };
 
-  // Close on backdrop click
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) onClose();
   };
@@ -67,7 +67,6 @@ function CollabGameModal({ onClose, navigate }) {
   return (
     <div className="collab-modal-backdrop" onClick={handleBackdropClick}>
       <div className="collab-modal">
-        {/* Header */}
         <div className="collab-modal-header">
           <div className="collab-modal-title-group">
             <span className="collab-modal-icon">🎮</span>
@@ -76,7 +75,6 @@ function CollabGameModal({ onClose, navigate }) {
           <button className="collab-modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
-        {/* Tabs */}
         <div className="collab-tabs">
           <button
             className={`collab-tab ${tab === 'host' ? 'collab-tab--active' : ''}`}
@@ -92,7 +90,6 @@ function CollabGameModal({ onClose, navigate }) {
           </button>
         </div>
 
-        {/* Tab content */}
         <div className="collab-modal-body">
           {error && <p className="collab-error">{error}</p>}
 
@@ -157,13 +154,14 @@ function CollabGameModal({ onClose, navigate }) {
 }
 
 /* ── Main Page ─────────────────────────────────────────────────── */
-const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
+const LandingPage = ({ currentUser, onLogout, recentSets = [], recommendationsEnabled = true }) => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [recommendation, setRecommendation] = useState(null);
+  const [dismissedSetId, setDismissedSetId] = useState(null);
   const [showCollabModal, setShowCollabModal] = useState(false);
-
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -175,11 +173,47 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!currentUser || !recommendationsEnabled) {
+      setRecommendation(null);
+      return;
+    }
+
+    const fetchRecommendation = () => {
+      getRecommendation(currentUser.id)
+        .then(rec => {
+          if (rec && rec.setId !== dismissedSetId) {
+            setRecommendation(rec);
+          }
+        })
+        .catch(console.error);
+    };
+
+    fetchRecommendation();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchRecommendation();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [currentUser, recommendationsEnabled, dismissedSetId]);
+
+  const handleDismissRecommendation = () => {
+    if (recommendation) {
+      setDismissedSetId(recommendation.setId);
+    }
+    setRecommendation(null);
+  };
+
   function onSearch(e) {
     e.preventDefault();
     const q = searchQuery.trim();
     if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
   }
+
   const mostRecent = recentSets[0] || null;
 
   return (
@@ -214,7 +248,7 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
                   Profile Settings
                 </button>
                 <button className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/settings'); }}>
-                    Settings
+                  Settings
                 </button>
                 <button className="dropdown-item logout-btn" onClick={onLogout}>
                   Log Out
@@ -232,6 +266,10 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
 
       {currentUser ? (
         <div className="dashboard">
+          <RecommendationBanner
+            recommendation={recommendation}
+            onDismiss={handleDismissRecommendation}
+          />
           <div className="dashboard-header">
             <div>
               <p className="greeting-sub">Hello,</p>
@@ -254,11 +292,11 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
 
           <form onSubmit={onSearch} style={{ marginBottom: '16px', display: 'flex', gap: '8px' }}>
             <input
-                className="search-input"
-                placeholder="Search folders, flashcard sets, PDFs…"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--color-border)', fontSize: '14px' }}
+              className="search-input"
+              placeholder="Search folders, flashcard sets, PDFs…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--color-border)', fontSize: '14px' }}
             />
             <button type="submit" className="auth-btn login-btn">Search</button>
           </form>
@@ -267,7 +305,7 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
             <div className="study-card" onClick={() => navigate('/pick-set?mode=learn')}>
               <div className="study-icon study-icon--blue">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-info)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-brain-icon lucide-brain"><path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/><path d="M18 18a4 4 0 0 0 2-7.464"/><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/><path d="M6 18a4 4 0 0 1-2-7.464"/><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/><path d="M18 18a4 4 0 0 0 2-7.464"/><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/><path d="M6 18a4 4 0 0 1-2-7.464"/><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/></svg>
                 </svg>
               </div>
               <p className="study-card-title">Learn</p>
@@ -276,9 +314,7 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
             <div className="study-card" onClick={() => navigate('/pick-set?mode=match')}>
               <div className="study-icon study-icon--green">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                  <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-copy-slash-icon lucide-copy-slash"><line x1="12" x2="18" y1="18" y2="12"/><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="18" y1="18" y2="12"/><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                 </svg>
               </div>
               <p className="study-card-title">Match</p>
@@ -287,10 +323,7 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
             <div className="study-card" onClick={() => navigate('/pick-set?mode=test')}>
               <div className="study-icon study-icon--amber">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-notebook-text-icon lucide-notebook-text"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9.5 8h5"/><path d="M9.5 12H16"/><path d="M9.5 16H14"/></svg>
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9.5 8h5"/><path d="M9.5 12H16"/><path d="M9.5 16H14"/></svg>
                 </svg>
               </div>
               <p className="study-card-title">Practice test</p>
@@ -334,8 +367,8 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
             />
           )}
 
-          <p className="section-label" style={{marginTop: '16px'}}>Your pages</p>
-          <div className="study-grid" style={{marginBottom: '28px'}}>
+          <p className="section-label" style={{ marginTop: '16px' }}>Your pages</p>
+          <div className="study-grid" style={{ marginBottom: '28px' }}>
             <div className="study-card" onClick={() => navigate('/folders')}>
               <div className="study-icon study-icon--blue">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#335145" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
