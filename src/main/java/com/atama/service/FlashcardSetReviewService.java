@@ -37,7 +37,7 @@ public class FlashcardSetReviewService {
         FlashcardSet set = flashcardSetRepository.findById(setId)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", setId));
 
-        if (set.getOwnerId().equals(userId)) {
+        if (set.getOwner().getId().equals(userId)) {
             throw new IllegalArgumentException("You cannot review your own flashcard set.");
         }
 

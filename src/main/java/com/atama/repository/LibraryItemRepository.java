@@ -36,6 +36,7 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, UUID> 
     select li from LibraryItem li
     where li.library.id = :libraryId
     and li.folder is null
+    and li.hidden = false
     order by li.updatedAt desc
     """)
     List<LibraryItem> findLooseItemsByLibraryId(@Param("libraryId") UUID libraryId);

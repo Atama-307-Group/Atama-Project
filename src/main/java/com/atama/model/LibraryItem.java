@@ -24,6 +24,11 @@ public abstract class LibraryItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "library_id", nullable = false)
@@ -63,4 +68,7 @@ public abstract class LibraryItem {
     @JsonProperty("isPublic")
     @Column(name = "is_public", nullable = false)
     private boolean isPublic = true;
+
+    @Column(nullable = false)
+    private boolean hidden = false;
 }
