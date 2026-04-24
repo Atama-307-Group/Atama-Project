@@ -186,11 +186,11 @@
     border-radius: 16px;
     padding: 14px 18px;
     box-shadow: 0 4px 12px rgba(30, 53, 47, 0.06);
+
     display: flex;
-    align-items: center;
+    align-items: flex-start;   /* 👈 THIS lets it grow vertically */
     justify-content: space-between;
     gap: 12px;
-    transition: border-color 0.15s;
 }
 
 .adm-card:hover {
@@ -217,9 +217,12 @@
     font-weight: 600;
     color: #7a9e90;
     margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
+    white-space: normal;        /* allow multiple lines */
+    overflow: visible;          /* don't hide text */
+    text-overflow: unset;       /* remove ellipsis */
+    word-break: break-word;     /* handle long words */
+    line-height: 1.4;
 }
 
 /* ===== Pills ===== */
