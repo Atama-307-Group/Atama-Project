@@ -51,10 +51,4 @@ public class AdminController {
         adminService.resolveCourseRequest(id, Status.REJECTED);
         return ResponseEntity.ok().build();
     }
-
-    @PatchMapping("/course-requests/{id}/restore")
-    public ResponseEntity<?> restoreCourseRequest(@PathVariable UUID id) {
-        adminService.resolveCourseRequest(id, Status.PENDING);
-        return ResponseEntity.ok().build();
-    }
 }
