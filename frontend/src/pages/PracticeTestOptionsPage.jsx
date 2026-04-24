@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AiDisabledModal from '../components/AiDisabledModal.jsx';
 
 const PracticeTestOptionsPage = () => {
     const navigate = useNavigate();
@@ -7,6 +8,7 @@ const PracticeTestOptionsPage = () => {
     const [selectedOption, setSelectedOption] = useState(null);
     const [formattedText, setFormattedText] = useState('');
     const [error, setError] = useState('');
+    const [showAiModal, setShowAiModal] = useState(false);
 
     useEffect(() => {
         const saved = localStorage.getItem('currentUser');
@@ -89,7 +91,7 @@ const PracticeTestOptionsPage = () => {
 
     const handleOptionSelect = (option) => {
         if (option === 3 && aiDisabled) {
-            setError("Warning: Your AI Study toggle is currently OFF. You cannot use the AI test generator until you enable it in your Settings.");
+            setShowAiModal(true);
             return;
         }
         setError('');
@@ -178,6 +180,7 @@ const PracticeTestOptionsPage = () => {
                 </div>
 
             </div>
+            {showAiModal && <AiDisabledModal onClose={() => setShowAiModal(false)} />}
         </div>
     );
 };

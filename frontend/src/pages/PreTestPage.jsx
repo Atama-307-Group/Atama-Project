@@ -19,6 +19,8 @@ const PreTestPage = () => {
     const [numQuestions, setNumQuestions] = useState(10);
     const [maxCards, setMaxCards] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [loadingMessage, setLoadingMessage] = useState('');
     const [error, setError] = useState('');
 
     const [aiDisabled, setAiDisabled] = useState(false);
@@ -63,6 +65,25 @@ const PreTestPage = () => {
             return [...prev, type];
         });
     };
+
+    useEffect(() => {
+        let interval;
+        if (loading) {
+            setProgress(0);
+            // We'll show an initial message about gathering/uploading files to AI
+            setLoadingMessage('Uploading materials to AI...');
+            interval = setInterval(() => {
+                setProgress(prev => {
+                    const next = prev + (Math.random() * 8);
+                    if (next > 30 && prev <= 30) setLoadingMessage('Analyzing concepts and definitions...');
+                    if (next > 65 && prev <= 65) setLoadingMessage('Generating comprehensive questions...');
+                    if (next > 90) return 92; // cap it gracefully until backend actually finishes
+                    return next;
+                });
+            }, 600);
+        }
+        return () => clearInterval(interval);
+    }, [loading]);
 
     const handleStart = async () => {
         try {
@@ -155,11 +176,33 @@ const PreTestPage = () => {
                 <button 
                     onClick={handleStart} 
                     disabled={loading}
-                    style={{ borderRadius: '5px', padding: '12px 24px', fontSize: '18px', backgroundColor: '#335145', color: '#fff', border: 'none', cursor: 'pointer' }}
+                    style={{ 
+                        borderRadius: '5px', 
+                        padding: '12px 24px', 
+                        fontSize: '18px', 
+                        backgroundColor: loading ? '#ccc' : '#335145', 
+                        color: '#fff', 
+                        border: 'none', 
+                        cursor: loading ? 'not-allowed' : 'pointer' 
+                    }}
                 >
                     {loading ? 'Generating...' : 'Start Test'}
                 </button>
             </div>
+
+            {loading && (
+                <div style={{ marginTop: '25px', textAlign: 'center', transition: 'all 0.3s ease' }}>
+                    <p style={{ marginBottom: '10px', color: '#55916f', fontWeight: 'bold' }}>{loadingMessage}</p>
+                    <div style={{ width: '100%', backgroundColor: '#eee', borderRadius: '10px', height: '14px', overflow: 'hidden', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)' }}>
+                        <div style={{ 
+                            width: `${progress}%`, 
+                            backgroundColor: '#335145', 
+                            height: '100%', 
+                            transition: 'width 0.4s ease-out' 
+                        }} />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
