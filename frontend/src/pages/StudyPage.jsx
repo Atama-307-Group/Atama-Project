@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StudyPage.css';
-import { startStudying, stopStudying, updateCardProgress, addSetStudyTime, getSetProgress } from "../api.js";
+import { startStudying, stopStudying, updateCardProgress, addSetStudyTime, getSetProgress, recordAccess } from "../api.js";
 
 const KNOWLEDGE_OPTIONS = [
     { value: 'DONT_KNOW',     label: "Don't Know",    color: '#ef4444' },
@@ -59,6 +59,11 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
         window.addEventListener("beforeunload", handleUnload);
         return () => window.removeEventListener("beforeunload", handleUnload);
     }, [userId, setId]);
+
+    useEffect(() => {
+        if (!setId) return;
+        recordAccess(setId).catch(console.error);
+    }, [setId]);
 
     if (!cards || cards.length === 0) {
         return (

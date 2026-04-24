@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './FlashcardStartPage.css';
+import RecommendationBanner from '../components/RecommendationBanner.jsx';
+import { getRecommendation } from '../api.js';
 import "./LandingPage.css";
 import { hostGame, getLibraryContents, validateGame } from '../api.js';
 
@@ -76,6 +79,7 @@ function CollabGameModal({ onClose, navigate }) {
           <button className="collab-modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
+const FlashcardStartPage = ({ currentUser, onLogout, recentSets = [], recommendationsEnabled = true }) => {
         {/* Tabs */}
         <div className="collab-tabs">
           <button
@@ -162,6 +166,8 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [recommendation, setRecommendation] = useState(null);
+  const [dismissedSetId, setDismissedSetId] = useState(null);
   const [showCollabModal, setShowCollabModal] = useState(false);
 
 
@@ -174,6 +180,43 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+      if (!currentUser || !recommendationsEnabled) {
+          setRecommendation(null);
+          return;
+      }
+
+      const fetchRecommendation = () => {
+          getRecommendation(currentUser.id)
+              .then(rec => {
+                  if (rec && rec.setId !== dismissedSetId) {
+                      setRecommendation(rec);
+                  }
+              })
+              .catch(console.error);
+      };
+
+      // Fetch on mount
+      fetchRecommendation();
+
+      // Re-fetch when user tabs back in
+      const handleVisibilityChange = () => {
+          if (document.visibilityState === 'visible') {
+              fetchRecommendation();
+          }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [currentUser, recommendationsEnabled, dismissedSetId]);
+
+  const handleDismissRecommendation = () => {
+      if (recommendation) {
+          setDismissedSetId(recommendation.setId);
+      }
+      setRecommendation(null);
+  };
 
   function onSearch(e) {
     e.preventDefault();
@@ -232,6 +275,10 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [] }) => {
 
       {currentUser ? (
         <div className="dashboard">
+            <RecommendationBanner
+                    recommendation={recommendation}
+                    onDismiss={handleDismissRecommendation}
+                />
           <div className="dashboard-header">
             <div>
               <p className="greeting-sub">Hello,</p>
