@@ -66,3 +66,16 @@
 /*    background-color: #f9f9f9;*/
 /*  }*/
 /*}*/
+
+body[data-theme='dark'] {
+    filter: invert(1) hue-rotate(180deg);
+    background-color: #111;
+}
+
+body[data-theme='dark'] img,
+body[data-theme='dark'] video,
+body[data-theme='dark'] iframe,
+body[data-theme='dark'] .profile-picture,
+body[data-theme='dark'] .preserve-colors {
+    filter: invert(1) hue-rotate(180deg);
+}
