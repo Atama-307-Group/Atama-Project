@@ -583,7 +583,6 @@ export async function getCourseItems(courseId) {
     if (!res.ok) throw new Error("Failed to fetch course items");
       console.log("fetching course items for:", courseId);
 
-
     return res.json();
 }
 

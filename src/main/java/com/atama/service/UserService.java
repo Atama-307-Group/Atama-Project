@@ -5,6 +5,7 @@ import com.atama.dto.response.FlashcardSetSearchDTO;
 import com.atama.dto.response.LoginResult;
 import com.atama.dto.response.UserProfileDTO;
 import com.atama.exception.ResourceNotFoundException;
+import com.atama.model.*;
 import com.atama.model.Library;
 import com.atama.model.University;
 import com.atama.model.User;
@@ -32,6 +33,7 @@ public class UserService {
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
     private final JwtService jwtService;
+    private final ReportRepository reportRepository;
     private final LibraryItemRepository libraryItemRepository;
     private final FlashcardSetReviewService flashcardSetReviewService;
 
@@ -108,7 +110,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public void deleteAccountWithPassword(UUID id, String password) {
+    public void deleteAccountWithPassword(UUID id, String password, String dataOption) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
@@ -116,7 +118,38 @@ public class UserService {
             throw new IllegalArgumentException("Incorrect password.");
         }
 
+        if ("transfer".equals(dataOption)) {
+            transferUserContentToAnonymous(user);
+        }
+
+        reportRepository.nullifyUser(id);
+
+        user.getEnrolledCourses().clear();
+        userRepository.save(user);
         userRepository.delete(user);
+    }
+
+    private void transferUserContentToAnonymous(User user) {
+        User anonymous = userRepository.findByUsername("Atama Anonymous")
+                .orElseThrow(() -> new IllegalStateException("Anonymous account not found."));
+
+        Library anonymousLibrary = libraryRepository.findByUser(anonymous)
+                .orElseThrow(() -> new IllegalStateException("Anonymous library not found."));
+
+        Library userLibrary = user.getLibrary();
+        if (userLibrary == null) return;
+
+        for (LibraryItem item : userLibrary.getItems()) {
+            item.setOwner(anonymous);
+            item.setLibrary(anonymousLibrary);
+            item.setFolder(null);
+        }
+
+        anonymousLibrary.getItems().addAll(userLibrary.getItems());
+        userLibrary.getItems().clear();
+
+        libraryRepository.save(anonymousLibrary);
+        libraryRepository.save(userLibrary);
     }
 
     public void changePassword(UUID id, String oldPassword, String newPassword) {
