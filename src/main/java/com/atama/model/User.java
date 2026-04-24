@@ -56,13 +56,10 @@ public class User {
 
     @ManyToMany
     @JsonIgnore
-    @JoinTable(
-            name = "user_enrolled_courses",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
-    private List<Course> enrolledCourses = new ArrayList<>();
+    @JoinTable(name = "user_enrolled_courses", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
+    private List<Course> enrolledCourses;
 
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean recommendationsEnabled = true;
+
 }

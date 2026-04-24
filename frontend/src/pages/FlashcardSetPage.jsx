@@ -19,6 +19,7 @@ import FlashcardCard from "../components/FlashcardCard.jsx";
 import FlashcardInput from "../components/FlashcardInput.jsx";
 import ConceptMapModal from "../components/ConceptMapModal.jsx";
 import "./FlashcardSetPage.css";
+import ReportModal from '../components/ReportModal';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -100,6 +101,8 @@ const FlashcardSetPage = ({ currentUser }) => {
 
     // Concept Map Modal
     const [showConceptMapModal, setShowConceptMapModal] = useState(false);
+
+    const [showReport, setShowReport] = useState(false);
 
     useEffect(() => {
         if (!UUID_REGEX.test(id)) { setError("Invalid flashcard set."); setLoading(false); return; }
@@ -266,7 +269,18 @@ const FlashcardSetPage = ({ currentUser }) => {
 
     return (
         <div className="set-page">
-            <button className="set-page-back" type="button" onClick={() => navigate("/")}>← Back</button>
+            <div className="set-page-top-bar">
+                <button className="set-page-back" type="button" onClick={() => navigate("/")}>← Back</button>
+                {!isOwner && setData && (
+                    <button className="set-page-report-btn" onClick={() => setShowReport(true)} title="Report this set">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                            <line x1="4" y1="22" x2="4" y2="15"/>
+                        </svg>
+                        Report
+                    </button>
+                )}
+            </div>
 
             <div className="set-page-progress-bar-wrap">
                 <div className="set-page-progress-bar-labels"><span>Progress</span><span>{percentKnowWell}% Know Well</span></div>
@@ -465,6 +479,14 @@ const FlashcardSetPage = ({ currentUser }) => {
                     defaultCards={setData.flashcards} 
                     onClose={() => setShowConceptMapModal(false)}
                     aiDisabled={currentUser?.aiDisabled}
+                />
+            )}
+
+            {showReport && (
+                <ReportModal
+                    targetType="item"
+                    targetId={setData.id}
+                    onClose={() => setShowReport(false)}
                 />
             )}
         </div>
