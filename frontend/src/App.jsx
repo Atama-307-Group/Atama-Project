@@ -25,7 +25,7 @@ import PreTestPage from "./pages/PreTestPage.jsx";
 import PracticeTestOptionsPage from "./pages/PracticeTestOptionsPage.jsx";
 import PracticeTestPage from "./pages/PracticeTestPage.jsx";
 import PostTestPage from "./pages/PostTestPage.jsx";
-import GoalsPage from "./pages/StudyGoal.jsx"
+import GoalsPage from "./pages/StudyGoal.jsx";
 import CountdownPage from "./pages/CountdownPage.jsx";
 import UniversityPage from './pages/UniversityPage.jsx';
 import SharedSetPage from "./pages/SharedSetPage.jsx";
@@ -56,6 +56,11 @@ function App() {
         return saved ? JSON.parse(saved).aiDisabled ?? false : false;
     });
 
+    const [recommendationsEnabled, setRecommendationsEnabled] = useState(() => {
+        const saved = localStorage.getItem('currentUser');
+        return saved ? JSON.parse(saved).recommendationsEnabled ?? true : true;
+    });
+
     const [darkMode, setDarkMode] = useState(() => {
         const saved = localStorage.getItem('currentUser');
         return saved ? JSON.parse(saved).darkMode ?? false : false;
@@ -69,11 +74,15 @@ function App() {
         }
     }, [darkMode]);
 
-    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, isAdmin, userDarkMode) => {
-        const user = { id, username, email, profilePictureUrl, verified, isAdmin, aiDisabled, darkMode: userDarkMode };
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, isAdmin, userAiDisabled, userRecsEnabled, userDarkMode) => {
+        const resolvedAiDisabled = userAiDisabled ?? false;
+        const resolvedRecsEnabled = userRecsEnabled ?? true;
+        const resolvedDarkMode = userDarkMode ?? false;
+        const user = { id, username, email, profilePictureUrl, verified, isAdmin, aiDisabled: resolvedAiDisabled, recommendationsEnabled: resolvedRecsEnabled, darkMode: resolvedDarkMode };
         setCurrentUser(user);
-        setAiDisabled(aiDisabled ?? false);
-        setDarkMode(userDarkMode ?? false);
+        setAiDisabled(resolvedAiDisabled);
+        setRecommendationsEnabled(resolvedRecsEnabled);
+        setDarkMode(resolvedDarkMode);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
 
@@ -86,6 +95,13 @@ function App() {
     const handleAiDisabledChange = (val) => {
         setAiDisabled(val);
         const updated = { ...currentUser, aiDisabled: val };
+        setCurrentUser(updated);
+        localStorage.setItem('currentUser', JSON.stringify(updated));
+    };
+
+    const handleRecsEnabledChange = (val) => {
+        setRecommendationsEnabled(val);
+        const updated = { ...currentUser, recommendationsEnabled: val };
         setCurrentUser(updated);
         localStorage.setItem('currentUser', JSON.stringify(updated));
     };
@@ -136,54 +152,32 @@ function App() {
             )}
 
             <Routes>
-
-                {/* Home / Dashboard */}
                 <Route
                     path="/"
                     element={
                         <StartPage
                             currentUser={currentUser}
                             onLogout={handleLogout}
+                            recommendationsEnabled={recommendationsEnabled}
                         />
                     }
                 />
 
-                {/* Auth Routes */}
                 <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                {/* Profile & Account Management */}
-                <Route
-                    path="/profile"
-                    element={currentUser ? <ProfilePage currentUser={currentUser} /> : <Navigate to="/login" />}
-                />
-                <Route
-                    path="/change-password"
-                    element={currentUser ? <ChangePasswordPage currentUser={currentUser} /> : <Navigate to="/login" />}
-                />
+                <Route path="/profile" element={currentUser ? <ProfilePage currentUser={currentUser} /> : <Navigate to="/login" />} />
+                <Route path="/change-password" element={currentUser ? <ChangePasswordPage currentUser={currentUser} /> : <Navigate to="/login" />} />
 
-                {/* Create Flashcard Set */}
-                <Route
-                    path="/create"
-                    element={currentUser
-                        ? <CreateFlashcardSetPage aiDisabled={aiDisabled} />
-                        : <Navigate to="/login" />}
-                />
+                <Route path="/create" element={currentUser ? <CreateFlashcardSetPage aiDisabled={aiDisabled} /> : <Navigate to="/login" />} />
+                <Route path="/pick-set" element={currentUser ? <PickSetPage /> : <Navigate to="/login" />} />
 
-                {/* Pick a set to study */}
-                <Route
-                    path="/pick-set"
-                    element={currentUser ? <PickSetPage /> : <Navigate to="/login" />}
-                />
-
-                {/* Study & Learning Flow — flashcards passed via router state */}
                 <Route path="/pre_learn" element={<PreLearnPage />} />
                 <Route path="/study" element={<StudyPage onToggleFavorite={() => {}} userId={currentUser?.id} />} />
                 <Route path="/post_learn" element={<PostLearnPage />} />
 
-                {/* Match Flow */}
                 <Route path="/pre_match" element={<PreMatchPage />} />
                 <Route path="/match" element={<MatchPage userId={currentUser?.id} />} />
                 <Route path="/post_match" element={<PostMatchPage />} />
@@ -201,96 +195,42 @@ function App() {
                 <Route path="/shared/:token" element={<SharedSetPage />} />
                 <Route path="/concept-maps/:id" element={currentUser ? <ConceptMapPage /> : <Navigate to="/login" />} />
 
-                {/* Multiplayer Games */}
                 <Route path="/game/host/:joinCode" element={currentUser ? <HostGameView currentUser={currentUser} /> : <Navigate to="/login" />} />
                 <Route path="/game/play/:joinCode" element={<ParticipantPlayView currentUser={currentUser} />} />
                 <Route path="/game/join" element={<ParticipantJoinView currentUser={currentUser} />} />
                 <Route path="/game/join/:joinCode" element={<ParticipantJoinView currentUser={currentUser} />} />
 
-                {/* Personal Library */}
-                <Route
-                    path="/folders"
-                    element={currentUser ? <FoldersPage userId={currentUser.id} /> : <Navigate to="/login" />}
-                />
+                <Route path="/folders" element={currentUser ? <FoldersPage userId={currentUser.id} /> : <Navigate to="/login" />} />
+                <Route path="/goals" element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />} />
+                <Route path="/university" element={currentUser ? <UniversityPage userId={currentUser?.id} /> : <Navigate to="/login" />} />
+                <Route path="/course/:courseId" element={<CoursePage userId={currentUser?.id} />} />
+                <Route path="/countdowns" element={<CountdownPage userId={currentUser?.id} />} />
+                <Route path="/courses/:courseId/groups" element={currentUser ? <StudyGroupsListPage userId={currentUser.id} /> : <Navigate to="/login" />} />
+                <Route path="/groups/:groupId" element={currentUser ? <StudyGroupPage userId={currentUser.id} /> : <Navigate to="/login" />} />
+                <Route path="/search" element={<SearchPage />} />
 
-                {/* Study Goals Page */}
-                <Route
-                    path="/goals"
-                    element={currentUser ? <GoalsPage userId={currentUser.id} /> : <Navigate to="/login" />}
-                />
-
-                {/* University Page */}
-                <Route
-                    path="/university"
-                    element={currentUser ? <UniversityPage userId={currentUser?.id} /> : <Navigate to="/login" />}
-                />
-
-                {/* Course Page */}
-                <Route
-                    path="/course/:courseId"
-                    element={<CoursePage userId={currentUser?.id} />}
-                />
-
-                {/* Exam Countdowns Page */}
-                <Route
-                    path="/countdowns"
-                    element={<CountdownPage userId={currentUser?.id} />}
-                />
-
-
-                {/* Study Groups list for a course */}
-                <Route
-                    path="/courses/:courseId/groups"
-                    element={currentUser ? <StudyGroupsListPage userId={currentUser.id} /> : <Navigate to="/login" />}
-                />
-
-                {/* Individual study group */}
-                <Route
-                    path="/groups/:groupId"
-                    element={currentUser ? <StudyGroupPage userId={currentUser.id} /> : <Navigate to="/login" />}
-                />
-
-                {/* Search Page */}
-                <Route
-                    path="/search"
-                    element={<SearchPage />}
-                />
-
-                {/* Settings Page */}
                 <Route
                     path="/settings"
                     element={currentUser
                         ? <SettingsPage
                             currentUser={currentUser}
                             aiDisabled={aiDisabled}
+                            recommendationsEnabled={recommendationsEnabled}
                             onAiDisabledChange={handleAiDisabledChange}
+                            onRecsEnabledChange={handleRecsEnabledChange}
                             darkMode={darkMode}
                             onDarkModeChange={handleDarkModeChange}
                           />
                         : <Navigate to="/login" />}
                 />
 
-                {/* Admin Dashboard */}
                 <Route
                     path="/admin"
-                    element={
-                        currentUser?.isAdmin
-                            ? <AdminDashboard currentUser={currentUser} onLogout={handleLogout} />
-                            : <Navigate to="/" />
-                    }
+                    element={currentUser?.isAdmin ? <AdminDashboard currentUser={currentUser} onLogout={handleLogout} /> : <Navigate to="/" />}
                 />
 
-                {/* User profile pages */}
-                <Route
-                    path="/users/:username"
-                    element={<UserProfilePage />} />
-
-                {/* Catch-all */}
-                <Route
-                    path="*"
-                    element={<Navigate to="/" />}
-                />
-
+                <Route path="/users/:username" element={<UserProfilePage />} />
+                <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </>
     );

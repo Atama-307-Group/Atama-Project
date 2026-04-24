@@ -27,6 +27,7 @@ public class LibraryItemService {
     private final PDFRepository pdfRepository;
     private final CourseRepository courseRepository;
     private final CourseLibraryItemRepository courseLibraryItemRepository;
+    private final RecommendationService recommendationService;
 
 //    public void initializeLibraryItem(LibraryItem item, LibraryItemRequestDTO dto) {
 //        item.setTitle(dto.getTitle());
@@ -149,6 +150,9 @@ public class LibraryItemService {
                 .orElseThrow(() -> new RuntimeException("Item not found"));
         item.setLastAccessed(Instant.now());
         libraryItemRepository.save(item);
+
+        UUID userId = item.getLibrary().getUser().getId();
+        recommendationService.recordAccess(userId, itemId);
     }
 
     @Transactional
