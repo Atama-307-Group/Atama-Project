@@ -29,7 +29,6 @@ const UniversityPage = ({ userId }) => {
 
     const navigate = useNavigate();
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
-    const [showLeaveAllCoursesModal, setShowLeaveAllCoursesModal] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
 
     const menuRef = useRef(null);
@@ -47,14 +46,14 @@ const UniversityPage = ({ userId }) => {
                 if (searchOpen) {
                     setSearchOpen(false);
                     setSearchQuery("");
-                } else if (showLeaveAllCoursesModal) {
-                    setShowLeaveAllCoursesModal(false);
+                } else if (showLeaveAllModal) {
+                    setShowLeaveAllModal(false);
                 }
             }
         }
         document.addEventListener("keydown", onKeyDown);
         return () => document.removeEventListener("keydown", onKeyDown);
-    }, [searchOpen, showLeaveAllCoursesModal]);
+    }, [searchOpen, showLeaveAllModal]);
 
     function handleSetView(v) {
         setView(v);
@@ -92,7 +91,7 @@ const UniversityPage = ({ userId }) => {
                 <button className="backBtn" onClick={() => navigate('/')}>← Back</button>
                 <h1 className="universityTitle">{university ? university.name : "Loading..."}</h1>
                 {enrolledIds.size > 0 && (
-                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllCoursesModal(true)}>
+                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
                         Leave All Your Courses
                     </button>
                 )}
@@ -319,12 +318,12 @@ const UniversityPage = ({ userId }) => {
             )}
 
             {/* Leave all courses modal */}
-            {showLeaveAllCoursesModal && (
+            {showLeaveAllModal && (
                 <LeaveAllCoursesModal
                         leavingAll={leavingAll}
                         scheduledLeaveDate={scheduledLeaveDate}
                         onConfirm={handleLeaveAll}
-                        onCancel={() => setShowLeaveAllCoursesModal(false)}
+                        onCancel={() => setShowLeaveAllModal(false)}
                     />
             )}
 

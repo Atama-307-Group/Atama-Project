@@ -37,7 +37,9 @@ const CalendarGrid = ({ year, month, selectedDate, onSelect }) => {
 
 const LeaveAllCoursesModal = ({ leavingAll, scheduledLeaveDate, onConfirm, onCancel }) => {
     const [scheduleEnabled, setScheduleEnabled] = useState(!!scheduledLeaveDate);
-    const [scheduleLeaveDate, setScheduleLeaveDate] = useState(scheduledLeaveDate ?? null);
+    const [scheduleLeaveDate, setScheduleLeaveDate] = useState(
+        scheduledLeaveDate ? new Date(scheduledLeaveDate) : null
+    );
     const [calViewYear, setCalViewYear] = useState(new Date().getFullYear());
     const [calViewMonth, setCalViewMonth] = useState(new Date().getMonth());
 

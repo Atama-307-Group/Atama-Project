@@ -103,5 +103,6 @@ export function useCourseEnrollment(userId) {
         enrolling, handleEnroll,
         showLeaveAllModal, setShowLeaveAllModal, leavingAll, handleLeaveAll,
         leaveOneCourse, setLeaveOneCourse, leavingOne, handleLeaveOne,
+        scheduledLeaveDate, setScheduledLeaveDate,
     };
 }
