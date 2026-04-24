@@ -1,9 +1,15 @@
 package com.atama.service;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.dto.response.FlashcardSetSearchDTO;
 import com.atama.dto.response.LoginResult;
+import com.atama.dto.response.UserProfileDTO;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.*;
+import com.atama.model.Library;
+import com.atama.model.University;
+import com.atama.model.User;
+import com.atama.model.Course;
 import com.atama.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +31,8 @@ public class UserService {
     private final UniversityRepository universityRepository;
     private final JwtService jwtService;
     private final ReportRepository reportRepository;
+    private final LibraryItemRepository libraryItemRepository;
+    private final FlashcardSetReviewService flashcardSetReviewService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CourseRepository courseRepository;
@@ -219,5 +227,39 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setAiDisabled(aiDisabled);
         userRepository.save(user);
+    }
+
+    public void updateRecommendationsEnabled(UUID userId, boolean enabled) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setRecommendationsEnabled(enabled);
+        userRepository.save(user);
+    }
+    public void updateDarkMode(UUID userId, boolean darkMode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setDarkMode(darkMode);
+        userRepository.save(user);
+    }
+
+    public UserProfileDTO getPublicProfile(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<FlashcardSetSearchDTO> publicSets = libraryItemRepository
+                .findPublicSetsByUser(user.getId())
+                .stream()
+                .map(i -> {
+                    FlashcardSetReviewService.ReviewAggregate agg = flashcardSetReviewService.getAggregate(i.getId());
+                    return new FlashcardSetSearchDTO(
+                            i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
+                            i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
+                            i.getFolder() != null ? i.getFolder().getId() : null,
+                            agg.averageStars(), agg.topTags()
+                    );
+                })
+                .toList();
+
+        return new UserProfileDTO(user.getId(), user.getUsername(), user.getProfilePictureUrl(), publicSets);
     }
 }

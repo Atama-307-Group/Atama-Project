@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { startStudying, stopStudying, addSetStudyTime } from "../api.js";
+import { startStudying, stopStudying, addSetStudyTime, recordAccess } from "../api.js";
 
 const MatchPage = ({ userId }) => {
   const location = useLocation();
@@ -89,6 +89,11 @@ const MatchPage = ({ userId }) => {
       navigate('/post_match', { state: { attempts, time: time.toFixed(1) } });
     }
   }, [cards, attempts, time, navigate]);
+
+    useEffect(() => {
+        if (!setId) return;
+        recordAccess(setId).catch(console.error);
+    }, [setId]);
 
   if (flashcards.length === 0) return <button onClick={() => navigate('/')}>Return to Home</button>;
 

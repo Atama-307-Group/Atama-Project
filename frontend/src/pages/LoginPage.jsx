@@ -19,7 +19,7 @@ const LoginPage = ({ onLoginSuccess }) => {
             const data = await loginUser({ identifier, password });
             console.log("login data:", data); // confirm isAdmin is true here
 
-            onLoginSuccess(data.id, data.username, data.email, data.profilePictureUrl, data.verified, data.isAdmin);
+            onLoginSuccess(data.id, data.username, data.email, data.profilePictureUrl, data.verified, data.isAdmin, data.darkMode);
 
             if (data.isAdmin) {
                 navigate('/admin');

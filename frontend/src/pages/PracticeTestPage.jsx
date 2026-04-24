@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { startStudying, stopStudying, addSetStudyTime } from "../api.js";
+import { startStudying, stopStudying, addSetStudyTime, recordAccess } from "../api.js";
 
 const getEditDistance = (a, b) => {
   if (a.length === 0) return b.length;
@@ -80,6 +80,11 @@ const PracticeTestPage = ({ userId }) => {
     });
     setQuestions(questionSet);
   }, [cards, promptType, numQuestions]);
+
+    useEffect(() => {
+        if (!setId) return;
+        recordAccess(setId).catch(console.error);
+    }, [setId]);
 
   if (questions.length === 0) return <div style={{ textAlign: 'center', marginTop: '50px' }}><button onClick={() => navigate('/')}>Return Home</button></div>;
 
