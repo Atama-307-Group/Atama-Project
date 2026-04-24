@@ -1,16 +1,15 @@
 package com.atama.service;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.dto.response.FlashcardSetSearchDTO;
 import com.atama.dto.response.LoginResult;
+import com.atama.dto.response.UserProfileDTO;
 import com.atama.exception.ResourceNotFoundException;
 import com.atama.model.Library;
 import com.atama.model.University;
 import com.atama.model.User;
 import com.atama.model.Course;
-import com.atama.repository.CourseRepository;
-import com.atama.repository.LibraryRepository;
-import com.atama.repository.UniversityRepository;
-import com.atama.repository.UserRepository;
+import com.atama.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,8 +28,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
-    private final LibraryService libraryService;
     private final JwtService jwtService;
+    private final LibraryItemRepository libraryItemRepository;
+    private final FlashcardSetReviewService flashcardSetReviewService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CourseRepository courseRepository;
@@ -69,18 +69,6 @@ public class UserService {
         return savedUser;
     }
 
-//    public User loginUser(String identifier, String password) {
-//        // Try finding by username first, then by email
-//        User user = userRepository.findByUsername(identifier)
-//                .orElseGet(() -> userRepository.findByEmail(identifier)
-//                        .orElseThrow(() -> new IllegalArgumentException("Invalid username/email or password.")));
-//
-//        if (!passwordEncoder.matches(password, user.getPassword())) {
-//            throw new IllegalArgumentException("Invalid username/email or password.");
-//        }
-//
-//        return user;
-//    }
     public LoginResult loginUser(String identifier, String password) {
         User user = userRepository.findByUsername(identifier)
                 .orElseGet(() -> userRepository.findByEmail(identifier)
@@ -90,8 +78,9 @@ public class UserService {
             throw new IllegalArgumentException("Invalid username/email or password.");
         }
 
-        String token = jwtService.generateToken(user.getId(), user.getUsername());
-        return new LoginResult(user, token);
+        String token = jwtService.generateToken(user.getId(), user.getUsername(), user.getEmail());
+        boolean isAdmin = user.getEmail().equals("atamacs307@gmail.com");
+        return new LoginResult(user, token, isAdmin);
     }
 
     public User createUser(User user) {
@@ -181,7 +170,7 @@ public class UserService {
         }
     }
 
-    public void unenrollFromCourse(UUID userId, UUID courseId) {
+    public void unenrollFromCourse(UUID userId, UUID courseId) {    // One course
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         Course course = courseRepository.findById(courseId)
@@ -195,10 +184,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        // Clear all courses
         user.getEnrolledCourses().clear();
-
-        // Save the user — Hibernate deletes all join table entries
         userRepository.save(user);
     }
 
@@ -214,5 +200,32 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setRecommendationsEnabled(enabled);
         userRepository.save(user);
+    }
+    public void updateDarkMode(UUID userId, boolean darkMode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setDarkMode(darkMode);
+        userRepository.save(user);
+    }
+
+    public UserProfileDTO getPublicProfile(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<FlashcardSetSearchDTO> publicSets = libraryItemRepository
+                .findPublicSetsByUser(user.getId())
+                .stream()
+                .map(i -> {
+                    FlashcardSetReviewService.ReviewAggregate agg = flashcardSetReviewService.getAggregate(i.getId());
+                    return new FlashcardSetSearchDTO(
+                            i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
+                            i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
+                            i.getFolder() != null ? i.getFolder().getId() : null,
+                            agg.averageStars(), agg.topTags()
+                    );
+                })
+                .toList();
+
+        return new UserProfileDTO(user.getId(), user.getUsername(), user.getProfilePictureUrl(), publicSets);
     }
 }

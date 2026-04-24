@@ -53,4 +53,7 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, UUID> 
 
     @Query("SELECT f FROM FlashcardSet f WHERE f.isPublic = true")
     List<FlashcardSet> findAllPublicFlashcardSets();
+
+    @Query("SELECT i FROM LibraryItem i WHERE i.library.user.id = :userId AND i.itemType = 'FLASHCARD_SET' AND i.isPublic = true")
+    List<LibraryItem> findPublicSetsByUser(@Param("userId") UUID userId);
 }

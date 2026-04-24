@@ -22,7 +22,7 @@ const SearchPage = () => {
     }, [q]);
 
     const total = results
-        ? results.folders.length + results.flashcardSets.length + results.pdfs.length
+        ? results.folders.length + results.flashcardSets.length + results.pdfs.length + (results.users?.length ?? 0)
         : 0;
 
     return (
@@ -58,7 +58,7 @@ const SearchPage = () => {
                                 <div key={item.id} className="recent-item"
                                      onClick={() => navigate(`/sets/${item.id}`)}
                                      style={{ cursor: "pointer" }}>
-                                    <p className="recent-title">🃏 {item.title}</p>
+                                    <p className="recent-title">{item.title}</p>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
                                         {item.averageRating != null ? (
                                             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f59e0b' }}>
@@ -95,6 +95,25 @@ const SearchPage = () => {
                                      onClick={() => openPDF(item.id)}
                                      style={{ cursor: "pointer" }}>
                                     <p className="recent-title">📄 {item.title}</p>
+                                </div>
+                            ))}
+                        </section>
+                    )}
+
+                    {results.users?.length > 0 && (
+                        <section style={{ marginBottom: 32 }}>
+                            <h3 style={{ marginBottom: 12 }}>Users</h3>
+                            {results.users.map(user => (
+                                <div key={user.id} className="recent-item"
+                                     onClick={() => navigate(`/users/${user.username}`)}
+                                     style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }}>
+                                    {user.profilePictureUrl
+                                        ? <img src={user.profilePictureUrl} alt="" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
+                                        : <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600 }}>
+                                            {user.username.charAt(0).toUpperCase()}
+                                          </div>
+                                    }
+                                    <p className="recent-title">👤 {user.username}</p>
                                 </div>
                             ))}
                         </section>

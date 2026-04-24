@@ -2,6 +2,7 @@ package com.atama.controller;
 
 import com.atama.dto.request.UserRegistrationRequest;
 import com.atama.dto.response.LoginResult;
+import com.atama.dto.response.UserProfileDTO;
 import com.atama.model.Course;
 import com.atama.model.User;
 import com.atama.service.JwtService;
@@ -48,6 +49,8 @@ public class UserController {
             responseBody.put("email", user.getEmail());
             responseBody.put("profilePictureUrl", user.getProfilePictureUrl());
             responseBody.put("verified", user.isVerified());
+            responseBody.put("isAdmin", result.isAdmin());
+            responseBody.put("darkMode", user.isDarkMode());
 
             return ResponseEntity.ok(responseBody);
 
@@ -298,5 +301,22 @@ public class UserController {
         }
         userService.updateRecommendationsEnabled(userId, value);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{userId}/dark-mode")
+    public ResponseEntity<Void> updateDarkMode(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean value = body.get("darkMode");
+        if (value == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.updateDarkMode(userId, value);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{username}/profile")
+    public ResponseEntity<UserProfileDTO> getProfile(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getPublicProfile(username));
     }
 }

@@ -17,9 +17,16 @@ const LoginPage = ({ onLoginSuccess }) => {
 
         try {
             const data = await loginUser({ identifier, password });
-            onLoginSuccess(data.id, data.username, data.email, data.profilePictureUrl, data.verified);
-            const destination = location.state?.from || '/';
-            navigate(destination);
+            console.log("login data:", data); // confirm isAdmin is true here
+
+            onLoginSuccess(data.id, data.username, data.email, data.profilePictureUrl, data.verified, data.isAdmin, data.darkMode);
+
+            if (data.isAdmin) {
+                navigate('/admin');
+            } else {
+                const destination = location.state?.from || '/';
+                navigate(destination);
+            }
         } catch (err) {
             setStatus({ loading: false, error: err.message || 'Failed to connect to server.' });
         }

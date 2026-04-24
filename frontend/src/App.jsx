@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import { useTimer } from './context/TimerContext';
 import TimerPopup from './components/TimerPopup.jsx';
 
-import StartPage from './pages/FlashcardStartPage.jsx';
+import AdminDashboard from './pages/admin/AdminPage.jsx';
+import StartPage from './pages/LandingPage.jsx';
 import StudyPage from './pages/StudyPage.jsx';
 import CreateFlashcardSetPage from './pages/CreateFlashcardSetPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
@@ -34,6 +36,11 @@ import SearchPage from "./pages/SearchPage.jsx";
 import SettingsPage from './pages/SettingsPage.jsx';
 import StudyGroupPage from "./pages/StudyGroupPage.jsx";
 import StudyGroupsListPage from "./pages/StudyGroupsListPage.jsx";
+import ConceptMapPage from "./pages/ConceptMapPage.jsx";
+import HostGameView from './pages/game/HostGameView.jsx';
+import ParticipantJoinView from './pages/game/ParticipantJoinView.jsx';
+import ParticipantPlayView from './pages/game/ParticipantPlayView.jsx';
+import UserProfilePage from './pages/UserProfilePage';
 
 function App() {
     const { openPopup } = useTimer();
@@ -55,14 +62,31 @@ function App() {
 
     const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, aiDisabled) => {
         const user = { id, username, email, profilePictureUrl, verified, aiDisabled };
+    const [darkMode, setDarkMode] = useState(() => {
+        const saved = localStorage.getItem('currentUser');
+        return saved ? JSON.parse(saved).darkMode ?? false : false;
+    });
+
+    useEffect(() => {
+        if (darkMode) {
+            document.body.setAttribute('data-theme', 'dark');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+    }, [darkMode]);
+
+    const handleLoginSuccess = (id, username, email, profilePictureUrl, verified, isAdmin, userDarkMode) => {
+        const user = { id, username, email, profilePictureUrl, verified, isAdmin, aiDisabled, darkMode: userDarkMode };
         setCurrentUser(user);
         setAiDisabled(aiDisabled ?? false);
         setRecommendationsEnabled(recommendationsEnabled ?? true);
+        setDarkMode(userDarkMode ?? false);
         localStorage.setItem('currentUser', JSON.stringify(user));
     };
 
     const handleLogout = () => {
         setCurrentUser(null);
+        setDarkMode(false);
         localStorage.removeItem('currentUser');
     };
 
@@ -76,6 +100,13 @@ function App() {
     const handleRecsEnabledChange = (val) => {
         setRecommendationsEnabled(val);
         const updated = { ...currentUser, recommendationsEnabled: val };
+        setCurrentUser(updated);
+        localStorage.setItem('currentUser', JSON.stringify(updated));
+    };
+
+    const handleDarkModeChange = (val) => {
+        setDarkMode(val);
+        const updated = { ...currentUser, darkMode: val };
         setCurrentUser(updated);
         localStorage.setItem('currentUser', JSON.stringify(updated));
     };
@@ -179,6 +210,13 @@ function App() {
 
                 <Route path="/sets/:id" element={<FlashcardSetPage currentUser={currentUser} />} />
                 <Route path="/shared/:token" element={<SharedSetPage />} />
+                <Route path="/concept-maps/:id" element={currentUser ? <ConceptMapPage /> : <Navigate to="/login" />} />
+
+                {/* Multiplayer Games */}
+                <Route path="/game/host/:joinCode" element={currentUser ? <HostGameView currentUser={currentUser} /> : <Navigate to="/login" />} />
+                <Route path="/game/play/:joinCode" element={<ParticipantPlayView currentUser={currentUser} />} />
+                <Route path="/game/join" element={<ParticipantJoinView currentUser={currentUser} />} />
+                <Route path="/game/join/:joinCode" element={<ParticipantJoinView currentUser={currentUser} />} />
 
                 {/* Personal Library */}
                 <Route
@@ -239,9 +277,26 @@ function App() {
                             recommendationsEnabled={recommendationsEnabled}
                             onAiDisabledChange={handleAiDisabledChange}
                             onRecsEnabledChange={handleRecsEnabledChange}
+                            darkMode={darkMode}
+                            onDarkModeChange={handleDarkModeChange}
                           />
                         : <Navigate to="/login" />}
                 />
+
+                {/* Admin Dashboard */}
+                <Route
+                    path="/admin"
+                    element={
+                        currentUser?.isAdmin
+                            ? <AdminDashboard currentUser={currentUser} onLogout={handleLogout} />
+                            : <Navigate to="/" />
+                    }
+                />
+
+                {/* User profile pages */}
+                <Route
+                    path="/users/:username"
+                    element={<UserProfilePage />} />
 
                 {/* Catch-all */}
                 <Route

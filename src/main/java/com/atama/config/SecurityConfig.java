@@ -34,7 +34,9 @@ public class SecurityConfig {
                                 "/api/users/forgot-password",
                                 "/api/users/reset-password",
                                 "/api/users/send-verification",
-                                "/api/users/register-verified")
+                                "/api/users/register-verified",
+                                "/ws-game/**",
+                                "/api/games/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

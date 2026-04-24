@@ -1,0 +1,173 @@
+.user-profile-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.user-profile-back {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4a6b57;
+    padding: 0;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+    transition: color 0.15s;
+}
+
+.user-profile-back:hover {
+    color: #1a3c27;
+}
+
+/* Profile card */
+.user-profile-card {
+    background: #ffffff;
+    border: 1px solid #e0ebe4;
+    border-radius: 16px;
+    padding: 36px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 16px rgba(43, 92, 63, 0.06);
+}
+
+.user-profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2b5c3f, #4a9b6f);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(43, 92, 63, 0.25);
+}
+
+.user-profile-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(43, 92, 63, 0.25);
+}
+
+.user-profile-username {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a3c27;
+    margin: 0;
+}
+
+.user-profile-set-count {
+    font-size: 14px;
+    color: #4a6b57;
+    margin: 0;
+}
+
+/* Section label */
+.user-profile-section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a6b57;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 0 0 12px;
+}
+
+/* Sets list */
+.user-profile-sets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-profile-set-item {
+    background: #ffffff;
+    border: 1px solid #e0ebe4;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.user-profile-set-item:hover {
+    background: #f5f9f6;
+    border-color: #c3d4cc;
+    transform: translateY(-1px);
+}
+
+.user-profile-set-item:active {
+    transform: translateY(0);
+}
+
+.user-profile-set-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-profile-set-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a3c27;
+    margin: 0;
+}
+
+.user-profile-set-meta {
+    font-size: 13px;
+    color: #4a6b57;
+    margin: 0;
+}
+
+.user-profile-set-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.user-profile-rating {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f59e0b;
+}
+
+.user-profile-no-rating {
+    font-size: 13px;
+    color: #aaa;
+}
+
+.user-profile-arrow {
+    font-size: 16px;
+    color: #4a6b57;
+}
+
+/* States */
+.user-profile-loading,
+.user-profile-empty {
+    color: #4a6b57;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 48px;
+}
+
+.user-profile-error {
+    color: #c92a2a;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 48px;
+}

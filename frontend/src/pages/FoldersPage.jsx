@@ -782,6 +782,8 @@ const FoldersPage = ({ userId }) => {
                                             }
                                             else if (item.itemType === "PDF") {
                                                 openPDF(item.id);
+                                            } else if (item.itemType === "CONCEPT_MAP" || item.item_type === "CONCEPT_MAP") {
+                                                navigate(`/concept-maps/${item.id}`);
                                             } else {
                                                 navigate(`/sets/${item.id}`);
                                             }
@@ -882,10 +884,18 @@ const FoldersPage = ({ userId }) => {
                                 <div className="itemsList">
                                     {filteredFolderItems.map((it) => (
                                         <div key={it.id} className="itemCard"
-                                             onClick={() => navigate(`/sets/${it.id}`)}>
+                                             onClick={() => {
+                                                 if (it.itemType === "PDF" || it.item_type === "PDF") {
+                                                     openPDF(it.id);
+                                                 } else if (it.itemType === "CONCEPT_MAP" || it.item_type === "CONCEPT_MAP") {
+                                                     navigate(`/concept-maps/${it.id}`);
+                                                 } else {
+                                                     navigate(`/sets/${it.id}`);
+                                                 }
+                                             }}>
                                             <div className="folderName">{it.title}</div>
                                             <div className="folderMeta">
-                                                <span className="itemTypeBadge">{it.item_type}</span>
+                                                <span className="itemTypeBadge">{it.item_type || it.itemType}</span>
                                                 <div className="menuWrap"
                                                      ref={openItemMenuId === it.id ? menuRef : null}>
                                                     <button

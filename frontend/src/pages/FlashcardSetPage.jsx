@@ -13,9 +13,11 @@ import {
     getMyReview,
     upsertReview,
     deleteReview,
+    hostGame,
 } from "../api.js";
 import FlashcardCard from "../components/FlashcardCard.jsx";
 import FlashcardInput from "../components/FlashcardInput.jsx";
+import ConceptMapModal from "../components/ConceptMapModal.jsx";
 import "./FlashcardSetPage.css";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -95,6 +97,9 @@ const FlashcardSetPage = ({ currentUser }) => {
     const [averageRating, setAverageRating] = useState(null);
     const [topTags, setTopTags] = useState([]);
     const [reviewCount, setReviewCount] = useState(0);
+
+    // Concept Map Modal
+    const [showConceptMapModal, setShowConceptMapModal] = useState(false);
 
     useEffect(() => {
         if (!UUID_REGEX.test(id)) { setError("Invalid flashcard set."); setLoading(false); return; }
@@ -245,6 +250,15 @@ const FlashcardSetPage = ({ currentUser }) => {
         navigate(destinations[mode], { state: { flashcards: setData.flashcards, setTitle: setData.title, setId: id } });
     };
 
+    const handleHostGame = async () => {
+        try {
+            const { joinCode } = await hostGame(id);
+            navigate(`/game/host/${joinCode}`);
+        } catch (e) {
+            alert('Failed to host game');
+        }
+    };
+
     const percentKnowWell = stats?.percentKnowWell ?? 0;
 
     if (loading) return <div className="set-page-loading">Loading...</div>;
@@ -300,9 +314,11 @@ const FlashcardSetPage = ({ currentUser }) => {
                     </div>
 
                     <div className="set-page-study-actions">
+                        <button className="set-page-study-btn" onClick={() => setShowConceptMapModal(true)}>🧠 Concept Map</button>
                         <button className="set-page-study-btn" onClick={() => handleStudyMode('learn')}>📖 Learn</button>
                         <button className="set-page-study-btn" onClick={() => handleStudyMode('match')}>🔀 Match</button>
                         <button className="set-page-study-btn" onClick={() => handleStudyMode('test')}>📝 Practice Test</button>
+                        <button className="set-page-study-btn" onClick={handleHostGame} style={{ background: '#46178f', color: 'white' }}>🎮 Host Game</button>
                         <button className="set-page-study-btn set-page-study-btn--stats" onClick={() => setShowStats(true)}>📊 View Statistics</button>
                     </div>
 
@@ -441,6 +457,15 @@ const FlashcardSetPage = ({ currentUser }) => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {showConceptMapModal && (
+                <ConceptMapModal 
+                    sourceSetId={id} 
+                    defaultCards={setData.flashcards} 
+                    onClose={() => setShowConceptMapModal(false)}
+                    aiDisabled={currentUser?.aiDisabled}
+                />
             )}
         </div>
     );

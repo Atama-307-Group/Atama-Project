@@ -18,16 +18,31 @@ public class JwtService {
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
 
-    public String generateToken(UUID userId, String username) {
+    @Value("${admin.email}")
+    private String adminEmail;
+
+
+    public String generateToken(UUID userId, String username, String email) {
         Key key = Keys.hmacShaKeyFor(secret.getBytes());
 
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("username", username)
+                .claim("isAdmin", email.equals(adminEmail))
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
                 .compact();
+    }
+
+    public UUID extractUserId(String token) {
+        Key key = Keys.hmacShaKeyFor(secret.getBytes());
+        return UUID.fromString(Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject());
     }
 
     public Cookie createAuthCookie(String token) {

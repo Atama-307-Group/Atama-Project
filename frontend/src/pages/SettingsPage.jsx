@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateAiDisabled, updateRecommendationsEnabled } from '../api.js';
+import { updateAiDisabled, updateRecommendationsEnabled, updateDarkMode } from '../api.js';
 
-const SettingsPage = ({ currentUser, aiDisabled, recommendationsEnabled, onAiDisabledChange, onRecsEnabledChange }) => {
+const SettingsPage = ({ currentUser, aiDisabled, recommendationsEnabled, onAiDisabledChange, onRecsEnabledChange, darkMode, onDarkModeChange }) => {
     const navigate = useNavigate();
     const [saving, setSaving] = useState(false);
+    const [savingDark, setSavingDark] = useState(false);
 
     const handleToggleAi = async () => {
         const newVal = !aiDisabled;
@@ -30,6 +31,28 @@ const SettingsPage = ({ currentUser, aiDisabled, recommendationsEnabled, onAiDis
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleDarkToggle = async () => {
+        const newVal = !darkMode;
+        setSavingDark(true);
+        try {
+            await updateDarkMode(currentUser.id, newVal);
+            onDarkModeChange(newVal);
+        } catch (err) {
+            console.error("Failed to save dark mode setting", err);
+        } finally {
+            setSavingDark(false);
+        }
+    };
+
+    const containerStyle = {
+        border: '1px solid #e0e0e0',
+        borderRadius: '12px',
+        padding: '20px 24px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     };
 
     const toggleStyle = (active) => ({
@@ -90,18 +113,25 @@ const SettingsPage = ({ currentUser, aiDisabled, recommendationsEnabled, onAiDis
                         <div style={knobStyle(recommendationsEnabled)} />
                     </div>
                 </div>
+
+                {/* Dark Mode Toggle */}
+                <div style={containerStyle}>
+                    <div>
+                        <p style={{ fontWeight: '600', margin: 0 }}>Dark Mode</p>
+                        <p style={{ color: '#888', fontSize: '14px', margin: '4px 0 0' }}>
+                            Toggle dark/light mode for the application.
+                        </p>
+                    </div>
+                    <div onClick={savingDark ? undefined : handleDarkToggle} style={{
+                        ...toggleStyle(darkMode),
+                        cursor: savingDark ? 'not-allowed' : 'pointer',
+                    }}>
+                        <div style={knobStyle(darkMode)} />
+                    </div>
+                </div>
             </div>
         </div>
     );
-};
-
-const containerStyle = {
-    border: '1px solid #e0e0e0',
-    borderRadius: '12px',
-    padding: '20px 24px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
 };
 
 export default SettingsPage;
