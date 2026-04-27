@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +64,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "feature/report",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Users/pawan/IdeaProjects/Atama-Project/pom.xml",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

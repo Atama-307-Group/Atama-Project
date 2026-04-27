@@ -31,7 +31,7 @@ const UniversityPage = ({ userId }) => {
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
     const [showLeaveAllCoursesModal, setShowLeaveAllCoursesModal] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
-    const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
+//     const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
 
     const menuRef = useRef(null);
     const [showScheduleModal, setShowScheduleModal] = useState(false);

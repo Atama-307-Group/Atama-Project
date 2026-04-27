@@ -171,10 +171,10 @@ const AdminPage = ({ currentUser, onLogout }) => {
                                                         <p className="adm-card-title">{formatReportTarget(report)}</p>
                                                         <p className="adm-card-meta">
                                                             {formatReportType(report.type)}
-                                                            {report.user ? ` · Reported by @${report.user.username}` :
-                                                               ' · Reported by Deleted account'}
-                                                {report.description && ` · "${report.description}"`}
-                                                {` · ${formatTime(report.createdAt)}`}
+{/*                                                             {report.user ? ` · Reported by @${report.user.username}` : */}
+{/*                                                                ' · Reported by Deleted account'} */}
+                                                            {report.description && ` · "${report.description}"`}
+                                                            {` · ${formatTime(report.createdAt)}`}
                                             </p>
                                         </div>
                                         {isResolved ? (
@@ -227,6 +227,20 @@ const AdminPage = ({ currentUser, onLogout }) => {
                                             {req.status === 'REJECTED' ? 'Rejected' : 'New'}
                                         </span>
 
+                                        <div className="adm-actions">
+                                            <button
+                                                className="adm-btn adm-btn-approve"
+                                                onClick={() => handleCourseRequest(req.id, 'approve')}
+                                            >
+                                                Approve
+                                            </button>
+                                            <button
+                                                className="adm-btn adm-btn-reject"
+                                                onClick={() => handleCourseRequest(req.id, 'reject')}
+                                            >
+                                                Reject
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
