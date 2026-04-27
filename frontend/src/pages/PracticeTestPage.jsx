@@ -198,9 +198,8 @@ const PracticeTestPage = ({ userId }) => {
   const hasStoppedRef = useRef(false);
   const sessionStartRef = useRef(Date.now());
 
-  const { questions: initialQuestions, setId } = location.state || { questions: [], setId: null };
-  const { promptType, cards, numQuestions, setId } = location.state || {
-    promptType: 'term', cards: [], numQuestions: 0, setId: null,
+  const { questions: initialQuestions, promptType, cards, numQuestions, setId } = location.state || {
+    questions: [], promptType: 'term', cards: [], numQuestions: 0, setId: null,
   };
 
   const [questions, setQuestions] = useState(initialQuestions || []);
@@ -251,27 +250,15 @@ const PracticeTestPage = ({ userId }) => {
         recordAccess(setId).catch(console.error);
   }, [setId]);
 
-  if (!questions || questions.length === 0) return <div style={{ textAlign: 'center', marginTop: '50px' }}><button onClick={() => navigate('/')}>Return Home</button></div>;
-
-  const currentQ = questions[currentIndex];
-
-  const isSubmitDisabled = (currentQ.type === 'MCQ' || currentQ.type === 'TRUE_FALSE')
-      ? !selectedAnswer
-      : currentQ.type === 'SHORT_ANSWER' 
-        ? !userInputs[0] || userInputs[0].trim() === ""
-        : currentQ.correctAnswers.some((_, idx) => !userInputs[idx] || userInputs[idx].trim() === "");
-    if (!setId) return;
-    recordAccess(setId).catch(console.error);
-  }, [setId]);
-
   useEffect(() => {
+    if (initialQuestions && initialQuestions.length > 0) return;
     if (!cards || cards.length === 0) return;
     const shuffled = [...cards].filter(card => card.type !== 'DRAG_DROP').sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, numQuestions);
     setQuestions(selected.map(card => buildQuestion(card, promptType, cards)));
-  }, [cards, promptType, numQuestions]);
+  }, [cards, promptType, numQuestions, initialQuestions]);
 
-  if (questions.length === 0) {
+  if (!questions || questions.length === 0) {
     return (
       <div style={{ textAlign: 'center', marginTop: '50px' }}>
         <button onClick={() => navigate('/')}>Return Home</button>
@@ -461,28 +448,8 @@ const PracticeTestPage = ({ userId }) => {
         <h2 style={{ lineHeight: '1.6' }}>{currentQ.prompt}</h2>
       </div>
 
-      {currentQ.type === 'MCQ' || currentQ.type === 'TRUE_FALSE' ? (
-      <h3>Question {currentIndex + 1} of {questions.length}</h3>
-
-      {/* Prompt card */}
-      <div style={{
-        padding: '30px', border: '1px solid #ccc', borderRadius: '10px',
-        margin: '20px 0', backgroundColor: '#f9f9f9', position: 'relative',
-      }}>
-        {typeBadge && (
-          <span style={{
-            position: 'absolute', top: '10px', left: '12px',
-            background: typeBadge.color, color: 'white',
-            fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '999px',
-          }}>
-            {typeBadge.label}
-          </span>
-        )}
-        <h2 style={{ lineHeight: '1.6', marginTop: typeBadge ? '16px' : 0 }}>{currentQ.prompt}</h2>
-      </div>
-
       {/* Answer area */}
-      {currentQ.type === 'MCQ' && (
+      {(currentQ.type === 'MCQ' || currentQ.type === 'TRUE_FALSE') && (
         <div style={{ display: 'grid', gap: '10px' }}>
           {currentQ.choices.map((choice, i) => (
             <button key={i} onClick={() => !showFeedback && setSelectedAnswer(choice)} style={{
@@ -497,7 +464,9 @@ const PracticeTestPage = ({ userId }) => {
             }}>{choice}</button>
           ))}
         </div>
-      ) : currentQ.type === 'SHORT_ANSWER' ? (
+      )}
+
+      {currentQ.type === 'SHORT_ANSWER' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', alignItems: 'center' }}>
             <div style={{ width: '100%', position: 'relative' }}>
               <input
@@ -538,13 +507,6 @@ const PracticeTestPage = ({ userId }) => {
               )}
             </div>
         </div>
-      ) : (
-                ? (choice === currentQ.correctAnswer ? '#d4edda' : (choice === selectedAnswer ? '#f8d7da' : '#fff'))
-                : (selectedAnswer === choice ? '#eee' : '#fff'),
-              cursor: showFeedback ? 'default' : 'pointer',
-            }}>{choice}</button>
-          ))}
-        </div>
       )}
 
       {currentQ.type === 'FITB' && (
@@ -576,13 +538,7 @@ const PracticeTestPage = ({ userId }) => {
                 />
                 {hasFuzzyWarning && (
                   <div style={{ position: 'absolute', top: '55px', left: '50%', transform: 'translateX(-50%)', backgroundColor: '#fff', border: '2px solid #ffa500', padding: '12px', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', zIndex: 10, width: '220px' }}>
-                    <p style={{ margin: '0 0 10px 0', fontSize: '14px' }}>Did you mean <strong>{fuzzyMatch.expected}</strong>?</p>
-                  <div style={{
-                    position: 'absolute', top: '55px', left: '50%', transform: 'translateX(-50%)',
-                    backgroundColor: '#fff', border: '2px solid #ffa500', padding: '12px',
-                    borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', zIndex: 10, width: '220px',
-                  }}>
-                    <p style={{ margin: '0 0 10px', fontSize: '14px' }}>Did you mean <strong>{ans}</strong>?</p>
+                    <p style={{ margin: '0 0 10px', fontSize: '14px' }}>Did you mean <strong>{fuzzyMatch.expected}</strong>?</p>
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                       <button onClick={() => resolveFuzzy(idx, true, fuzzyMatch.expected)} style={{ padding: '4px 12px', cursor: 'pointer', backgroundColor: '#e3f2fd', border: '1px solid #2196f3', borderRadius: '4px' }}>Yes</button>
                       <button onClick={() => resolveFuzzy(idx, false, fuzzyMatch.expected)} style={{ padding: '4px 12px', cursor: 'pointer', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}>No</button>
@@ -628,26 +584,6 @@ const PracticeTestPage = ({ userId }) => {
           }}>Check Answer</button>
         ) : (
           <button onClick={handleNext} style={{ padding: '12px 40px', fontSize: '18px', cursor: 'pointer', borderRadius: '8px', border: 'none', backgroundColor: '#55916f', color: '#fff' }}>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitDisabled}
-            style={{
-              padding: '12px 40px', fontSize: '18px',
-              cursor: isSubmitDisabled ? 'not-allowed' : 'pointer',
-              borderRadius: '8px', border: 'none',
-              backgroundColor: isSubmitDisabled ? '#ccc' : '#333', color: '#fff',
-            }}
-          >
-            Check Answer
-          </button>
-        ) : (
-          <button
-            onClick={handleNext}
-            style={{
-              padding: '12px 40px', fontSize: '18px', cursor: 'pointer',
-              borderRadius: '8px', border: 'none', backgroundColor: '#007bff', color: '#fff',
-            }}
-          >
             {currentIndex === questions.length - 1 ? 'Finish Test' : 'Next Question'}
           </button>
         )}
