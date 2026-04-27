@@ -178,14 +178,44 @@ const FoldersPage = ({ userId }) => {
 
     const filteredItems = useMemo(() => {
         const q = query.trim().toLowerCase();
-        return libItems
-            .filter(item => item.title?.toLowerCase().includes(q) && !item.folderId)
+        let allItems = libItems;
+        if (q) {
+            const insideFolders = folders.flatMap(f => (f.items || []).map(i => ({...i, folderId: f.id})));
+            // Remove duplicates by ID in case any exist
+            const uniqItems = new Map();
+            allItems.forEach(i => uniqItems.set(i.id, i));
+            insideFolders.forEach(i => uniqItems.set(i.id, i));
+            allItems = Array.from(uniqItems.values());
+        }
+        return allItems
+            .filter(item => {
+                const matches = item.title?.toLowerCase().includes(q);
+                return q ? matches : (matches && !item.folderId);
+            })
             .sort((a, b) => {
                 if (a.starred !== b.starred) return a.starred ? -1 : 1;
                 const primary = compareBySort(a, b);
                 return primary !== 0 ? primary : (a.title ?? "").localeCompare(b.title ?? "");
             });
-    }, [libItems, query, sortBy]);
+    }, [libItems, folders, query, sortBy]);
+
+    const filteredSavedSets = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return savedSets;
+        return savedSets.filter(set => set.title?.toLowerCase().includes(q));
+    }, [savedSets, query]);
+
+    const filteredStudyGroups = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return studyGroups;
+        return studyGroups.filter(m => {
+            const g = m.group;
+            if (!g) return false;
+            return g.name?.toLowerCase().includes(q) || 
+                   g.course?.courseCode?.toLowerCase().includes(q) || 
+                   g.course?.courseName?.toLowerCase().includes(q);
+        });
+    }, [studyGroups, query]);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -534,10 +564,10 @@ const FoldersPage = ({ userId }) => {
                                     />
                                 ))}
 
-                                {savedSets.length > 0 && (
+                                {filteredSavedSets.length > 0 && (
                                     <>
                                         <div className="sectionDivider">Saved Sets</div>
-                                        {savedSets.map((set) => (
+                                        {filteredSavedSets.map((set) => (
                                             <div key={set.id} className="itemCard" onClick={() => navigate(`/sets/${set.id}`)}>
                                                 <div className="folderName">{set.title}</div>
                                                 <div className="folderMeta">
@@ -549,10 +579,10 @@ const FoldersPage = ({ userId }) => {
                                     </>
                                 )}
 
-                                {!studyGroupsLoading && studyGroups.length > 0 && (
+                                {!studyGroupsLoading && filteredStudyGroups.length > 0 && (
                                     <>
                                         <div className="sectionDivider">Study Groups</div>
-                                        {studyGroups.map((membership) => {
+                                        {filteredStudyGroups.map((membership) => {
                                             const g = membership.group;
                                             if (!g) return null;
                                             const courseName = g.course?.courseCode ?? g.course?.courseName ?? null;
