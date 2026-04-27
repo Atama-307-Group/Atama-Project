@@ -250,7 +250,11 @@ const FlashcardSetPage = ({ currentUser }) => {
 
     const handleStudyMode = (mode) => {
         const destinations = { learn: '/pre_learn', match: '/pre_match', test: '/pre_test' };
-        navigate(destinations[mode], { state: { flashcards: setData.flashcards, setTitle: setData.title, setId: id } });
+        let stateObj = { flashcards: setData.flashcards, setTitle: setData.title, setId: id };
+        if (mode === 'test') {
+            stateObj.selectedItems = [{ id, title: setData.title, itemType: 'FLASHCARD_SET' }];
+        }
+        navigate(destinations[mode], { state: stateObj });
     };
 
     const handleHostGame = async () => {

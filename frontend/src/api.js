@@ -890,3 +890,19 @@ export async function updateDarkMode(userId, darkMode) {
     if (!res.ok) throw new Error("Failed to update dark mode preference");
 }
 
+
+
+export const generatePracticeTest = async (payload) => {
+    const response = await fetch(`${API_BASE}/api/practice-test/generate`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(err || 'Failed to generate practice test');
+    }
+    return response.json();
+};
+
