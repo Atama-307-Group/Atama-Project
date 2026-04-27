@@ -1,13 +1,12 @@
 package com.atama.service;
 
-import com.atama.dto.response.FlashcardSetSearchDTO;
-import com.atama.dto.response.FolderResponse;
-import com.atama.dto.response.LibraryItemResponseDTO;
-import com.atama.dto.response.SearchResponseDTO;
+import com.atama.dto.response.*;
 import com.atama.model.LibraryItemType;
 import com.atama.repository.FolderRepository;
 import com.atama.repository.LibraryItemRepository;
+import com.atama.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,7 @@ public class SearchService {
     private final FolderRepository folderRepository;
     private final LibraryItemRepository libraryItemRepository;
     private final FlashcardSetReviewService reviewService;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public SearchResponseDTO search(String q, UUID userId) {
@@ -62,6 +62,13 @@ public class SearchService {
                 ))
                 .toList();
 
-        return new SearchResponseDTO(folders, flashcardSets, pdfs);
+        List<UserSearchDTO> users = userRepository
+                .searchByUsername(q)
+                .stream()
+                .filter(u -> !u.getId().equals(userId))
+                .map(u -> new UserSearchDTO(u.getId(), u.getUsername(), u.getProfilePictureUrl()))
+                .toList();
+
+        return new SearchResponseDTO(folders, flashcardSets, pdfs, users);
     }
 }

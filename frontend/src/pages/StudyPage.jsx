@@ -1,13 +1,90 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StudyPage.css';
-import { startStudying, stopStudying, updateCardProgress, addSetStudyTime, getSetProgress } from "../api.js";
+import { startStudying, stopStudying, updateCardProgress, addSetStudyTime, getSetProgress, recordAccess } from "../api.js";
 
 const KNOWLEDGE_OPTIONS = [
     { value: 'DONT_KNOW',     label: "Don't Know",    color: '#ef4444' },
     { value: 'KNOW_SOMEWHAT', label: 'Know Somewhat',  color: '#f59e0b' },
     { value: 'KNOW_WELL',     label: 'Know Well',      color: '#22c55e' },
 ];
+
+/* ── Card content helpers ────────────────────────────────────────── */
+
+function getCardFront(card, studyMode) {
+    switch (card.type) {
+        case 'FILL_BLANK':
+            return { text: card.textWithBlanks, isRich: false };
+        case 'STEPS':
+            return { text: card.title, isRich: false };
+        case 'DRAG_DROP':
+            return { text: card.prompt, imageUrl: card.imageUrl, isRich: false };
+        default:
+            return { text: studyMode === 'term' ? card.term : card.definition, isRich: false };
+    }
+}
+
+function getCardBack(card, studyMode) {
+    switch (card.type) {
+        case 'FILL_BLANK':
+            return { text: card.correctAnswers?.join(', '), isRich: false };
+        case 'STEPS':
+            return { steps: card.steps, isRich: true };
+        case 'DRAG_DROP':
+            return { draggableLabels: card.draggableLabels, isRich: true };
+        default:
+            return { text: studyMode === 'term' ? card.definition : card.term, isRich: false };
+    }
+}
+
+function CardFrontContent({ front }) {
+    return (
+        <div style={{ textAlign: 'center' }}>
+            {front.imageUrl && (
+                <img
+                    src={front.imageUrl}
+                    alt="card"
+                    style={{ maxWidth: '100%', maxHeight: '100px', objectFit: 'contain', marginBottom: '8px', borderRadius: '6px' }}
+                />
+            )}
+            <div>{front.text}</div>
+        </div>
+    );
+}
+
+function CardBackContent({ back }) {
+    if (back.steps) {
+        return (
+            <ol style={{ textAlign: 'left', paddingLeft: '20px', margin: 0, fontSize: '13px' }}>
+                {back.steps.map((step, i) => (
+                    <li key={i} style={{ marginBottom: '4px' }}>{step}</li>
+                ))}
+            </ol>
+        );
+    }
+    if (back.draggableLabels) {
+        return (
+            <div style={{ textAlign: 'left', fontSize: '13px' }}>
+                <p style={{ margin: '0 0 6px', fontWeight: '600', color: '#666' }}>Labels in this diagram:</p>
+                {back.draggableLabels.map((label, i) => (
+                    <div key={i} style={{ marginBottom: '4px' }}>• {label}</div>
+                ))}
+            </div>
+        );
+    }
+    return <div>{back.text}</div>;
+}
+
+function getCardTypeBadge(type) {
+    switch (type) {
+        case 'FILL_BLANK': return { label: 'Fill in the Blank', color: '#6366f1' };
+        case 'STEPS':      return { label: 'Steps',             color: '#0ea5e9' };
+        case 'DRAG_DROP':  return { label: 'Diagram',           color: '#f59e0b' };
+        default:           return null;
+    }
+}
+
+/* ── Main Component ──────────────────────────────────────────────── */
 
 const StudyPage = ({ onToggleFavorite, userId }) => {
     const location = useLocation();
@@ -21,7 +98,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
     const [isFlipped, setIsFlipped] = useState(false);
     const [flippedCards, setFlippedCards] = useState(new Set());
     const [cards, setCards] = useState(initialFlashcards);
-    const [knowledgeMap, setKnowledgeMap] = useState({}); // cardId -> level
+    const [knowledgeMap, setKnowledgeMap] = useState({});
 
     useEffect(() => {
         if (!setId) return;
@@ -35,6 +112,11 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
                 setKnowledgeMap(map);
             })
             .catch(console.error);
+    }, [setId]);
+
+    useEffect(() => {
+        if (!setId) return;
+        recordAccess(setId).catch(console.error);
     }, [setId]);
 
     const sessionStartRef = useRef(Date.now());
@@ -70,15 +152,9 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
     }
 
     const currentCard = cards[currentIndex];
-    const isFITB = currentCard.type === 'FILL_BLANK';
-
-    const frontContent = isFITB
-        ? currentCard.textWithBlanks
-        : (studyMode === 'term' ? currentCard.term : currentCard.definition);
-
-    const backContent = isFITB
-        ? currentCard.correctAnswers.join(', ')
-        : (studyMode === 'term' ? currentCard.definition : currentCard.term);
+    const front = getCardFront(currentCard, studyMode);
+    const back = getCardBack(currentCard, studyMode);
+    const badge = getCardTypeBadge(currentCard.type);
 
     const handleFlip = () => {
         setIsFlipped(!isFlipped);
@@ -135,6 +211,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
             <h2>Learn</h2>
 
             <div style={{ position: 'relative', width: '400px', maxWidth: '90%', margin: '0 auto' }}>
+                {/* Favorite button */}
                 <button
                     onClick={handleToggleFavorite}
                     title="Favorite"
@@ -147,6 +224,19 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
                     {currentCard.favorite ? '★' : '☆'}
                 </button>
 
+                {/* Card type badge */}
+                {badge && (
+                    <div style={{
+                        position: 'absolute', top: '10px', left: '10px', zIndex: 10,
+                        background: badge.color, color: 'white',
+                        fontSize: '11px', fontWeight: '600', padding: '2px 8px',
+                        borderRadius: '999px',
+                    }}>
+                        {badge.label}
+                    </div>
+                )}
+
+                {/* Flip card */}
                 <div style={{ perspective: '1000px', width: '100%', marginBottom: '12px' }}>
                     <div
                         onClick={handleFlip}
@@ -158,6 +248,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
                             cursor: 'pointer',
                         }}
                     >
+                        {/* Front */}
                         <div style={{
                             position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                             backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
@@ -165,8 +256,9 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
                             padding: '20px', boxSizing: 'border-box',
                             border: '2px solid #333', borderRadius: '10px', backgroundColor: 'white',
                         }}>
-                            {frontContent}
+                            <CardFrontContent front={front} />
                         </div>
+                        {/* Back */}
                         <div style={{
                             position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                             backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
@@ -174,27 +266,25 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             padding: '20px', boxSizing: 'border-box',
                             border: '2px solid #333', borderRadius: '10px', backgroundColor: 'white',
+                            overflowY: 'auto',
                         }}>
-                            {backContent}
+                            <CardBackContent back={back} />
                         </div>
                     </div>
                 </div>
 
-                {/* Knowledge level dropdown */}
+                {/* Knowledge level */}
                 <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '13px', color: '#666' }}>I</span>
                     <select
                         value={currentKnowledge}
                         onChange={(e) => handleKnowledgeChange(e.target.value)}
                         style={{
-                            padding: '6px 10px',
-                            borderRadius: '8px',
+                            padding: '6px 10px', borderRadius: '8px',
                             border: `2px solid ${currentKnowledgeOption.color}`,
                             color: currentKnowledgeOption.color,
-                            fontWeight: '600',
-                            fontSize: '13px',
-                            background: 'white',
-                            cursor: 'pointer',
+                            fontWeight: '600', fontSize: '13px',
+                            background: 'white', cursor: 'pointer',
                         }}
                     >
                         {KNOWLEDGE_OPTIONS.map(opt => (

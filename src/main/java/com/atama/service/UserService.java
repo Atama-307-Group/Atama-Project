@@ -1,17 +1,19 @@
 package com.atama.service;
 
 import com.atama.dto.request.UserRegistrationRequest;
+import com.atama.dto.response.FlashcardSetSearchDTO;
 import com.atama.dto.response.LoginResult;
+import com.atama.dto.response.UserProfileDTO;
 import com.atama.exception.ResourceNotFoundException;
+import com.atama.model.*;
 import com.atama.model.Library;
 import com.atama.model.University;
 import com.atama.model.User;
 import com.atama.model.Course;
-import com.atama.repository.CourseRepository;
-import com.atama.repository.LibraryRepository;
-import com.atama.repository.UniversityRepository;
-import com.atama.repository.UserRepository;
+import com.atama.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -30,6 +33,9 @@ public class UserService {
     private final LibraryRepository libraryRepository;
     private final UniversityRepository universityRepository;
     private final JwtService jwtService;
+    private final ReportRepository reportRepository;
+    private final LibraryItemRepository libraryItemRepository;
+    private final FlashcardSetReviewService flashcardSetReviewService;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final CourseRepository courseRepository;
@@ -104,7 +110,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public void deleteAccountWithPassword(UUID id, String password) {
+    public void deleteAccountWithPassword(UUID id, String password, String dataOption) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
@@ -112,7 +118,38 @@ public class UserService {
             throw new IllegalArgumentException("Incorrect password.");
         }
 
+        if ("transfer".equals(dataOption)) {
+            transferUserContentToAnonymous(user);
+        }
+
+        reportRepository.nullifyUser(id);
+
+        user.getEnrolledCourses().clear();
+        userRepository.save(user);
         userRepository.delete(user);
+    }
+
+    private void transferUserContentToAnonymous(User user) {
+        User anonymous = userRepository.findByUsername("Atama Anonymous")
+                .orElseThrow(() -> new IllegalStateException("Anonymous account not found."));
+
+        Library anonymousLibrary = libraryRepository.findByUser(anonymous)
+                .orElseThrow(() -> new IllegalStateException("Anonymous library not found."));
+
+        Library userLibrary = user.getLibrary();
+        if (userLibrary == null) return;
+
+        for (LibraryItem item : userLibrary.getItems()) {
+            item.setOwner(anonymous);
+            item.setLibrary(anonymousLibrary);
+            item.setFolder(null);
+        }
+
+        anonymousLibrary.getItems().addAll(userLibrary.getItems());
+        userLibrary.getItems().clear();
+
+        libraryRepository.save(anonymousLibrary);
+        libraryRepository.save(userLibrary);
     }
 
     public void changePassword(UUID id, String oldPassword, String newPassword) {
@@ -158,14 +195,21 @@ public class UserService {
     }
 
     public void enrollInCourse(UUID userId, UUID courseId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+            Course course = courseRepository.findById(courseId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
 
-        if (!user.getEnrolledCourses().contains(course)) {
-            user.getEnrolledCourses().add(course);
-            userRepository.save(user);
+            if (!user.getEnrolledCourses().contains(course)) {
+                user.getEnrolledCourses().add(course);
+                userRepository.save(user);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -183,6 +227,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
+        System.out.println("Unenrolling from all courses.");
         user.getEnrolledCourses().clear();
         userRepository.save(user);
     }
@@ -192,5 +237,39 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setAiDisabled(aiDisabled);
         userRepository.save(user);
+    }
+
+    public void updateRecommendationsEnabled(UUID userId, boolean enabled) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setRecommendationsEnabled(enabled);
+        userRepository.save(user);
+    }
+    public void updateDarkMode(UUID userId, boolean darkMode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setDarkMode(darkMode);
+        userRepository.save(user);
+    }
+
+    public UserProfileDTO getPublicProfile(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<FlashcardSetSearchDTO> publicSets = libraryItemRepository
+                .findPublicSetsByUser(user.getId())
+                .stream()
+                .map(i -> {
+                    FlashcardSetReviewService.ReviewAggregate agg = flashcardSetReviewService.getAggregate(i.getId());
+                    return new FlashcardSetSearchDTO(
+                            i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
+                            i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
+                            i.getFolder() != null ? i.getFolder().getId() : null,
+                            agg.averageStars(), agg.topTags()
+                    );
+                })
+                .toList();
+
+        return new UserProfileDTO(user.getId(), user.getUsername(), user.getProfilePictureUrl(), publicSets);
     }
 }

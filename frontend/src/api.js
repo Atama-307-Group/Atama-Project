@@ -30,6 +30,24 @@ export async function deleteFolder(folderId) {
     if (!res.ok) throw new Error("Failed to delete folder");
 }
 
+export async function deleteLibraryItem(itemId) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to delete library item");
+}
+
+export async function renameLibraryItem(itemId, title) {
+    const res = await fetch(`${API_BASE}/library-items/${itemId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+    });
+    if (!res.ok) throw new Error("Failed to rename item");
+}
+
 async function request(path, options = {}) {
     const res = await fetch(`${BASE}${path}`, {
         credentials: "include",
@@ -96,14 +114,6 @@ export async function setFolderPrivacy(folderId, isPublic) {
         body: JSON.stringify({ isPublic }),
     });
     if (!res.ok) throw new Error("Failed to update folder privacy");
-    return res.json();
-}
-
-export async function getLibraryItems() {
-    const res = await fetch(`${API_BASE}/library-items`, {
-        credentials: "include",
-    });
-    if (!res.ok) throw new Error("Failed to load library items");
     return res.json();
 }
 
@@ -195,6 +205,15 @@ export async function updateSetPrivacy(id, isPublic) {
     if (!res.ok) throw new Error('Failed to update privacy');
     return res.json();
 }
+
+export async function deleteFlashcardSet(setId) {
+    const res = await fetch(`${API_BASE}/flashcard-sets/${setId}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to delete flashcard set");
+}
+
 /* Goals ------------------------------------------- */
 
 export async function getGoal(userId) {
@@ -325,7 +344,10 @@ export async function enrollInCourse(userId, courseId) {
         body: JSON.stringify({ courseId }),
         credentials: "include",
     });
-    if (!res.ok) throw new Error("Failed to enroll in course");
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Enroll failed");
+    }
     return res.json();
 }
 
@@ -385,13 +407,6 @@ export async function uploadPDFToCourse(file, title, year, semester, description
     return res.json();
 }
 
-export async function recordAccess(itemId) {
-    await fetch(`${API_BASE}/library-items/${itemId}/access`, {
-        method: "POST",
-        credentials: "include",
-    });
-}
-
 export async function updateCourseLibraryItem(id, year, semester, description) {
     const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
         method: "PATCH",
@@ -403,12 +418,31 @@ export async function updateCourseLibraryItem(id, year, semester, description) {
     return res.json();
 }
 
+export async function updateCourseLibraryItemTitle(id, { title }) {
+    const res = await fetch(`${API_BASE}/library-items/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+    });
+    if (!res.ok) throw new Error("Failed to update library item");
+    return res.json();
+}
+
+
 export async function deleteCourseLibraryItem(id) {
     const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
         method: "DELETE",
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to remove item");
+}
+
+export async function recordAccess(itemId) {
+    await fetch(`${API_BASE}/library-items/${itemId}/access`, {
+        method: "POST",
+        credentials: "include",
+    });
 }
 
 export function openPDF(itemId) {
@@ -547,6 +581,8 @@ export async function getCourseItems(courseId) {
         credentials: "include",
     });
     if (!res.ok) throw new Error("Failed to fetch course items");
+      console.log("fetching course items for:", courseId);
+
     return res.json();
 }
 
@@ -714,6 +750,7 @@ export async function getGroupLeaderboard(groupId) {
 }
 
 
+
 export async function getGroupMessages(groupId) {
     const res = await fetch(`${API_BASE}/api/groups/${groupId}/messages`, {
         credentials: "include",
@@ -737,6 +774,16 @@ export async function nudgeMember(groupId, targetUserId, senderId) {
     });
     if (!res.ok) throw new Error("Failed to send nudge");
 }
+
+export async function getRecommendation(userId) {
+    const res = await fetch(`${API_BASE}/api/recommendations/${userId}`, {
+        credentials: "include",
+    });
+    if (res.status === 204) return null;
+    if (!res.ok) throw new Error("Failed to fetch recommendation");
+    return res.json();
+}
+
 /* Concept Maps ------------------------------------------- */
 
 export async function generateConceptMap(setId, selectedCardIds, title) {
@@ -770,7 +817,7 @@ export async function createManualConceptMap(setId, selectedCardIds, title) {
 export async function uploadConceptMapPng(mapId, file) {
     const formData = new FormData();
     formData.append("file", file);
-    
+
     const res = await fetch(`${API_BASE}/api/concept-maps/${mapId}/png`, {
         method: "POST",
         credentials: "include",
@@ -846,3 +893,42 @@ export async function updateAiDisabled(userId, aiDisabled) {
     if (!res.ok) throw new Error("Failed to update AI preference");
 
 }
+
+export async function updateRecommendationsEnabled(userId, recommendationsEnabled) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/recommendations-enabled`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recommendationsEnabled }),
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to update recommendation preference");
+    }
+}
+
+export async function updateDarkMode(userId, darkMode) {
+    const res = await fetch(`${API_BASE}/api/users/${userId}/dark-mode`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ darkMode }),
+    });
+    if (!res.ok) throw new Error("Failed to update dark mode preference");
+}
+
+export const generatePracticeTest = async (payload) => {
+    const response = await fetch(`${API_BASE}/api/practice-test/generate`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+        const err = await response.text();
+        throw new Error(err || 'Failed to generate practice test');
+    }
+    return response.json();
+};
+
+

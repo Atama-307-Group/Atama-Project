@@ -28,7 +28,7 @@ public class AdminService {
     private final CourseRepository courseRepository;
 
     public List<ReportDTO> getPendingReports() {
-        return reportRepository.findByStatus(Status.PENDING)
+        return reportRepository.findAll()
                 .stream().map(ReportDTO::from).toList();
     }
 
@@ -41,7 +41,7 @@ public class AdminService {
     }
 
     public List<CourseRequestResponseDTO> getPendingCourseRequests() {
-        return courseRequestRepository.findByStatus(Status.PENDING)
+        return courseRequestRepository.findAll()
                 .stream().map(CourseRequestResponseDTO::from).toList();
     }
 

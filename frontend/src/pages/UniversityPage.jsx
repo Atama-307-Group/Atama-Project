@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UniversityPage.css";
+import EnrollModal from "../components/EnrollModal.jsx"
+import LeaveAllCoursesModal from "../components/LeaveAllCoursesModal.jsx"
 import { useCourseEnrollment } from "../hooks/useCourseEnrollment.js";
 import { useSearch } from "../hooks/useSearch.jsx";
 import EnrollFromScheduleModal from "../components/EnrollFromScheduleModal";
@@ -14,6 +16,7 @@ const UniversityPage = ({ userId }) => {
         enrolling, handleEnroll,
         showLeaveAllModal, setShowLeaveAllModal, leavingAll, handleLeaveAll,
         leaveOneCourse, setLeaveOneCourse, leavingOne, handleLeaveOne,
+        scheduledLeaveDate, setScheduledLeaveDate,
     } = useCourseEnrollment(userId);
 
     const {
@@ -26,14 +29,33 @@ const UniversityPage = ({ userId }) => {
 
     const navigate = useNavigate();
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
+    const [showLeaveAllCoursesModal, setShowLeaveAllCoursesModal] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
+//     const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
+
     const menuRef = useRef(null);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [showRequestModal, setShowRequestModal] = useState(false);
 
-    const visibleCourses = view === "enrolled"
-        ? courses.filter(c => enrolledIds.has(c.id))
-        : courses;
+    // Global keyboard shortcut: Cmd/Ctrl+K to open search
+    useEffect(() => {
+        function onKeyDown(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                setSearchOpen(true);
+            }
+            if (e.key === "Escape") {
+                if (searchOpen) {
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                } else if (showLeaveAllModal) {
+                    setShowLeaveAllModal(false);
+                }
+            }
+        }
+        document.addEventListener("keydown", onKeyDown);
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [searchOpen, showLeaveAllModal]);
 
     function handleSetView(v) {
         setView(v);
@@ -51,6 +73,19 @@ const UniversityPage = ({ userId }) => {
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [openMenuId]);
+
+
+    useEffect(() => { setActiveIndex(0); }, [searchQuery]);
+
+
+    const visibleCourses = view === "enrolled"
+        ? courses.filter(c => enrolledIds.has(c.id))
+        : courses;
+
+    function handleSetView(v) {
+        setView(v);
+        localStorage.setItem("universityView", v);
+    }
 
     return (
         <div className="universityPage">
@@ -242,23 +277,12 @@ const UniversityPage = ({ userId }) => {
 
             {/* Enroll modal */}
             {selectedCourse && (
-                <div className="modalOverlay" onClick={() => setSelectedCourse(null)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="modalTitle">Enroll in course?</div>
-                        <p className="modalBody">
-                            Do you want to enroll in <strong>{selectedCourse.courseCode} — {selectedCourse.courseName}</strong>?
-                            This will give you access to the course page and resources.
-                        </p>
-                        <div className="modalActions">
-                            <button className="btn cancelBtn" onClick={() => setSelectedCourse(null)}>
-                                Cancel
-                            </button>
-                            <button className="btn primary" onClick={handleEnroll} disabled={enrolling}>
-                                {enrolling ? "Enrolling..." : "Yes, enroll"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <EnrollModal
+                    course={selectedCourse}
+                    enrolling={enrolling}
+                    onConfirm={handleEnroll}
+                    onCancel={() => setSelectedCourse(null)}
+                />
             )}
 
             {/* Enroll from schedule modal */}
@@ -297,22 +321,12 @@ const UniversityPage = ({ userId }) => {
 
             {/* Leave all courses modal */}
             {showLeaveAllModal && (
-                <div className="modalOverlay" onClick={() => setShowLeaveAllModal(false)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="modalTitle">Leave all courses?</div>
-                        <p className="modalBody">
-                            Are you sure you want to leave all your enrolled courses? You can always re-enroll later.
-                        </p>
-                        <div className="modalActions">
-                            <button className="btn cancelBtn" onClick={() => setShowLeaveAllModal(false)}>
-                                Cancel
-                            </button>
-                            <button className="btn leaveAllConfirmBtn" onClick={handleLeaveAll} disabled={leavingAll}>
-                                {leavingAll ? "Leaving..." : "Yes, leave all"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <LeaveAllCoursesModal
+                        leavingAll={leavingAll}
+                        scheduledLeaveDate={scheduledLeaveDate}
+                        onConfirm={handleLeaveAll}
+                        onCancel={() => setShowLeaveAllModal(false)}
+                    />
             )}
 
             {/* Request course modal */}

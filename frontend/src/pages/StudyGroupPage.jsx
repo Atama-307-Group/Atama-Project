@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
-import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember, leaveGroup, getLibraryItems, openPDF } from "../api.js";
+import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember, leaveGroup, getLibraryContents, openPDF } from "../api.js";
 import "./StudyGroupPage.css";
 
 const StudyGroupPage = ({ userId }) => {
@@ -163,7 +163,7 @@ const StudyGroupPage = ({ userId }) => {
         if (pickerItems.length > 0) return;
         setPickerLoading(true);
         try {
-            const items = await getLibraryItems();
+            const items = await getLibraryContents();
             setPickerItems(Array.isArray(items) ? items.filter(i => i.isPublic) : []);
         } catch {
             setPickerItems([]);

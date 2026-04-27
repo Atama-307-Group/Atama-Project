@@ -2,6 +2,7 @@ package com.atama.controller;
 
 import com.atama.dto.request.UserRegistrationRequest;
 import com.atama.dto.response.LoginResult;
+import com.atama.dto.response.UserProfileDTO;
 import com.atama.model.Course;
 import com.atama.model.User;
 import com.atama.service.JwtService;
@@ -49,6 +50,9 @@ public class UserController {
             responseBody.put("profilePictureUrl", user.getProfilePictureUrl());
             responseBody.put("verified", user.isVerified());
             responseBody.put("isAdmin", result.isAdmin());
+            responseBody.put("aiDisabled", user.isAiDisabled());
+            responseBody.put("recommendationsEnabled", user.isRecommendationsEnabled());
+            responseBody.put("darkMode", user.isDarkMode());
 
             return ResponseEntity.ok(responseBody);
 
@@ -99,11 +103,25 @@ public class UserController {
     @PostMapping("/{id}/delete-account")
     public ResponseEntity<?> deleteAccount(@PathVariable UUID id, @RequestBody Map<String, String> request) {
         String password = request.get("password");
+        String dataOption = request.get("dataOption");
+
+        if (password == null || password.isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Password is required."));
+        }
+        if (!List.of("delete", "transfer").contains(dataOption)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Invalid data option."));
+        }
+
         try {
-            userService.deleteAccountWithPassword(id, password);
+            userService.deleteAccountWithPassword(id, password, dataOption);
             return ResponseEntity.ok(Map.of("message", "Account deleted successfully."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", e.getMessage()));
         }
     }
@@ -259,8 +277,12 @@ public class UserController {
             UUID courseId = UUID.fromString(request.get("courseId"));
             userService.enrollInCourse(id, courseId);
             return ResponseEntity.ok(Map.of("message", "Enrolled successfully."));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        } catch (Exception e) {
+            System.err.println("ENROLL ERROR: " + e.getMessage());
+            for (StackTraceElement el : e.getStackTrace()) {
+                System.err.println("\t" + el.toString());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", e.getMessage()));
         }
     }
@@ -287,5 +309,34 @@ public class UserController {
         }
         userService.updateAiDisabled(userId, value);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{userId}/recommendations-enabled")
+    public ResponseEntity<Void> updateRecommendationsEnabled(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean value = body.get("recommendationsEnabled");
+        if (value == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.updateRecommendationsEnabled(userId, value);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{userId}/dark-mode")
+    public ResponseEntity<Void> updateDarkMode(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean value = body.get("darkMode");
+        if (value == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        userService.updateDarkMode(userId, value);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{username}/profile")
+    public ResponseEntity<UserProfileDTO> getProfile(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getPublicProfile(username));
     }
 }

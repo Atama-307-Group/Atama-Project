@@ -598,6 +598,33 @@
 .set-page-stat-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #999; }
 .set-page-stat-value { font-size: 1rem; font-weight: 700; color: #111; }
 
+.set-page-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.set-page-report-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.set-page-report-btn:hover {
+    color: #e05c5c;
+    background: #fef2f2;
+}
+
 /* Study buttons */
 .set-page-study-actions { display: flex; gap: 0.75rem; margin: 1rem 0 1.25rem; flex-wrap: wrap; }
 .set-page-study-btn { padding: 0.55rem 1.2rem; border: none; border-radius: 8px; background: #2b5c3f; color: white; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s; }

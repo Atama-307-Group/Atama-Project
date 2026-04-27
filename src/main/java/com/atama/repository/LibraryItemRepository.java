@@ -2,6 +2,7 @@ package com.atama.repository;
 
 import com.atama.model.LibraryItem;
 import com.atama.model.LibraryItemType;
+import com.atama.model.FlashcardSet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,6 +36,7 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, UUID> 
     select li from LibraryItem li
     where li.library.id = :libraryId
     and li.folder is null
+    and li.hidden = false
     order by li.updatedAt desc
     """)
     List<LibraryItem> findLooseItemsByLibraryId(@Param("libraryId") UUID libraryId);
@@ -49,4 +51,10 @@ public interface LibraryItemRepository extends JpaRepository<LibraryItem, UUID> 
     and (li.isPublic = true or li.library.user.id = :userId)
     """)
     List<LibraryItem> searchByType(@Param("q") String q, @Param("type") LibraryItemType type, @Param("userId") UUID userId);
+
+    @Query("SELECT f FROM FlashcardSet f WHERE f.isPublic = true")
+    List<FlashcardSet> findAllPublicFlashcardSets();
+
+    @Query("SELECT i FROM LibraryItem i WHERE i.library.user.id = :userId AND i.itemType = 'FLASHCARD_SET' AND i.isPublic = true")
+    List<LibraryItem> findPublicSetsByUser(@Param("userId") UUID userId);
 }

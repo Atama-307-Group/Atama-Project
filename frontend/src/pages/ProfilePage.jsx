@@ -20,6 +20,8 @@ const ProfilePage = ({ currentUser }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deletePassword, setDeletePassword] = useState('');
     const [deleteStatus, setDeleteStatus] = useState({ loading: false, error: '' });
+    const [deleteDataOption, setDeleteDataOption] = useState('delete');
+
 
     // Load profile picture on mount
     useEffect(() => {
@@ -129,7 +131,7 @@ const ProfilePage = ({ currentUser }) => {
             const response = await fetch(`/api/users/${currentUser.id}/delete-account`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: deletePassword })
+                body: JSON.stringify({ password: deletePassword, dataOption: deleteDataOption })
             });
 
             if (!response.ok) {
@@ -273,13 +275,43 @@ const ProfilePage = ({ currentUser }) => {
                 <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
                     <div className="modal-card delete-modal" onClick={(e) => e.stopPropagation()}>
                         <h3 className="modal-title delete-title">⚠️ Delete Account</h3>
-                        <p className="modal-subtitle">This action is <strong>permanent</strong> and cannot be undone. Enter your password to confirm.</p>
+                        <p className="modal-subtitle">This action is <strong>permanent</strong> and cannot be undone. First, choose what happens to your content.</p>
 
                         {deleteStatus.error && <div className="alert error">{deleteStatus.error}</div>}
 
                         <form onSubmit={handleDeleteAccount}>
+                            <div className="delete-options">
+                                <label className={`delete-option ${deleteDataOption === 'delete' ? 'selected' : ''}`}>
+                                    <input
+                                        type="radio"
+                                        name="dataOption"
+                                        value="delete"
+                                        checked={deleteDataOption === 'delete'}
+                                        onChange={() => setDeleteDataOption('delete')}
+                                    />
+                                    <div>
+                                        <div className="option-title">Delete all my content</div>
+                                        <div className="option-desc">Permanently removes all uploaded course materials and personal library items (e.g. flashcard sets).</div>
+                                    </div>
+                                </label>
+
+                                <label className={`delete-option ${deleteDataOption === 'transfer' ? 'selected' : ''}`}>
+                                    <input
+                                        type="radio"
+                                        name="dataOption"
+                                        value="transfer"
+                                        checked={deleteDataOption === 'transfer'}
+                                        onChange={() => setDeleteDataOption('transfer')}
+                                    />
+                                    <div>
+                                        <div className="option-title">Move to Atama Anonymous</div>
+                                        <div className="option-desc">Transfers all uploaded course materials and personal library items to the shared anonymous account.</div>
+                                    </div>
+                                </label>
+                            </div>
+
                             <div className="input-group">
-                                <label>Password</label>
+                                <label>Confirm with your password</label>
                                 <input
                                     type="password"
                                     value={deletePassword}

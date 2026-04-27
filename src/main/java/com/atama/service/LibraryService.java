@@ -21,7 +21,6 @@ import java.util.*;
 @Transactional
 public class LibraryService {
 
-    // TODO Do we actually need this file???
     private final LibraryRepository libraryRepository;
     private final LibraryItemRepository libraryItemRepository;
 

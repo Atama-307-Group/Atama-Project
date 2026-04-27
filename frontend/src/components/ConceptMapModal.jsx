@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getLibraryContents, searchLibrary, getFlashcardSetById, generateConceptMap, createManualConceptMap } from '../api';
 import './ConceptMapModal.css';
+import AiDisabledModal from './AiDisabledModal.jsx';
 
-const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
+const ConceptMapModal = ({ onClose, sourceSetId, defaultCards, aiDisabled }) => {
     const [step, setStep] = useState(1); // 1: picker, 2: progress
     const [loadingLibrary, setLoadingLibrary] = useState(true);
     const [librarySets, setLibrarySets] = useState([]);
@@ -15,7 +16,8 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState(null);
     const [progressLabel, setProgressLabel] = useState("");
-    const [generationMode, setGenerationMode] = useState('AI'); // 'AI' or 'MANUAL'
+    const [generationMode, setGenerationMode] = useState(aiDisabled ? 'MANUAL' : 'AI'); // 'AI' or 'MANUAL'
+    const [showAiModal, setShowAiModal] = useState(false);
 
     // Initialize with default cards (from the current set)
     useEffect(() => {
@@ -167,8 +169,25 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
                         <p className="cmap-modal-subtitle">Pick material from your library to include in the map.</p>
                         
                         <div className="cmap-toggle-group">
-                            <label className={`cmap-toggle-label ${generationMode === 'AI' ? 'active' : ''}`}>
-                                <input type="radio" value="AI" checked={generationMode === 'AI'} onChange={() => setGenerationMode('AI')} style={{display: 'none'}} />
+                            <label 
+                                className={`cmap-toggle-label ${generationMode === 'AI' ? 'active' : ''}`}
+                                onClick={(e) => {
+                                    if (aiDisabled) {
+                                        e.preventDefault();
+                                        setShowAiModal(true);
+                                    }
+                                }}
+                                style={{ opacity: aiDisabled ? 0.5 : 1, cursor: aiDisabled ? 'not-allowed' : 'pointer' }}
+                            >
+                                <input 
+                                    type="radio" 
+                                    value="AI" 
+                                    checked={generationMode === 'AI'} 
+                                    onChange={() => {
+                                        if (!aiDisabled) setGenerationMode('AI');
+                                    }} 
+                                    style={{display: 'none'}} 
+                                />
                                 ✨ Generate with AI
                             </label>
                             <label className={`cmap-toggle-label ${generationMode === 'MANUAL' ? 'active' : ''}`}>
@@ -265,6 +284,7 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards }) => {
                     </div>
                 )}
             </div>
+            {showAiModal && <AiDisabledModal onClose={() => setShowAiModal(false)} />}
         </div>
     );
 };

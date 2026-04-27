@@ -38,6 +38,9 @@ public class User {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean aiDisabled = false;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean darkMode = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id")
     private University university;
@@ -55,4 +58,8 @@ public class User {
     @JsonIgnore
     @JoinTable(name = "user_enrolled_courses", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
     private List<Course> enrolledCourses;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean recommendationsEnabled = true;
+
 }

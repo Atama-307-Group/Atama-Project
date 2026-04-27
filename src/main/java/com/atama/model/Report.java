@@ -19,7 +19,7 @@ public class Report {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL"))
     private User user;   // The user who created the report
 
     @Enumerated(EnumType.STRING)
@@ -45,7 +45,7 @@ public class Report {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_user_id")
+    @JoinColumn(name = "reported_user_id", foreignKey = @ForeignKey(foreignKeyDefinition = "FOREIGN KEY (reported_user_id) REFERENCES users(id) ON DELETE SET NULL"))
     private User reportedUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
