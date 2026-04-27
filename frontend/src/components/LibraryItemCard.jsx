@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 
-export function LibraryItemCard({ item, organizeMode, isSelected, onToggleStar, onMoveToFolder, onDelete, onClick, folders = [] }) {
+export function LibraryItemCard({ item, organizeMode, isSelected, onToggleStar, onMoveToFolder, onRemoveFromFolder, onDelete, onRename, onClick, onDragStart, folders = [] }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef(null);
 
@@ -22,6 +22,8 @@ export function LibraryItemCard({ item, organizeMode, isSelected, onToggleStar, 
                 ${organizeMode && isSelected ? "selectedItem" : ""}
                 ${organizeMode ? "organizeModeItem" : ""}`}
             onClick={onClick}
+            draggable={organizeMode}
+            onDragStart={onDragStart}
         >
             <div className="folderName">{item.title}</div>
             <div className="folderMeta">
@@ -52,6 +54,12 @@ export function LibraryItemCard({ item, organizeMode, isSelected, onToggleStar, 
 
                             {menuOpen && (
                                 <div className="dropdownMenu" role="menu">
+                                    {onRemoveFromFolder && (
+                                        <button className="menuItem"
+                                            onClick={(e) => { e.stopPropagation(); onRemoveFromFolder(item.id); setMenuOpen(false); }}>
+                                            ↩ Move to main library
+                                        </button>
+                                    )}
                                     {folders.length > 0 && (
                                         <div className="menuItemSubmenu">
                                             <span className="menuItem">📁 Move to folder ›</span>
