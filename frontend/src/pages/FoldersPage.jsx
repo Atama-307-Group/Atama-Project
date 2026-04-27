@@ -466,13 +466,20 @@ const FoldersPage = ({ userId }) => {
             {/* Right: library */}
             <main className="library">
                 <header className="libraryHeader">
-                    <div>
-                        <div className="libraryTitle">Your Library</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {selectedFolderId == null && (
+                            <button className="backBtn" onClick={() => navigate('/')} title="Back to Home">
+                                ←
+                            </button>
+                        )}
+                        <div>
+                            <div className="libraryTitle">Your Library</div>
                         <div className="librarySub">
                             {loading ? "Loading…" : `${filtered.length} folder${filtered.length === 1 ? "" : "s"}`}
                             {selected ? ` · Selected: ${selected.name}` : ""}
                         </div>
                     </div>
+                </div>
 
                     <div className="sortWrap" ref={sortMenuRef}>
                         <button
