@@ -68,17 +68,22 @@ public class PracticeTestService {
                 if (optPdf.isPresent()) {
                     PDF pdf = optPdf.get();
                     try {
-                        Path path = Paths.get(pdf.getFilePath());
-                        if (Files.exists(path)) {
-                            try (PDDocument document = Loader.loadPDF(Files.readAllBytes(path))) {
-                                PDFTextStripper stripper = new PDFTextStripper();
-                                String text = stripper.getText(document);
-                                if (text != null && !text.trim().isEmpty()) {
-                                    combinedText.append("\n").append(text).append("\n");
-                                }
+                        byte[] pdfBytes = pdf.getFileData();
+                        if (pdfBytes == null) {
+                            Path path = Paths.get(pdf.getFilePath());
+                            if (Files.exists(path)) {
+                                pdfBytes = Files.readAllBytes(path);
+                            } else {
+                                throw new RuntimeException("PDF file not found on server for document ID: " + docId);
                             }
-                        } else {
-                            throw new RuntimeException("PDF file not found on server for document ID: " + docId);
+                        }
+
+                        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
+                            PDFTextStripper stripper = new PDFTextStripper();
+                            String text = stripper.getText(document);
+                            if (text != null && !text.trim().isEmpty()) {
+                                combinedText.append("\n").append(text).append("\n");
+                            }
                         }
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to read PDF file for document ID: " + docId, e);

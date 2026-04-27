@@ -96,6 +96,7 @@ public class LibraryItemService {
         PDF pdf = new PDF();
         pdf.setTitle(title != null ? title : file.getOriginalFilename());
         pdf.setFilePath(filePath.toString());
+        pdf.setFileData(file.getBytes());
         pdf.setItemType(LibraryItemType.PDF);
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

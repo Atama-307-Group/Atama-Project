@@ -41,6 +41,10 @@ export function useCourseEnrollment(userId) {
     }, [userId]);
 
     async function handleEnroll(courseOverride = null) {
+        // Ignore React synthetic events passing as the first argument
+        if (courseOverride && courseOverride.nativeEvent) {
+            courseOverride = null;
+        }
         const course = courseOverride ?? selectedCourse;
         if (!course) return;
         setEnrolling(true);

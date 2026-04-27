@@ -11,4 +11,7 @@ import lombok.Setter;
 public class PDF extends LibraryItem {
     @Column(nullable = false)
     private String filePath;
+
+    @Column(columnDefinition = "bytea")
+    private byte[] fileData;
 }

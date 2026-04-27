@@ -110,6 +110,14 @@ public class LibraryItemController {
         PDF pdf = (PDF) libraryItemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
 
+        if (pdf.getFileData() != null) {
+            String filename = (pdf.getTitle() != null ? pdf.getTitle() : "document") + ".pdf";
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                    .body(new org.springframework.core.io.ByteArrayResource(pdf.getFileData()));
+        }
+
         Path filePath = Paths.get(pdf.getFilePath());
         Resource resource = new UrlResource(filePath.toUri());
 
@@ -141,10 +149,19 @@ public class LibraryItemController {
                 .orElseThrow(() -> new RuntimeException("Item not found"));
 
         PDF pdf = (PDF) item;
+        String filename = (item.getTitle() != null ? item.getTitle() : "document") + ".pdf";
+
+        if (pdf.getFileData() != null) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(new org.springframework.core.io.ByteArrayResource(pdf.getFileData()));
+        }
+
         Path filePath = Paths.get(pdf.getFilePath());
         Resource resource = new UrlResource(filePath.toUri());
 
-        String filename = (item.getTitle() != null ? item.getTitle() : "document") + ".pdf";
+        if (!resource.exists()) throw new RuntimeException("File not found");
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")

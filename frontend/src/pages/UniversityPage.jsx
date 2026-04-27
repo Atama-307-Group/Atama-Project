@@ -280,7 +280,7 @@ const UniversityPage = ({ userId }) => {
                 <EnrollModal
                     course={selectedCourse}
                     enrolling={enrolling}
-                    onConfirm={handleEnroll}
+                    onConfirm={() => handleEnroll()}
                     onCancel={() => setSelectedCourse(null)}
                 />
             )}
