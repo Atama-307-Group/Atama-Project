@@ -149,7 +149,6 @@ const ProfilePage = ({ currentUser }) => {
 
     return (
         <div className="profile-page">
-            <button className="back-btn" onClick={() => navigate('/')}>&larr; Back</button>
 
             <div className="profile-card">
                 {/* Avatar */}

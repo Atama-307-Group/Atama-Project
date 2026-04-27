@@ -168,7 +168,6 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                <Route path="/profile" element={currentUser ? <ProfilePage currentUser={currentUser} /> : <Navigate to="/login" />} />
                 <Route path="/change-password" element={currentUser ? <ChangePasswordPage currentUser={currentUser} /> : <Navigate to="/login" />} />
 
                 <Route path="/create" element={currentUser ? <CreateFlashcardSetPage aiDisabled={aiDisabled} /> : <Navigate to="/login" />} />
