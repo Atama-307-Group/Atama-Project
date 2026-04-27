@@ -1,22 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { getGoal, getCountdowns } from "../api.js";
+import { getGoal, getCountdowns, getPendingNudges } from "../api.js";
 import "./DesktopNotification.css";
 
-/**
- * DesktopNotification – renders desktop-style toast popups inside the browser
- * window. It polls the backend to determine when to show notifications for:
- *   1. Study reminders  (based on Goal notifyByDesktop + notificationTime)
- *   2. Exam countdowns   (based on reminderMinutesBefore + notifyByDesktop)
- *
- * Props:
- *   userId – the logged-in user's UUID (or null)
- */
 const DesktopNotification = ({ userId }) => {
     const [notifications, setNotifications] = useState([]);
-    const shownIdsRef = useRef(new Set());   // prevent duplicate toasts
+    const shownIdsRef = useRef(new Set());
     const nextIdRef = useRef(1);
-
-    /* ── helpers ── */
 
     const addNotification = useCallback((title, body, icon = "📚") => {
         const id = nextIdRef.current++;
@@ -24,7 +13,6 @@ const DesktopNotification = ({ userId }) => {
             ...prev,
             { id, title, body, icon, createdAt: Date.now() },
         ]);
-        // auto-dismiss after 15 seconds
         setTimeout(() => {
             setNotifications((prev) => prev.filter((n) => n.id !== id));
         }, 15000);
@@ -36,19 +24,16 @@ const DesktopNotification = ({ userId }) => {
 
     /* ── Study reminder check ── */
 
-    const
-    checkStudyReminder = useCallback(async () => {
+    const checkStudyReminder = useCallback(async () => {
         if (!userId) return;
         try {
             const goal = await getGoal(userId);
             if (!goal.notifyByDesktop || !goal.notificationTime) return;
 
-            // Compare current HH:MM with notificationTime
             const now = new Date();
             const [h, m] = goal.notificationTime.substring(0, 5).split(":").map(Number);
             if (now.getHours() !== h || now.getMinutes() !== m) return;
 
-            // Check if today is a study day
             const jsDayMap = {
                 1: "MONDAY", 2: "TUESDAY", 3: "WEDNESDAY",
                 4: "THURSDAY", 5: "FRIDAY", 6: "SATURDAY", 0: "SUNDAY",
@@ -110,42 +95,64 @@ const DesktopNotification = ({ userId }) => {
         }
     }, [userId, addNotification]);
 
-const checkCourseLeaveNotification = useCallback(async () => {
-    if (!userId) return;
-    try {
-        const res = await fetch(`/api/users/${userId}/schedule-leave/status`);
-        const data = await res.json();
-        if (!data.executedAt) return;
+    /* ── Nudge notification check ── */
 
-        const key = `course-leave-${data.executedAt}`;
-        if (localStorage.getItem(key)) return;
-        localStorage.setItem(key, "true");
+    const checkNudgeNotifications = useCallback(async () => {
+        if (!userId) return;
+        try {
+            const nudges = await getPendingNudges(userId);
+            for (const n of nudges) {
+                addNotification(
+                    "Study nudge from " + n.senderUsername + "! 👋",
+                    `${n.senderUsername} wants you to join them in "${n.groupName}". Open Atama and get studying!`,
+                    "👥"
+                );
+            }
+        } catch {
+            /* silent */
+        }
+    }, [userId, addNotification]);
 
-        addNotification(
-            "Courses Left",
-            "You have been automatically unenrolled from all your courses.",
-            "📅"
-        );
-    } catch {
-        /* silent */
-    }
-}, [userId, addNotification]);
+    /* ── Course leave notification check ── */
+
+    const checkCourseLeaveNotification = useCallback(async () => {
+        if (!userId) return;
+        try {
+            const res = await fetch(`/api/users/${userId}/schedule-leave/status`);
+            const data = await res.json();
+            if (!data.executedAt) return;
+
+            const key = `course-leave-${data.executedAt}`;
+            if (localStorage.getItem(key)) return;
+            localStorage.setItem(key, "true");
+
+            addNotification(
+                "Courses Left",
+                "You have been automatically unenrolled from all your courses.",
+                "📅"
+            );
+        } catch {
+            /* silent */
+        }
+    }, [userId, addNotification]);
 
     /* ── Polling ── */
 
     useEffect(() => {
         checkStudyReminder();
         checkExamReminders();
+        checkNudgeNotifications();
         checkCourseLeaveNotification();
 
         const interval = setInterval(() => {
             checkStudyReminder();
             checkExamReminders();
+            checkNudgeNotifications();
             checkCourseLeaveNotification();
         }, 30000);
 
         return () => clearInterval(interval);
-    }, [checkStudyReminder, checkExamReminders, checkCourseLeaveNotification]);
+    }, [checkStudyReminder, checkExamReminders, checkNudgeNotifications, checkCourseLeaveNotification]);
 
     /* ── Render ── */
 

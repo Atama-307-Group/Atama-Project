@@ -749,6 +749,32 @@ export async function getGroupLeaderboard(groupId) {
     return res.json();
 }
 
+
+
+export async function getGroupMessages(groupId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/messages`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch messages");
+    return res.json();
+}
+
+export async function getPendingNudges(userId) {
+    const res = await fetch(`${API_BASE}/api/notifications/nudges/${userId}`, {
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch nudge notifications");
+    return res.json();
+}
+
+export async function nudgeMember(groupId, targetUserId, senderId) {
+    const res = await fetch(`${API_BASE}/api/groups/${groupId}/nudge/${targetUserId}?senderId=${senderId}`, {
+        method: "POST",
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to send nudge");
+}
+
 export async function getRecommendation(userId) {
     const res = await fetch(`${API_BASE}/api/recommendations/${userId}`, {
         credentials: "include",
@@ -865,6 +891,7 @@ export async function updateAiDisabled(userId, aiDisabled) {
         body: JSON.stringify({ aiDisabled }),
     });
     if (!res.ok) throw new Error("Failed to update AI preference");
+
 }
 
 export async function updateRecommendationsEnabled(userId, recommendationsEnabled) {
@@ -890,8 +917,6 @@ export async function updateDarkMode(userId, darkMode) {
     if (!res.ok) throw new Error("Failed to update dark mode preference");
 }
 
-
-
 export const generatePracticeTest = async (payload) => {
     const response = await fetch(`${API_BASE}/api/practice-test/generate`, {
         method: 'POST',
@@ -905,4 +930,5 @@ export const generatePracticeTest = async (payload) => {
     }
     return response.json();
 };
+
 

@@ -4,327 +4,158 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
+    <list default="true" id="34ed46a6-52cf-40b0-ba37-098021c0c94c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/db-forest-config.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/2026-02-22T135829.500.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/2026-02-22T140058.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/2026-02-22T140700.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/http-client.cookies" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/http-requests-log.http" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ConfirmModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/CourseToolbar.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/EnrollModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/FolderCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Highlighted.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Highlighted.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/LeaveAllCoursesModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/LibraryItemCard.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/MetadataModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/RecommendationBanner.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ReportModal.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ReportModal.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/constants.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useCourseItems.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useEscapeKey.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useFilteredItems.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/PracticeTestOptionsPage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/UserProfilePage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/pages/UserProfilePage.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLeaveDateController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/PracticeTestController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/RecommendationController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/ReportController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/game/QuestionDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/request/CreateReportDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/request/PracticeTestRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/UserProfileDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/UserSearchDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/CourseLeaveDate.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/RecentlyStudied.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/CourseLeaveDateRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/RecentlyStudiedRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateScheduler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/PracticeTestService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/RecommendationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/ReportService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/1650613e-9681-4de5-8a74-55944047ad7a_2. InterviewPlan_FG.docx.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/27d28d4f-cf4f-4a6e-a948-e0ea21c0fc85_DVC1-2 (Aquinas).pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/54223394-db8d-4908-a2e1-e7a839f83bfe_DVC1-2 (Aquinas).pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/57fc36cd-cdfa-49f3-937f-bf48f556cd91_AI Shadow Report (1).pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/7db099f7-13c6-4aaa-8580-3946411303a7_U-M GenAI Committee Report.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/8bb8a567-e598-4442-bd5f-6a04b715c5b6_congestion-422-26s-a.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/906e578a-1d28-49ea-ad64-814194ed3829_C-Span Paper.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/adb627c1-9d41-4da5-aa1f-0093998ea361_AI Shadow Report (1).pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/be352472-6bba-4741-a8c3-c2e889d25a88_SQs Aquinas (QDV and ST 1-2_61-62).pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/c1c19cc8-829d-4042-9d91-dc2d4ad119c0_Psychological Persuasion for Academic Practice.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/c2e1b6eb-c8f1-4fe7-9157-3a93e72c33c0_Ethnography_FieldNote_Reflection.docx.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/d4357632-0a0a-43db-ad10-d41d42c81e78_8. Sprint 2 Retrospective.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ConceptMapModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ConceptMapModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/DesktopNotification.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/DesktopNotification.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useCourseEnrollment.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useCourseEnrollment.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LandingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LandingPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/MatchPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MatchPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PickSetPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PickSetPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PracticeTestPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PracticeTestPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PreTestPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PreTestPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/AdminController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLibraryItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLibraryItemController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/FlashcardSetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/FlashcardSetController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryItemController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FlashcardSetResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FlashcardSetResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/SearchResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/SearchResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/mapper/FlashcardSetMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/mapper/FlashcardSetMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/FlashcardSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/FlashcardSet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/LibraryItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/LibraryItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/Report.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/Report.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/FlashcardRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/FlashcardRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryItemRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/ReportRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/ReportRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/AdminService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/AdminService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/FolderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/FolderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/GeminiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/GeminiService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryItemService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="AnnotationType" />
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
-  <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="main" />
-      </map>
-    </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
-  </component>
-  <component name="MavenRunner">
-    <option name="delegateBuildToMaven" value="true" />
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
-  </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 7
-}</component>
-  <component name="ProjectId" id="39qrrfiHw3n3zvFUl776RUXLLU5" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Maven.Atama [clean].executor": "Run",
-    "Maven.Atama [compile].executor": "Run",
-    "Maven.Atama [install,--non-recursive].executor": "Run",
-    "Maven.AtamaApplication.executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/pawan/IdeaProjects/Atama-Project/pom.xml",
+    "git-widget-placeholder": "Merging feature/study__groups",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "node",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+    "node.js.selected.package.tslint": "(autodetect)"
   }
 }]]></component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\pawan\IdeaProjects\Atama-Project\src\main\frontend\src" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\pawan\IdeaProjects\Atama-Project\frontend\src\pages" />
-      <recent name="C:\Users\pawan\IdeaProjects\Atama-Project\frontend\src" />
-      <recent name="C:\Users\pawan\IdeaProjects\Atama-Project" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Spring Boot.AtamaApplication">
-    <configuration default="true" type="MavenRunConfiguration" factoryName="Maven">
-      <MavenSettings>
-        <option name="myGeneralSettings" />
-        <option name="myRunnerSettings" />
-        <option name="myRunnerParameters">
-          <MavenRunnerParameters>
-            <option name="cmdOptions" />
-            <option name="profiles">
-              <set />
-            </option>
-            <option name="goals">
-              <list />
-            </option>
-            <option name="multimoduleDir" />
-            <option name="pomFileName" />
-            <option name="profilesMap">
-              <map />
-            </option>
-            <option name="projectsCmdOptionValues">
-              <list />
-            </option>
-            <option name="resolveToWorkspace" value="false" />
-            <option name="workingDirPath" value="" />
-          </MavenRunnerParameters>
-        </option>
-      </MavenSettings>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="main.jsx" type="NodeJSConfigurationType" nameIsGenerated="true" path-to-js-file="main.jsx" working-dir="$PROJECT_DIR$/src/main/frontend/src">
-      <method v="2" />
-    </configuration>
-    <configuration name="AtamaApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
       <module name="Atama" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.atama.AtamaApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Atama" />
+      <option name="filePath" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="3b43e303-1d29-4e7f-b55b-e3f3fecfe604" name="Changes" comment="" />
-      <created>1771434641878</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1771434641878</updated>
-      <workItem from="1771434643414" duration="3774000" />
-      <workItem from="1771609725064" duration="5757000" />
-      <workItem from="1771768967321" duration="4678000" />
-      <workItem from="1771775768129" duration="8575000" />
-      <workItem from="1772128961129" duration="9024000" />
-      <workItem from="1772169616236" duration="22044000" />
-      <workItem from="1772388147147" duration="177000" />
-      <workItem from="1772388361510" duration="311000" />
-      <workItem from="1772388697551" duration="7231000" />
-      <workItem from="1772548421657" duration="7825000" />
-      <workItem from="1772560718549" duration="6173000" />
-      <workItem from="1772571703754" duration="231000" />
-      <workItem from="1772571975653" duration="41271000" />
-      <workItem from="1773335165903" duration="413000" />
-      <workItem from="1773335780453" duration="5222000" />
-      <workItem from="1773524198982" duration="4459000" />
-      <workItem from="1774708144283" duration="16285000" />
-      <workItem from="1775154791187" duration="7211000" />
-      <workItem from="1775164367927" duration="216000" />
-      <workItem from="1775164613189" duration="76000" />
-      <workItem from="1775164716618" duration="44000" />
-      <workItem from="1776038811093" duration="2342000" />
-    </task>
-    <task id="LOCAL-00001" summary="Added model java files for User and Flashcards, implemented basics for Flashcard types that extend Flashcard interface.">
-      <option name="closed" value="true" />
-      <created>1771438821946</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1771438821946</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Created/modified:&#10;•  AtamaApplication.java — Spring Boot entry point&#10;•  Model layer — Refactored Flashcard and LibraryItem from interfaces to abstract @Entity classes with Single Table Inheritance. Added JPA annotations to all entities (User, Library, Folder, FlashcardSet, all flashcard subtypes)&#10;•  Repository layer — UserRepository, LibraryRepository, FolderRepository, FlashcardRepository, FlashcardSetRepository&#10;•  Service layer — UserService, LibraryService, FlashcardSetService with CRUD operations and @Transactional support&#10;•  Controller layer — UserController, LibraryController, FlashcardSetController with REST endpoints under /api/&#10;•  Exception handling — ResourceNotFoundException + GlobalExceptionHandler&#10;•  DTO packages — dto/request and dto/response placeholders">
-      <option name="closed" value="true" />
-      <created>1771612893127</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1771612893127</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Created/modified:&#10;•  AtamaApplication.java — Spring Boot entry point&#10;&#10;•  Model layer — Refactored Flashcard and LibraryItem from interfaces to abstract @Entity classes with Single Table Inheritance. Added JPA annotations to all entities (User, Library, Folder, FlashcardSet, all flashcard subtypes)&#10;&#10;•  Repository layer — UserRepository, LibraryRepository, FolderRepository, FlashcardRepository, FlashcardSetRepository&#10;&#10;•  Service layer — UserService, LibraryService, FlashcardSetService with CRUD operations and @Transactional support&#10;&#10;•  Controller layer — UserController, LibraryController, FlashcardSetController with REST endpoints under /api/&#10;&#10;•  Exception handling — ResourceNotFoundException + GlobalExceptionHandler&#10;&#10;•  DTO packages — dto/request and dto/response placeholders">
-      <option name="closed" value="true" />
-      <created>1771612935966</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1771612935966</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Added 2 jsx files (and css files for them)&#10;- FlashcardInput: frontend implementation of the flashcard types and should ensure that each type can be use the same way as described by backend&#10;- CreateFlashcardSetPage: page to create sets, entering title and different types of flashcards. &#10;added button to main app">
-      <option name="closed" value="true" />
-      <created>1771791591588</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1771791591588</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Pt 1 of fix to make drag and drop flashcards work - changes to model in backend">
-      <option name="closed" value="true" />
-      <created>1771797845556</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1771797845556</updated>
-    </task>
-    <task id="LOCAL-00006" summary="DTOs added for flashcards, drag and drop UI and backend improved">
-      <option name="closed" value="true" />
-      <created>1772166020254</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1772166020254</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Drag and drop ui">
-      <option name="closed" value="true" />
-      <created>1772166303109</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1772166303109</updated>
-    </task>
-    <task id="LOCAL-00008" summary="LibraryItem inheritance applied to FlashcardSet DTOs. Service layer not fixed yet">
-      <option name="closed" value="true" />
-      <created>1772296052123</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1772296052123</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Errors fixed">
-      <option name="closed" value="true" />
-      <created>1772296134885</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1772296134885</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Services and Controller fixed to match library item inheritance">
-      <option name="closed" value="true" />
-      <created>1772299321732</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1772299321732</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Got api fully connected and tested (adds to database)&#10;However i did change folder and folder services &#10;TODO: change entity properties back later after login is integrated (set up now for no user)">
-      <option name="closed" value="true" />
-      <created>1772392378705</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1772392378705</updated>
-    </task>
-    <task id="LOCAL-00012" summary="minor change to frontend UI (css)">
-      <option name="closed" value="true" />
-      <created>1772395253692</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1772395253692</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Moved frontend to correct folder, can run from there and then delete folder src/main/frontend now. Need to check all functionality is intact individually.">
-      <option name="closed" value="true" />
-      <created>1772564579857</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1772564579857</updated>
-    </task>
-    <task id="LOCAL-00014" summary="change so log in is not required for creating and viewing sets">
-      <option name="closed" value="true" />
-      <created>1772571457166</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1772571457166</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Page for viewing flashcard sets now includes editing for individual cards and set information">
-      <option name="closed" value="true" />
-      <created>1772645122063</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1772645122063</updated>
-    </task>
-    <task id="LOCAL-00016" summary="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js">
-      <option name="closed" value="true" />
-      <created>1773547238502</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1773547238502</updated>
-    </task>
-    <option name="localTasksCounter" value="17" />
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added model java files for User and Flashcards, implemented basics for Flashcard types that extend Flashcard interface." />
-    <MESSAGE value="Created/modified:&#10;•  AtamaApplication.java — Spring Boot entry point&#10;•  Model layer — Refactored Flashcard and LibraryItem from interfaces to abstract @Entity classes with Single Table Inheritance. Added JPA annotations to all entities (User, Library, Folder, FlashcardSet, all flashcard subtypes)&#10;•  Repository layer — UserRepository, LibraryRepository, FolderRepository, FlashcardRepository, FlashcardSetRepository&#10;•  Service layer — UserService, LibraryService, FlashcardSetService with CRUD operations and @Transactional support&#10;•  Controller layer — UserController, LibraryController, FlashcardSetController with REST endpoints under /api/&#10;•  Exception handling — ResourceNotFoundException + GlobalExceptionHandler&#10;•  DTO packages — dto/request and dto/response placeholders" />
-    <MESSAGE value="Created/modified:&#10;•  AtamaApplication.java — Spring Boot entry point&#10;&#10;•  Model layer — Refactored Flashcard and LibraryItem from interfaces to abstract @Entity classes with Single Table Inheritance. Added JPA annotations to all entities (User, Library, Folder, FlashcardSet, all flashcard subtypes)&#10;&#10;•  Repository layer — UserRepository, LibraryRepository, FolderRepository, FlashcardRepository, FlashcardSetRepository&#10;&#10;•  Service layer — UserService, LibraryService, FlashcardSetService with CRUD operations and @Transactional support&#10;&#10;•  Controller layer — UserController, LibraryController, FlashcardSetController with REST endpoints under /api/&#10;&#10;•  Exception handling — ResourceNotFoundException + GlobalExceptionHandler&#10;&#10;•  DTO packages — dto/request and dto/response placeholders" />
-    <MESSAGE value="Added 2 jsx files (and css files for them)&#10;- FlashcardInput: frontend implementation of the flashcard types and should ensure that each type can be use the same way as described by backend&#10;- CreateFlashcardSetPage: page to create sets, entering title and different types of flashcards. &#10;added button to main app" />
-    <MESSAGE value="Pt 1 of fix to make drag and drop flashcards work - changes to model in backend" />
-    <MESSAGE value="DTOs added for flashcards, drag and drop UI and backend improved" />
-    <MESSAGE value="Drag and drop ui" />
-    <MESSAGE value="LibraryItem inheritance applied to FlashcardSet DTOs. Service layer not fixed yet" />
-    <MESSAGE value="Errors fixed" />
-    <MESSAGE value="Services and Controller fixed to match library item inheritance" />
-    <MESSAGE value="Got api fully connected and tested (adds to database)&#10;However i did change folder and folder services &#10;TODO: change entity properties back later after login is integrated (set up now for no user)" />
-    <MESSAGE value="minor change to frontend UI (css)" />
-    <MESSAGE value="Moved frontend to correct folder, can run from there and then delete folder src/main/frontend now. Need to check all functionality is intact individually." />
-    <MESSAGE value="change so log in is not required for creating and viewing sets" />
-    <MESSAGE value="Page for viewing flashcard sets now includes editing for individual cards and set information" />
-    <MESSAGE value="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing implementation to use httpOnly cookie with JWT. need to fix all login pages to use api.js" />
-  </component>
-  <component name="XSLT-Support.FileAssociations.UIState">
-    <expand />
-    <select />
   </component>
 </project>

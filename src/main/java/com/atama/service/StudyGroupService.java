@@ -6,11 +6,15 @@ import com.atama.model.StudyGroup;
 import com.atama.model.StudyGroup.Privacy;
 import com.atama.model.StudySession;
 import com.atama.model.User;
+import com.atama.model.NudgeNotification;
 import com.atama.repository.GroupMembershipRepository;
+import com.atama.repository.NudgeNotificationRepository;
 import com.atama.repository.StudyGroupRepository;
 import com.atama.repository.StudySessionRepository;
 import com.atama.repository.UserRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,15 +37,21 @@ public class StudyGroupService {
     private final GroupMembershipRepository membershipRepository;
     private final UserRepository userRepository;
     private final StudySessionRepository studySessionRepository;
+    private final JavaMailSender mailSender;
+    private final NudgeNotificationRepository nudgeNotificationRepository;
 
     public StudyGroupService(StudyGroupRepository studyGroupRepository,
                              GroupMembershipRepository membershipRepository,
                              UserRepository userRepository,
-                             StudySessionRepository studySessionRepository) {
+                             StudySessionRepository studySessionRepository,
+                             JavaMailSender mailSender,
+                             NudgeNotificationRepository nudgeNotificationRepository) {
         this.studyGroupRepository = studyGroupRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.studySessionRepository = studySessionRepository;
+        this.mailSender = mailSender;
+        this.nudgeNotificationRepository = nudgeNotificationRepository;
     }
 
     public record LeaderboardEntry(
@@ -54,12 +64,24 @@ public class StudyGroupService {
 
 
     @Transactional(readOnly = true)
-    public List<StudyGroup> getGroupsByCourseId(UUID courseId) {
-        return studyGroupRepository.findByCourseId(courseId);
+    public List<StudyGroup> getGroupsByCourseId(UUID courseId, UUID currentUserId) {
+        return studyGroupRepository.findByCourseId(courseId).stream()
+                .filter(g -> g.getPrivacy() == Privacy.PUBLIC
+                        || membershipRepository.existsByGroupIdAndUserId(g.getId(), currentUserId))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public StudyGroup getGroupById(UUID groupId) {
+    public StudyGroup getGroupById(UUID groupId, UUID currentUserId) {
+        StudyGroup group = findGroupById(groupId);
+        if (group.getPrivacy() == Privacy.PRIVATE
+                && !membershipRepository.existsByGroupIdAndUserId(groupId, currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This group is private");
+        }
+        return group;
+    }
+
+    private StudyGroup findGroupById(UUID groupId) {
         return studyGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Study group not found"));
     }
@@ -95,7 +117,7 @@ public class StudyGroupService {
 
     @Transactional
     public GroupMembership joinPublicGroup(UUID groupId, UUID userId) {
-        StudyGroup group = getGroupById(groupId);
+        StudyGroup group = findGroupById(groupId);
 
         if (group.getPrivacy() == Privacy.PRIVATE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This group requires an invite link");
@@ -128,7 +150,7 @@ public class StudyGroupService {
 
     @Transactional(readOnly = true)
     public List<LeaderboardEntry> getLeaderboard(UUID groupId) {
-        StudyGroup group = getGroupById(groupId);
+        StudyGroup group = findGroupById(groupId);
         UUID courseId = group.getCourse().getId();
 
         List<GroupMembership> memberships = membershipRepository.findByGroupId(groupId);
@@ -170,6 +192,43 @@ public class StudyGroupService {
                 })
                 .sorted(Comparator.comparingLong(LeaderboardEntry::weeklyMinutes).reversed())
                 .collect(Collectors.toList());
+    }
+
+    public void sendNudge(UUID groupId, UUID targetUserId, UUID senderId) {
+        StudyGroup group = findGroupById(groupId);
+
+        User target = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Target user not found"));
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+
+        if (target.getEmail() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Target user has no email address");
+        }
+
+        String courseName = group.getCourse() != null
+                ? (group.getCourse().getCourseName() != null ? group.getCourse().getCourseName() : group.getCourse().getCourseCode())
+                : "your course";
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(target.getEmail());
+        message.setSubject("Atama – " + sender.getUsername() + " wants you to study!");
+        message.setText(
+                "Hi " + target.getUsername() + ",\n\n" +
+                sender.getUsername() + " is thinking of you and wants you to join them in the \"" +
+                group.getName() + "\" study group for " + courseName + "!\n\n" +
+                "Your group is waiting! Study together and keep those streaks going.\n\n" +
+                "Head over to Atama to join.\n\n" +
+                "— Atama Team"
+        );
+        mailSender.send(message);
+
+        NudgeNotification notification = new NudgeNotification();
+        notification.setUserId(target.getId());
+        notification.setSenderUsername(sender.getUsername());
+        notification.setGroupName(group.getName());
+        notification.setGroupId(group.getId());
+        nudgeNotificationRepository.save(notification);
     }
 
     private GroupMembership addMember(StudyGroup group, UUID userId) {

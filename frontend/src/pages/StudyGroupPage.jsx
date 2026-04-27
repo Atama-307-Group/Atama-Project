@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard } from "../api.js";
+import { Client } from "@stomp/stompjs";
+import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember, leaveGroup, getLibraryContents, openPDF } from "../api.js";
 import "./StudyGroupPage.css";
 
 const StudyGroupPage = ({ userId }) => {
@@ -19,22 +20,43 @@ const StudyGroupPage = ({ userId }) => {
     const [messages, setMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
     const chatEndRef = useRef(null);
+    const stompClientRef = useRef(null);
+    const sentClientIds = useRef(new Set());
 
     const [copiedInvite, setCopiedInvite] = useState(false);
+    const [nudgedMembers, setNudgedMembers] = useState({});
+
+    const [showPicker, setShowPicker] = useState(false);
+    const [pickerItems, setPickerItems] = useState([]);
+    const [pickerLoading, setPickerLoading] = useState(false);
+    const pickerRef = useRef(null);
 
     useEffect(() => {
         async function load() {
             try {
-                const [groupData, membersData, uniData, leaderboardData] = await Promise.all([
+                const [groupData, membersData, uniData, leaderboardData, historyData] = await Promise.all([
                     getGroup(groupId),
                     getGroupMembers(groupId),
                     getUniversity(),
                     getGroupLeaderboard(groupId),
+                    getGroupMessages(groupId),
                 ]);
                 setGroup(groupData);
                 setMembers(membersData);
                 setUniversity(uniData);
                 setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : []);
+                setMessages(historyData.map(m => ({
+                    id: m.id,
+                    author: m.username,
+                    text: m.text,
+                    messageType: m.messageType ?? "TEXT",
+                    materialId: m.materialId,
+                    materialTitle: m.materialTitle,
+                    materialType: m.materialType,
+                    time: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                    isMe: String(m.userId) === String(userId),
+                    clientId: m.clientId,
+                })));
             } catch (e) {
                 setError(e.message);
             } finally {
@@ -42,25 +64,156 @@ const StudyGroupPage = ({ userId }) => {
             }
         }
         load();
+
+        const client = new Client({
+            brokerURL: "ws://localhost:8080/ws",
+            onConnect: () => {
+                client.subscribe(`/topic/groups/${groupId}`, (frame) => {
+                    const msg = JSON.parse(frame.body);
+                    if (msg.clientId && sentClientIds.current.has(msg.clientId)) {
+                        sentClientIds.current.delete(msg.clientId);
+                        return;
+                    }
+                    setMessages(prev => [...prev, {
+                        id: msg.id,
+                        author: msg.username,
+                        text: msg.text,
+                        messageType: msg.messageType ?? "TEXT",
+                        materialId: msg.materialId,
+                        materialTitle: msg.materialTitle,
+                        materialType: msg.materialType,
+                        time: new Date(msg.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                        isMe: String(msg.userId) === String(userId),
+                        clientId: msg.clientId,
+                    }]);
+                });
+            },
+        });
+        client.activate();
+        stompClientRef.current = client;
+
+        return () => { client.deactivate(); };
     }, [groupId]);
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
+    useEffect(() => {
+        if (!showPicker) return;
+        function onPointerDown(e) {
+            if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+                setShowPicker(false);
+            }
+        }
+        window.addEventListener("pointerdown", onPointerDown);
+        return () => window.removeEventListener("pointerdown", onPointerDown);
+    }, [showPicker]);
+
     function sendMessage(e) {
         e.preventDefault();
-        if (!chatInput.trim()) return;
+        const text = chatInput.trim();
+        if (!text || !stompClientRef.current?.connected) return;
+
         const me = members.find(m => String(m.user?.id) === String(userId));
         const username = me?.user?.username ?? "You";
+        const clientId = crypto.randomUUID();
+
+        sentClientIds.current.add(clientId);
         setMessages(prev => [...prev, {
-            id: Date.now(),
+            id: clientId,
             author: username,
-            text: chatInput.trim(),
+            text,
             time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
             isMe: true,
+            clientId,
         }]);
+
+        stompClientRef.current.publish({
+            destination: `/app/groups/${groupId}/chat`,
+            body: JSON.stringify({ userId, username, text, clientId }),
+        });
+
         setChatInput("");
+    }
+
+    async function handleNudge(targetUserId) {
+        setNudgedMembers(prev => ({ ...prev, [targetUserId]: "sending" }));
+        try {
+            await nudgeMember(groupId, targetUserId, userId);
+            setNudgedMembers(prev => ({ ...prev, [targetUserId]: "sent" }));
+            setTimeout(() => setNudgedMembers(prev => ({ ...prev, [targetUserId]: null })), 3000);
+        } catch {
+            setNudgedMembers(prev => ({ ...prev, [targetUserId]: null }));
+        }
+    }
+
+    async function handleLeave() {
+        if (!window.confirm("Are you sure you want to leave this group?")) return;
+        try {
+            await leaveGroup(groupId, userId);
+            navigate(-1);
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+
+    async function handleOpenPicker() {
+        setShowPicker(true);
+        if (pickerItems.length > 0) return;
+        setPickerLoading(true);
+        try {
+            const items = await getLibraryContents();
+            setPickerItems(Array.isArray(items) ? items.filter(i => i.isPublic) : []);
+        } catch {
+            setPickerItems([]);
+        } finally {
+            setPickerLoading(false);
+        }
+    }
+
+    function handleSendMaterial(item) {
+        if (!stompClientRef.current?.connected) return;
+        const me = members.find(m => String(m.user?.id) === String(userId));
+        const username = me?.user?.username ?? "You";
+        const clientId = crypto.randomUUID();
+
+        sentClientIds.current.add(clientId);
+        setMessages(prev => [...prev, {
+            id: clientId,
+            author: username,
+            text: "",
+            messageType: "MATERIAL",
+            materialId: item.id,
+            materialTitle: item.title,
+            materialType: item.itemType,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            isMe: true,
+            clientId,
+        }]);
+
+        stompClientRef.current.publish({
+            destination: `/app/groups/${groupId}/chat`,
+            body: JSON.stringify({
+                userId, username, text: "", clientId,
+                messageType: "MATERIAL",
+                materialId: item.id,
+                materialTitle: item.title,
+                materialType: item.itemType,
+            }),
+        });
+
+        setShowPicker(false);
+    }
+
+    function handleNavigateMaterial(type, id) {
+        if (type === "PDF") {
+            openPDF(id);
+        } else if (type === "CONCEPT_MAP") {
+            navigate(`/concept-maps/${id}`);
+        } else {
+            navigate(`/sets/${id}`);
+        }
     }
 
     function handleShareInvite() {
@@ -94,6 +247,9 @@ const StudyGroupPage = ({ userId }) => {
                 <button className="sgShareBtn" onClick={handleShareInvite}>
                     {copiedInvite ? "Copied!" : "Share Invite"}
                 </button>
+                {members.find(m => String(m.user?.id) === String(userId) && m.role !== "OWNER") && (
+                    <button className="sgLeaveBtn" onClick={handleLeave}>Leave</button>
+                )}
             </header>
 
             <div className="sgBody">
@@ -109,20 +265,71 @@ const StudyGroupPage = ({ userId }) => {
                                     <span className="sgMsgAuthor">{msg.author}</span>
                                     <span className="sgMsgTime">{msg.time}</span>
                                 </div>
-                                <span className="sgMsgText">{msg.text}</span>
+                                {msg.messageType === "MATERIAL" ? (
+                                    <div
+                                        className="sgMaterialCard"
+                                        onClick={() => handleNavigateMaterial(msg.materialType, msg.materialId)}
+                                    >
+                                        <div className="sgMaterialCardName">{msg.materialTitle}</div>
+                                        <div className="sgMaterialCardMeta">
+                                            <span className={`sgMaterialTypeBadge sgMaterialTypeBadge--${msg.materialType?.toLowerCase()}`}>
+                                                {msg.materialType?.replace(/_/g, " ")}
+                                            </span>
+                                            <span className="sgMaterialCardHint">Click to open →</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <span className="sgMsgText">{msg.text}</span>
+                                )}
                             </div>
                         ))}
                         <div ref={chatEndRef} />
                     </div>
-                    <form className="sgChatForm" onSubmit={sendMessage}>
-                        <input
-                            className="sgChatInput"
-                            value={chatInput}
-                            onChange={e => setChatInput(e.target.value)}
-                            placeholder="Type a message..."
-                        />
-                        <button className="sgChatSendBtn" type="submit">Send</button>
-                    </form>
+                    <div className="sgChatFormWrap" ref={pickerRef}>
+                        {showPicker && (
+                            <div className="sgPicker">
+                                <div className="sgPickerHeader">
+                                    <span>Share from Library</span>
+                                    <button className="sgPickerClose" onClick={() => setShowPicker(false)}>✕</button>
+                                </div>
+                                {pickerLoading ? (
+                                    <p className="sgPickerEmpty">Loading…</p>
+                                ) : pickerItems.length === 0 ? (
+                                    <p className="sgPickerEmpty">No public items in your library.</p>
+                                ) : (
+                                    <div className="sgPickerGrid">
+                                        {pickerItems.map(item => (
+                                            <div
+                                                key={item.id}
+                                                className="sgPickerItem"
+                                                onClick={() => handleSendMaterial(item)}
+                                            >
+                                                <div className="sgPickerItemName">{item.title}</div>
+                                                <span className={`sgMaterialTypeBadge sgMaterialTypeBadge--${item.itemType?.toLowerCase()}`}>
+                                                    {item.itemType?.replace(/_/g, " ")}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <form className="sgChatForm" onSubmit={sendMessage}>
+                            <button
+                                className="sgPickerBtn"
+                                type="button"
+                                onClick={handleOpenPicker}
+                                title="Share a library item"
+                            >+</button>
+                            <input
+                                className="sgChatInput"
+                                value={chatInput}
+                                onChange={e => setChatInput(e.target.value)}
+                                placeholder="Type a message..."
+                            />
+                            <button className="sgChatSendBtn" type="submit">Send</button>
+                        </form>
+                    </div>
                 </section>
 
                 <aside className="sgSidebar">
@@ -134,18 +341,32 @@ const StudyGroupPage = ({ userId }) => {
                             </span>
                         </h2>
                         <ul className="sgMemberList">
-                            {members.map(m => (
-                                <li key={m.id} className="sgMemberItem">
-                                    <div className="sgAvatar">
-                                        {m.user?.profilePictureUrl
-                                            ? <img src={m.user.profilePictureUrl} alt={m.user.username} />
-                                            : <span>{m.user?.username?.[0]?.toUpperCase() ?? "?"}</span>
-                                        }
-                                    </div>
-                                    <span className="sgMemberName">{m.user?.username}</span>
-                                    {m.role === "OWNER" && <span className="sgRoleBadge">Owner</span>}
-                                </li>
-                            ))}
+                            {members.map(m => {
+                                const isMe = String(m.user?.id) === String(userId);
+                                const nudgeState = nudgedMembers[m.user?.id];
+                                return (
+                                    <li key={m.id} className="sgMemberItem">
+                                        <div className="sgAvatar">
+                                            {m.user?.profilePictureUrl
+                                                ? <img src={m.user.profilePictureUrl} alt={m.user.username} />
+                                                : <span>{m.user?.username?.[0]?.toUpperCase() ?? "?"}</span>
+                                            }
+                                        </div>
+                                        <span className="sgMemberName">{m.user?.username}</span>
+                                        {m.role === "OWNER" && <span className="sgRoleBadge">Owner</span>}
+                                        {!isMe && (
+                                            <button
+                                                className={`sgNudgeBtn${nudgeState === "sent" ? " sgNudgeBtn--sent" : ""}`}
+                                                onClick={() => handleNudge(m.user?.id)}
+                                                disabled={!!nudgeState}
+                                                title="Send a nudge email"
+                                            >
+                                                {nudgeState === "sending" ? "..." : nudgeState === "sent" ? "Sent!" : "Nudge"}
+                                            </button>
+                                        )}
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </section>
 

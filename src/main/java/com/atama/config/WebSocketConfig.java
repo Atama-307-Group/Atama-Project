@@ -9,12 +9,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Use /topic for broadcasting messages to clients
         config.enableSimpleBroker("/topic");
-        // Prefix for messages originating from clients routed to @MessageMapping controllers
         config.setApplicationDestinationPrefixes("/app");
     }
 
@@ -23,5 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-game")
                 .setAllowedOriginPatterns("http://localhost:5173", "http://127.0.0.1:5173")
                 .withSockJS();
+        // plain WebSocket endpoint for the study group chat (no SockJS — used by @stomp/stompjs)
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:5173");
     }
 }

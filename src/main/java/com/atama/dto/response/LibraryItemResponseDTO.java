@@ -1,6 +1,7 @@
 package com.atama.dto.response;
 
 import com.atama.model.LibraryItemType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class LibraryItemResponseDTO {
     private Instant lastAccessed;
     private boolean starred;
     private LibraryItemType itemType;
+    @JsonProperty("isPublic")
     private boolean isPublic = true;
     private UUID folderId; // just the ID to avoid deep nesting
 }

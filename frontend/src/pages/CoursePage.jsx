@@ -1,14 +1,11 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF,
-    addLibraryItemToCourse, updateCourseLibraryItem, deleteCourseLibraryItem, getGroupsByCourse } from "../api.js";
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryContents, addLibraryItemToCourse, getGroupsByCourse, getUserGroups, joinPublicGroup, updateCourseLibraryItem, deleteCourseLibraryItem } from "../api.js";
 import "./CoursePage.css";
-
 import Highlighted from "../components/Highlighted.jsx";
 import CourseToolbar from "../components/CourseToolbar";
 import MetadataModal from "../components/MetadataModal";
 import { NUMERIC_YEARS, YEARS, SEMESTERS } from "../constants.js";
-
 import useEscapeKey from "../hooks/useEscapeKey.js"
 import useCourseItems from "../hooks/useCourseItems";
 import useFilteredItems from "../hooks/useFilteredItems";
@@ -51,6 +48,8 @@ const CoursePage = ({ userId }) => {
     // Study groups preview
     const [groups, setGroups] = useState([]);
     const [groupsLoading, setGroupsLoading] = useState(true);
+    const [joinedGroupIds, setJoinedGroupIds] = useState(new Set());
+    const [joiningGroupId, setJoiningGroupId] = useState(null);
 
     // Add from personal library
     const [showLibraryModal, setShowLibraryModal] = useState(false);
@@ -85,12 +84,15 @@ const CoursePage = ({ userId }) => {
     const { items, setItems, loading: itemsLoading, error: itemsError } = useCourseItems(courseId);
 
     useEffect(() => {
-        if (!courseId) return;
-        getGroupsByCourse(courseId)
-            .then(data => setGroups(Array.isArray(data) ? data : []))
+        if (!courseId || !userId) return;
+        Promise.all([getGroupsByCourse(courseId), getUserGroups(userId)])
+            .then(([groupsData, membershipsData]) => {
+                setGroups(Array.isArray(groupsData) ? groupsData : []);
+                setJoinedGroupIds(new Set((membershipsData ?? []).map(m => String(m.group?.id))));
+            })
             .catch(() => setGroups([]))
             .finally(() => setGroupsLoading(false));
-    }, [courseId]);
+    }, [courseId, userId]);
 
     const filteredItems = useFilteredItems(items, query, sortBy, {
         filterTypes,
@@ -212,7 +214,7 @@ const CoursePage = ({ userId }) => {
         setLibraryError("");
         setLibraryLoading(true);
         try {
-            const data = await getLibraryItems();
+            const data = await getLibraryContents();
             setLibraryItems(Array.isArray(data) ? data : []);
         } catch (e) {
             setLibraryError(e.message ?? "Failed to load library items");
@@ -484,21 +486,50 @@ const CoursePage = ({ userId }) => {
                     </p>
                 ) : (
                     <div className="studyGroupsRow">
-                        {groups.slice(0, 4).map(g => (
-                            <div
-                                key={g.id}
-                                className="studyGroupCard"
-                                onClick={() => navigate(`/groups/${g.id}`)}
-                            >
-                                <div className="studyGroupCardName">{g.name}</div>
-                                {g.description && (
-                                    <div className="studyGroupCardDesc">{g.description}</div>
-                                )}
-                                <span className={`studyGroupPrivacyBadge studyGroupPrivacyBadge--${g.privacy?.toLowerCase()}`}>
-                                    {g.privacy}
-                                </span>
-                            </div>
-                        ))}
+                        {groups.slice(0, 4).map(g => {
+                            const joined = joinedGroupIds.has(String(g.id));
+                            return (
+                                <div key={g.id} className="studyGroupCard">
+                                    <div className="studyGroupCardName">{g.name}</div>
+                                    {g.description && (
+                                        <div className="studyGroupCardDesc">{g.description}</div>
+                                    )}
+                                    <span className={`studyGroupPrivacyBadge studyGroupPrivacyBadge--${g.privacy?.toLowerCase()}`}>
+                                        {g.privacy}
+                                    </span>
+                                    <div className="studyGroupCardAction">
+                                        {joined ? (
+                                            <button
+                                                className="studyGroupOpenBtn"
+                                                onClick={() => navigate(`/groups/${g.id}`)}
+                                            >
+                                                Open →
+                                            </button>
+                                        ) : g.privacy === "PUBLIC" ? (
+                                            <button
+                                                className="studyGroupJoinBtn"
+                                                disabled={joiningGroupId === g.id}
+                                                onClick={async () => {
+                                                    setJoiningGroupId(g.id);
+                                                    try {
+                                                        await joinPublicGroup(g.id, userId);
+                                                        setJoinedGroupIds(prev => new Set([...prev, String(g.id)]));
+                                                    } catch (e) {
+                                                        console.error(e);
+                                                    } finally {
+                                                        setJoiningGroupId(null);
+                                                    }
+                                                }}
+                                            >
+                                                {joiningGroupId === g.id ? "Joining…" : "Join"}
+                                            </button>
+                                        ) : (
+                                            <span className="studyGroupInviteOnly">Invite only</span>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
                         {groups.length > 4 && (
                             <div
                                 className="studyGroupCard studyGroupCard--more"

@@ -927,15 +927,67 @@ button.leaveConfirmBtn:disabled {
     border: 1px solid rgba(119, 191, 163, 0.45);
     border-radius: 14px;
     padding: 14px;
-    cursor: pointer;
-    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: box-shadow 0.12s, border-color 0.12s;
     box-shadow: 0 2px 10px rgba(30, 53, 47, 0.07);
 }
 
 .studyGroupCard:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(30, 53, 47, 0.13);
     border-color: #77BFA3;
+}
+
+.studyGroupCardAction {
+    margin-top: 6px;
+}
+
+.studyGroupOpenBtn {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    background: #2b5c3f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.studyGroupOpenBtn:hover {
+    background: #1E352F;
+}
+
+.studyGroupJoinBtn {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    background: rgba(119, 191, 163, 0.2);
+    color: #2b5c3f;
+    border: 1.5px solid rgba(43, 92, 63, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.studyGroupJoinBtn:hover:not(:disabled) {
+    background: rgba(119, 191, 163, 0.4);
+}
+
+.studyGroupJoinBtn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.studyGroupInviteOnly {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9eb3ab;
 }
 
 .studyGroupCard--more {

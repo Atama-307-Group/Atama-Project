@@ -6,6 +6,7 @@ import com.atama.service.StudyGroupService;
 import com.atama.service.StudyGroupService.LeaderboardEntry;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +23,17 @@ public class StudyGroupController {
     }
 
     @GetMapping("/courses/{courseId}/groups")
-    public ResponseEntity<List<StudyGroup>> getGroupsByCourse(@PathVariable UUID courseId) {
-        return ResponseEntity.ok(studyGroupService.getGroupsByCourseId(courseId));
+    public ResponseEntity<List<StudyGroup>> getGroupsByCourse(
+            @PathVariable UUID courseId,
+            @AuthenticationPrincipal String currentUserId) {
+        return ResponseEntity.ok(studyGroupService.getGroupsByCourseId(courseId, UUID.fromString(currentUserId)));
     }
 
     @GetMapping("/groups/{groupId}")
-    public ResponseEntity<StudyGroup> getGroup(@PathVariable UUID groupId) {
-        return ResponseEntity.ok(studyGroupService.getGroupById(groupId));
+    public ResponseEntity<StudyGroup> getGroup(
+            @PathVariable UUID groupId,
+            @AuthenticationPrincipal String currentUserId) {
+        return ResponseEntity.ok(studyGroupService.getGroupById(groupId, UUID.fromString(currentUserId)));
     }
 
     @PostMapping("/groups")
@@ -76,5 +81,14 @@ public class StudyGroupController {
     @GetMapping("/groups/{groupId}/leaderboard")
     public ResponseEntity<List<LeaderboardEntry>> getLeaderboard(@PathVariable UUID groupId) {
         return ResponseEntity.ok(studyGroupService.getLeaderboard(groupId));
+    }
+
+    @PostMapping("/groups/{groupId}/nudge/{targetUserId}")
+    public ResponseEntity<Void> nudgeMember(
+            @PathVariable UUID groupId,
+            @PathVariable UUID targetUserId,
+            @RequestParam UUID senderId) {
+        studyGroupService.sendNudge(groupId, targetUserId, senderId);
+        return ResponseEntity.noContent().build();
     }
 }
