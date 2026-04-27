@@ -19,8 +19,18 @@ function CollabGameModal({ onClose, navigate }) {
       setLoadingSets(true);
       getLibraryContents()
         .then((data) => {
-          const loose = Array.isArray(data.looseItems) ? data.looseItems : [];
-          setSets(loose.filter((item) =>
+          let allItems = [];
+          if (data.looseItems && Array.isArray(data.looseItems)) {
+              allItems.push(...data.looseItems);
+          }
+          if (data.folders && Array.isArray(data.folders)) {
+              data.folders.forEach(folder => {
+                  if (folder.items && Array.isArray(folder.items)) {
+                      allItems.push(...folder.items);
+                  }
+              });
+          }
+          setSets(allItems.filter((item) =>
             item.itemType === 'FLASHCARD_SET' ||
             item.itemType === 'flashcard_set' ||
             item.item_type === 'FLASHCARD_SET'

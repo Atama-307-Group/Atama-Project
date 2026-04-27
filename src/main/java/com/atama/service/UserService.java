@@ -195,21 +195,14 @@ public class UserService {
     }
 
     public void enrollInCourse(UUID userId, UUID courseId) {
-        try {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-            Course course = courseRepository.findById(courseId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
 
-            if (!user.getEnrolledCourses().contains(course)) {
-                user.getEnrolledCourses().add(course);
-                userRepository.save(user);
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", e.getMessage()));
+        if (!user.getEnrolledCourses().contains(course)) {
+            user.getEnrolledCourses().add(course);
+            userRepository.save(user);
         }
     }
 

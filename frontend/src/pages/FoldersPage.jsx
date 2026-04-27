@@ -110,22 +110,22 @@ const FoldersPage = ({ userId }) => {
     }, []);
 
     // Loading folder items
-    useEffect(() => {
-        if (selectedFolderId == null) { setItems([]); setItemsError(""); setItemsLoading(false); return; }
-        let cancelled = false;
-        async function loadItems() {
-            setItemsError(""); setItemsLoading(true);
-            try {
-                const data = await getFolderItems(selectedFolderId);
-                if (!cancelled) setItems(Array.isArray(data.items) ? data.items : []);
-            } catch (e) {
-                if (!cancelled) setItemsError(e.message ?? "Failed to load folder contents");
-            } finally {
-                if (!cancelled) setItemsLoading(false);
-            }
+    async function loadFolderItems(folderId) {
+        if (folderId == null) { setItems([]); setItemsError(""); setItemsLoading(false); return; }
+        setItemsError(""); setItemsLoading(true);
+        try {
+            const data = await getFolderItems(folderId);
+            setItems(Array.isArray(data.items) ? data.items : []);
+        } catch (e) {
+            setItemsError(e.message ?? "Failed to load folder contents");
+        } finally {
+            setItemsLoading(false);
         }
-        loadItems();
-        return () => { cancelled = true; };
+    }
+
+    useEffect(() => {
+        if (selectedFolderId != null) loadFolderItems(selectedFolderId);
+        else { setItems([]); setItemsError(""); setItemsLoading(false); }
     }, [selectedFolderId]);
 
     // Loading library
@@ -178,14 +178,44 @@ const FoldersPage = ({ userId }) => {
 
     const filteredItems = useMemo(() => {
         const q = query.trim().toLowerCase();
-        return libItems
-            .filter(item => item.title?.toLowerCase().includes(q) && !item.folderId)
+        let allItems = libItems;
+        if (q) {
+            const insideFolders = folders.flatMap(f => (f.items || []).map(i => ({...i, folderId: f.id})));
+            // Remove duplicates by ID in case any exist
+            const uniqItems = new Map();
+            allItems.forEach(i => uniqItems.set(i.id, i));
+            insideFolders.forEach(i => uniqItems.set(i.id, i));
+            allItems = Array.from(uniqItems.values());
+        }
+        return allItems
+            .filter(item => {
+                const matches = item.title?.toLowerCase().includes(q);
+                return q ? matches : (matches && !item.folderId);
+            })
             .sort((a, b) => {
                 if (a.starred !== b.starred) return a.starred ? -1 : 1;
                 const primary = compareBySort(a, b);
                 return primary !== 0 ? primary : (a.title ?? "").localeCompare(b.title ?? "");
             });
-    }, [libItems, query, sortBy]);
+    }, [libItems, folders, query, sortBy]);
+
+    const filteredSavedSets = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return savedSets;
+        return savedSets.filter(set => set.title?.toLowerCase().includes(q));
+    }, [savedSets, query]);
+
+    const filteredStudyGroups = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return studyGroups;
+        return studyGroups.filter(m => {
+            const g = m.group;
+            if (!g) return false;
+            return g.name?.toLowerCase().includes(q) || 
+                   g.course?.courseCode?.toLowerCase().includes(q) || 
+                   g.course?.courseName?.toLowerCase().includes(q);
+        });
+    }, [studyGroups, query]);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -340,10 +370,65 @@ const FoldersPage = ({ userId }) => {
         }
     }
 
+    async function onRemoveItemFromFolder(itemId) {
+        try {
+            await removeItemFromFolder(itemId);
+            if (selectedFolderId) {
+                setItems(prev => prev.filter(i => i.id !== itemId));
+            }
+            await loadLibrary();
+        } catch (err) {
+            setError(err.message ?? "Failed to remove item from folder");
+        }
+    }
+
     // ── Rename folder ─────────────────────────────────────────────────────────
 
     function openRenameModal(folder) { setOpenMenuId(null); setRenameId(folder.id); setRenameName(folder.name ?? ""); }
-    function closeRenameModal() { setRenameId(null); setRenameName(""); }
+
+
+    // ── Drag & Drop Logic ───────────────────────────────────────────────────
+    const handleDragStart = (e, itemId) => {
+        if (!organizeMode) return;
+        // If the item being dragged isn't selected, select only it
+        if (!selectedItemIds.has(itemId)) {
+            setSelectedItemIds(new Set([itemId]));
+        }
+        e.dataTransfer.setData("text/plain", itemId);
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDragOver = (e) => {
+        if (!organizeMode) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        e.currentTarget.classList.add("folderDropTargetActive");
+    };
+
+    const handleDragLeave = (e) => {
+        e.currentTarget.classList.remove("folderDropTargetActive");
+    };
+
+    const handleDrop = async (e, targetFolderId) => {
+        if (!organizeMode) return;
+        e.preventDefault();
+        e.currentTarget.classList.remove("folderDropTargetActive");
+
+        const itemsToMove = selectedItemIds.size > 0 
+            ? Array.from(selectedItemIds) 
+            : [e.dataTransfer.getData("text/plain")];
+
+        if (itemsToMove.length === 0) return;
+
+        try {
+            await Promise.all(itemsToMove.map(id => moveItemToFolder(id, targetFolderId)));
+            setSelectedItemIds(new Set());
+            if (selectedFolderId) await loadFolderItems(selectedFolderId);
+            await loadLibrary();
+        } catch (err) {
+            setError("Failed to move items: " + err.message);
+        }
+    };
 
     async function onRenameSubmit(e) {
         e.preventDefault();
@@ -392,84 +477,98 @@ const FoldersPage = ({ userId }) => {
     // ── Main render ───────────────────────────────────────────────────────────
 
     return (
-        <div className="appShell">
-            {/* Left rail */}
-            <aside className="rail">
-                <div className="brand">
-                    <div className="brandMark">📚</div>
-                    <div>
-                        <div className="brandTitle">Atama</div>
-                        <div className="brandSub">Library</div>
-                    </div>
-                </div>
+        <div className="foldersPage">
+            <header className="libraryHeader">
+                <button className="backBtn" onClick={() => navigate('/')} title="Back to Home">
+                    ←
+                </button>
+                <div className="libraryTitle">Your Library</div>
+            </header>
 
-                <button className="btn primary" onClick={() => navigate('/create')} type="button">New Flashcard Set</button>
+            <div className="libraryToolbar">
+                <button 
+                    className="toolbarActionBtn primary" 
+                    onClick={() => navigate('/create')}
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    New Flashcard Set
+                </button>
 
-                <button className="btn secondary" type="button" onClick={() => fileInputRef.current.click()}>Upload PDF</button>
+                <button 
+                    className="toolbarActionBtn" 
+                    onClick={() => fileInputRef.current.click()}
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Upload PDF
+                </button>
                 <input ref={fileInputRef} type="file" accept=".pdf" style={{display: "none"}} onChange={onUploadPDF} />
 
-                <button className="btn ghost" onClick={() => setShowModal(true)} disabled={selectedFolderId !== null} type="button">New Folder</button>
+                <button 
+                    className="toolbarActionBtn" 
+                    onClick={() => setShowModal(true)} 
+                    disabled={selectedFolderId !== null}
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg>
+                    New Folder
+                </button>
 
                 <button
-                    type="button"
-                    className={`btn ${organizeMode ? "primary" : "organize"}`}
+                    className={`toolbarActionBtn ${organizeMode ? "primary" : ""}`}
                     onClick={() => { setOrganizeMode(p => !p); setSelectedItemIds(new Set()); }}
                 >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 11 12 14 22 4" />
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
                     {organizeMode ? "Done" : "Organize"}
                 </button>
 
-                <div className="panel">
-                    <div className="panelTitle">Search</div>
-                    <label htmlFor="folder-search" className="srOnly">Search personal library</label>
+                <div className="librarySearchWrap">
                     <input
                         id="folder-search"
-                        className="input"
-                        placeholder="Search personal library…"
+                        className="librarySearchInput"
+                        placeholder="Search your library…"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
                 </div>
 
-                {error && <div className="error">{error}</div>}
-            </aside>
+                <div className="sortWrap" ref={sortMenuRef}>
+                    <button
+                        type="button"
+                        className="toolbarActionBtn"
+                        onClick={() => setShowSortMenu((p) => !p)}
+                        aria-haspopup="true"
+                        aria-expanded={showSortMenu}
+                        title="Sort folders"
+                    >
+                        ⇅ Sort: {SORT_LABELS[sortBy]}
+                    </button>
 
-            {/* Right: library */}
-            <main className="library">
-                <header className="libraryHeader">
-                    <div>
-                        <div className="libraryTitle">Your Library</div>
-                        <div className="librarySub">
-                            {loading ? "Loading…" : `${filtered.length} folder${filtered.length === 1 ? "" : "s"}`}
-                            {selected ? ` · Selected: ${selected.name}` : ""}
+                    {showSortMenu && (
+                        <div className="dropdownMenu" role="menu">
+                            {Object.entries(SORT_LABELS).map(([key, label]) => (
+                                <button key={key} className="menuItem" onClick={() => { setSortBy(key); setShowSortMenu(false); }}>
+                                    {label}
+                                </button>
+                            ))}
                         </div>
-                    </div>
+                    )}
+                </div>
+            </div>
 
-                    <div className="sortWrap" ref={sortMenuRef}>
-                        <button
-                            type="button"
-                            className="iconBtn"
-                            onClick={() => setShowSortMenu((p) => !p)}
-                            aria-haspopup="true"
-                            aria-expanded={showSortMenu}
-                            title="Sort folders"
-                        >
-                            ⇅ Sort: {SORT_LABELS[sortBy]}
-                        </button>
+            {error && <div className="courseError" style={{marginTop: 16}}>{error}</div>}
 
-                        {showSortMenu && (
-                            <div className="dropdownMenu" role="menu">
-                                {Object.entries(SORT_LABELS).map(([key, label]) => (
-                                    <button key={key} className="menuItem" onClick={() => { setSortBy(key); setShowSortMenu(false); }}>
-                                        {label}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-
-
-                    </div>
-                </header>
-
+            <main className="library" style={{marginTop: 24}}>
                 <section className="libraryBody">
                     {selectedFolderId == null ? (
                         loading ? (
@@ -491,11 +590,14 @@ const FoldersPage = ({ userId }) => {
                                         onRenameModal={openRenameModal}
                                         onPrivacyModal={openPrivacyModal}
                                         onDeleteConfirm={(id) => { setOpenMenuId(null); setConfirmDeleteFolderId(id); }}
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={(e) => handleDrop(e, f.id)}
                                         onClick={async () => {
                                             if (organizeMode && selectedItemIds.size > 0) {
                                                 await Promise.all([...selectedItemIds].map(id => moveItemToFolder(id, f.id)));
-                                                setLibItems(prev => prev.filter(i => !selectedItemIds.has(i.id)));
                                                 setSelectedItemIds(new Set());
+                                                await loadLibrary();
                                             } else {
                                                 setSelectedFolderId(f.id);
                                             }
@@ -514,13 +616,19 @@ const FoldersPage = ({ userId }) => {
                                         folders={folders}
                                         onToggleStar={onToggleItemStar}
                                         onMoveToFolder={onMoveItemToFolder}
+                                        onRemoveFromFolder={item.folderId ? onRemoveItemFromFolder : null}
                                         onDelete={(id) => setConfirmDeleteItemId(id)}
                                         onRename={openRenameItemModal}
+                                        onDragStart={(e) => handleDragStart(e, item.id)}
                                         onClick={() => {
                                             if (organizeMode) {
                                                 setSelectedItemIds(prev => {
                                                     const next = new Set(prev);
-                                                    next.has(item.id) ? next.delete(item.id) : next.add(item.id);
+                                                    if (next.has(item.id)) {
+                                                        next.delete(item.id);
+                                                    } else {
+                                                        next.add(item.id);
+                                                    }
                                                     return next;
                                                 });
                                             } else if (item.itemType === "PDF") {
@@ -534,10 +642,10 @@ const FoldersPage = ({ userId }) => {
                                     />
                                 ))}
 
-                                {savedSets.length > 0 && (
+                                {filteredSavedSets.length > 0 && (
                                     <>
                                         <div className="sectionDivider">Saved Sets</div>
-                                        {savedSets.map((set) => (
+                                        {filteredSavedSets.map((set) => (
                                             <div key={set.id} className="itemCard" onClick={() => navigate(`/sets/${set.id}`)}>
                                                 <div className="folderName">{set.title}</div>
                                                 <div className="folderMeta">
@@ -549,10 +657,10 @@ const FoldersPage = ({ userId }) => {
                                     </>
                                 )}
 
-                                {!studyGroupsLoading && studyGroups.length > 0 && (
+                                {!studyGroupsLoading && filteredStudyGroups.length > 0 && (
                                     <>
                                         <div className="sectionDivider">Study Groups</div>
-                                        {studyGroups.map((membership) => {
+                                        {filteredStudyGroups.map((membership) => {
                                             const g = membership.group;
                                             if (!g) return null;
                                             const courseName = g.course?.courseCode ?? g.course?.courseName ?? null;
@@ -584,8 +692,8 @@ const FoldersPage = ({ userId }) => {
                     ) : (
                         /* Folder contents view */
                         <div className="folderContents">
-                            <button type="button" className="btn cancelBtn" onClick={() => setSelectedFolderId(null)} style={{marginBottom: 12}}>
-                                ← Back to folders
+                            <button type="button" className="toolbarActionBtn" onClick={() => setSelectedFolderId(null)} style={{marginBottom: 16}}>
+                                ← Back to main library
                             </button>
 
                             {itemsLoading ? (
@@ -597,47 +705,32 @@ const FoldersPage = ({ userId }) => {
                             ) : (
                                 <div className="itemsList">
                                     {filteredFolderItems.map((it) => (
-                                        <div key={it.id} className="itemCard" onClick={() => {
-                                                 if (it.itemType === "PDF" || it.item_type === "PDF") {
-                                                     openPDF(it.id);
-                                                 } else if (it.itemType === "CONCEPT_MAP" || it.item_type === "CONCEPT_MAP") {
-                                                     navigate(`/concept-maps/${it.id}`);
-                                                 } else {
-                                                     navigate(`/sets/${it.id}`);
-                                                 }
-                                             }}>
-                                            <div className="folderName">{it.title}</div>
-                                            <div className="folderMeta">
-                                                <span className="itemTypeBadge">{it.item_type || it.itemType}</span>
-                                                <div className="menuWrap" ref={openItemMenuId === it.id ? menuRef : null}>
-                                                    <button
-                                                        type="button"
-                                                        className="iconBtn menuTrigger"
-                                                        style={{opacity: 1}}
-                                                        onClick={(e) => { e.stopPropagation(); setOpenItemMenuId(openItemMenuId === it.id ? null : it.id); }}
-                                                        aria-label="Item options"
-                                                    >
-                                                        ⋯
-                                                    </button>
-                                                    {openItemMenuId === it.id && (
-                                                        <div className="dropdownMenu" role="menu">
-                                                            <button
-                                                                className="menuItem"
-                                                                onClick={async (e) => {
-                                                                    e.stopPropagation();
-                                                                    await removeItemFromFolder(it.id);
-                                                                    setItems(prev => prev.filter(i => i.id !== it.id));
-                                                                    setLibItems(prev => [...prev, {...it, folderId: null, itemType: it.item_type ?? it.itemType}]);
-                                                                    setOpenItemMenuId(null);
-                                                                }}
-                                                            >
-                                                                ↩ Remove from folder
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <LibraryItemCard
+                                            key={it.id}
+                                            item={{...it, itemType: it.item_type || it.itemType}}
+                                            organizeMode={organizeMode}
+                                            isSelected={selectedItemIds.has(it.id)}
+                                            onToggleStar={onToggleItemStar}
+                                            onDelete={(id) => setConfirmDeleteItemId(id)}
+                                            onRename={openRenameItemModal}
+                                            onRemoveFromFolder={onRemoveItemFromFolder}
+                                            onDragStart={(e) => handleDragStart(e, it.id)}
+                                            onClick={() => {
+                                                if (organizeMode) {
+                                                    setSelectedItemIds(prev => {
+                                                        const next = new Set(prev);
+                                                        next.has(it.id) ? next.delete(it.id) : next.add(it.id);
+                                                        return next;
+                                                    });
+                                                } else if (it.itemType === "PDF" || it.item_type === "PDF") {
+                                                    openPDF(it.id);
+                                                } else if (it.itemType === "CONCEPT_MAP" || it.item_type === "CONCEPT_MAP") {
+                                                    navigate(`/concept-maps/${it.id}`);
+                                                } else {
+                                                    navigate(`/sets/${it.id}`);
+                                                }
+                                            }}
+                                        />
                                     ))}
                                 </div>
                             )}

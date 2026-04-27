@@ -31,10 +31,21 @@ const PickSetPage = () => {
     useEffect(() => {
         getLibraryContents()
             .then((data) => {
-                const loose = Array.isArray(data.looseItems) ? data.looseItems : [];
+                let allItems = [];
+                if (data.looseItems && Array.isArray(data.looseItems)) {
+                    allItems.push(...data.looseItems);
+                }
+                if (data.folders && Array.isArray(data.folders)) {
+                    data.folders.forEach(folder => {
+                        if (folder.items && Array.isArray(folder.items)) {
+                            allItems.push(...folder.items);
+                        }
+                    });
+                }
+                
                 // Test mode can select flashcard sets
                 // If test-ai, allow documents/PDFs too
-                const all = loose.filter((item) => {
+                const filtered = allItems.filter((item) => {
                     const t = item.itemType || item.item_type;
                     if (isTestMode) {
                         if (isAiTestMode) {
@@ -44,7 +55,7 @@ const PickSetPage = () => {
                     }
                     return t === 'FLASHCARD_SET' || t === 'flashcard_set';
                 });
-                setItems(all);
+                setItems(filtered);
             })
             .catch((e) => setError(e.message || 'Failed to load library'))
             .finally(() => setLoading(false));

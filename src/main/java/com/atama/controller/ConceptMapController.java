@@ -58,6 +58,15 @@ public class ConceptMapController {
         ConceptMapResponseDTO dto = conceptMapService.addPngToMap(id, filePath.toString(), getAuthenticatedUserId());
         return ResponseEntity.ok(dto);
     }
+    
+    @PatchMapping("/{id}/privacy")
+    public ResponseEntity<ConceptMapResponseDTO> updatePrivacy(
+            @PathVariable UUID id,
+            @RequestBody Map<String, Boolean> request) {
+        boolean isPublic = request.getOrDefault("isPublic", true);
+        ConceptMapResponseDTO dto = conceptMapService.updatePrivacy(id, isPublic, getAuthenticatedUserId());
+        return ResponseEntity.ok(dto);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ConceptMapResponseDTO> getById(@PathVariable UUID id) {

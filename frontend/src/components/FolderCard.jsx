@@ -1,10 +1,13 @@
 import { useRef } from "react";
 
-export function FolderCard({ folder: f, organizeMode, hasSelection, openMenuId, setOpenMenuId, menuRef, onToggleStar, onRenameModal, onPrivacyModal, onDeleteConfirm, onClick }) {
+export function FolderCard({ folder: f, organizeMode, hasSelection, openMenuId, setOpenMenuId, menuRef, onToggleStar, onRenameModal, onPrivacyModal, onDeleteConfirm, onClick, onDragOver, onDragLeave, onDrop }) {
     return (
         <div
             className={`folderCard ${organizeMode && hasSelection ? "folderDropTarget" : ""} ${openMenuId === f.id ? "menuActive" : ""}`}
             onClick={onClick}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
         >
             <div className="folderName">{f.name}</div>
 

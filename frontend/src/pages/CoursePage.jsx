@@ -215,7 +215,18 @@ const CoursePage = ({ userId }) => {
         setLibraryLoading(true);
         try {
             const data = await getLibraryContents();
-            setLibraryItems(Array.isArray(data) ? data : []);
+            let allItems = [];
+            if (data.looseItems && Array.isArray(data.looseItems)) {
+                allItems.push(...data.looseItems);
+            }
+            if (data.folders && Array.isArray(data.folders)) {
+                data.folders.forEach(folder => {
+                    if (folder.items && Array.isArray(folder.items)) {
+                        allItems.push(...folder.items);
+                    }
+                });
+            }
+            setLibraryItems(allItems);
         } catch (e) {
             setLibraryError(e.message ?? "Failed to load library items");
         } finally {
@@ -379,6 +390,8 @@ const CoursePage = ({ userId }) => {
                                             openPDF(cli.libraryItem.id);
                                         } else if (cli.libraryItem?.itemType === "FLASHCARD_SET") {
                                             navigate(`/sets/${cli.libraryItem.id}`);
+                                        } else if (cli.libraryItem?.itemType === "CONCEPT_MAP") {
+                                            navigate(`/concept-maps/${cli.libraryItem.id}`);
                                         }
                                     }}
                                 >
