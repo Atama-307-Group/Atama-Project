@@ -50,6 +50,8 @@ public class UserController {
             responseBody.put("profilePictureUrl", user.getProfilePictureUrl());
             responseBody.put("verified", user.isVerified());
             responseBody.put("isAdmin", result.isAdmin());
+            responseBody.put("aiDisabled", user.isAiDisabled());
+            responseBody.put("recommendationsEnabled", user.isRecommendationsEnabled());
             responseBody.put("darkMode", user.isDarkMode());
 
             return ResponseEntity.ok(responseBody);
