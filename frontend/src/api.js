@@ -344,7 +344,10 @@ export async function enrollInCourse(userId, courseId) {
         body: JSON.stringify({ courseId }),
         credentials: "include",
     });
-    if (!res.ok) throw new Error("Failed to enroll in course");
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Enroll failed");
+    }
     return res.json();
 }
 

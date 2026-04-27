@@ -61,4 +61,5 @@ public class User {
 
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean recommendationsEnabled = true;
+
 }

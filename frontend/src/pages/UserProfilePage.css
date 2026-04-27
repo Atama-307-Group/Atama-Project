@@ -171,3 +171,27 @@
     text-align: center;
     margin-top: 48px;
 }
+
+.user-profile-card {
+    position: relative;
+}
+
+.user-profile-report-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #bbb;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.user-profile-report-btn:hover {
+    color: #e05c5c;
+    background: #fef2f2;
+}

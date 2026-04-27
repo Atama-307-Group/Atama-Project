@@ -16,6 +16,7 @@ const UniversityPage = ({ userId }) => {
         enrolling, handleEnroll,
         showLeaveAllModal, setShowLeaveAllModal, leavingAll, handleLeaveAll,
         leaveOneCourse, setLeaveOneCourse, leavingOne, handleLeaveOne,
+        scheduledLeaveDate, setScheduledLeaveDate,
     } = useCourseEnrollment(userId);
 
     const {
@@ -30,7 +31,7 @@ const UniversityPage = ({ userId }) => {
     const [view, setView] = useState(() => localStorage.getItem("universityView") || "all");
     const [showLeaveAllCoursesModal, setShowLeaveAllCoursesModal] = useState(false);
     const [openMenuId, setOpenMenuId] = useState(null);
-    const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
+//     const [scheduledLeaveDate, setScheduledLeaveDate] = useState(null);
 
     const menuRef = useRef(null);
     const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -47,14 +48,14 @@ const UniversityPage = ({ userId }) => {
                 if (searchOpen) {
                     setSearchOpen(false);
                     setSearchQuery("");
-                } else if (showLeaveAllCoursesModal) {
-                    setShowLeaveAllCoursesModal(false);
+                } else if (showLeaveAllModal) {
+                    setShowLeaveAllModal(false);
                 }
             }
         }
         document.addEventListener("keydown", onKeyDown);
         return () => document.removeEventListener("keydown", onKeyDown);
-    }, [searchOpen, showLeaveAllCoursesModal]);
+    }, [searchOpen, showLeaveAllModal]);
 
     function handleSetView(v) {
         setView(v);
@@ -76,6 +77,7 @@ const UniversityPage = ({ userId }) => {
 
     useEffect(() => { setActiveIndex(0); }, [searchQuery]);
 
+
     const visibleCourses = view === "enrolled"
         ? courses.filter(c => enrolledIds.has(c.id))
         : courses;
@@ -91,7 +93,7 @@ const UniversityPage = ({ userId }) => {
                 <button className="backBtn" onClick={() => navigate('/')}>← Back</button>
                 <h1 className="universityTitle">{university ? university.name : "Loading..."}</h1>
                 {enrolledIds.size > 0 && (
-                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllCoursesModal(true)}>
+                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
                         Leave All Your Courses
                     </button>
                 )}
@@ -318,12 +320,12 @@ const UniversityPage = ({ userId }) => {
             )}
 
             {/* Leave all courses modal */}
-            {showLeaveAllCoursesModal && (
+            {showLeaveAllModal && (
                 <LeaveAllCoursesModal
                         leavingAll={leavingAll}
                         scheduledLeaveDate={scheduledLeaveDate}
                         onConfirm={handleLeaveAll}
-                        onCancel={() => setShowLeaveAllCoursesModal(false)}
+                        onCancel={() => setShowLeaveAllModal(false)}
                     />
             )}
 

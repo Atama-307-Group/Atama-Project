@@ -44,7 +44,8 @@ const AdminPage = ({ currentUser, onLogout }) => {
                 method: 'PATCH',
                 credentials: 'include',
             });
-            setReports(prev => prev.filter(r => r.id !== id));
+            const newStatus = action === 'resolve' ? 'RESOLVED' : 'DISMISSED';
+            setReports(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
         } catch (err) {
             console.error('Failed to update report:', err);
         }
@@ -157,43 +158,54 @@ const AdminPage = ({ currentUser, onLogout }) => {
                     <p className="adm-empty">Loading...</p>
                 ) : activeTab === 'reports' ? (
                     <>
-                        <p className="adm-section-label">Pending reports</p>
-                        {pendingReports.length === 0 ? (
-                            <p className="adm-empty">No pending reports</p>
-                        ) : (
-                            <div className="adm-card-list">
-                                {pendingReports.map(report => (
-                                    <div key={report.id} className="adm-card">
-                                        <div className="adm-card-info">
-                                            <p className="adm-card-title">{formatReportTarget(report)}</p>
-                                            <p className="adm-card-meta">
-                                                {formatReportType(report.type)}
-                                                {report.user ? ` · Reported by @${report.user.username}` :
-                                                               ' · Reported by Deleted account'}
-                                                {report.description && ` · "${report.description}"`}
-                                                {` · ${formatTime(report.createdAt)}`}
+                         <p className="adm-section-label">Pending reports</p>
+                                {reports.length === 0 ? (
+                                    <p className="adm-empty">No pending reports</p>
+                                ) : (
+                                    <div className="adm-card-list">
+                                        {reports.map(report => {
+                                            const isResolved = report.status === 'RESOLVED' || report.status === 'DISMISSED';
+                                            return (
+                                                <div key={report.id} className={`adm-card ${isResolved ? 'adm-card-resolved' : ''}`}>
+                                                    <div className="adm-card-info">
+                                                        <p className="adm-card-title">{formatReportTarget(report)}</p>
+                                                        <p className="adm-card-meta">
+                                                            {formatReportType(report.type)}
+{/*                                                             {report.user ? ` · Reported by @${report.user.username}` : */}
+{/*                                                                ' · Reported by Deleted account'} */}
+                                                            {report.description && ` · "${report.description}"`}
+                                                            {` · ${formatTime(report.createdAt)}`}
                                             </p>
                                         </div>
-                                        <span className="adm-pill adm-pill-pending">Pending</span>
-                                        <div className="adm-actions">
-                                            <button
-                                                className="adm-btn adm-btn-approve"
-                                                onClick={() => handleReport(report.id, 'resolve')}
-                                            >
-                                                Mark as Resolved
-                                            </button>
-                                            <button
-                                                className="adm-btn adm-btn-reject"
-                                                onClick={() => handleReport(report.id, 'dismiss')}
-                                            >
-                                                Dismiss
-                                            </button>
-                                        </div>
+                                        {isResolved ? (
+                                                        <span className={`adm-pill ${report.status === 'RESOLVED' ? 'adm-pill-resolved' : 'adm-pill-dismissed'}`}>
+                                                            {report.status === 'RESOLVED' ? 'Resolved' : 'Dismissed'}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="adm-pill adm-pill-pending">Pending</span>
+                                                    )}
+                                                    {!isResolved && (
+                                                        <div className="adm-actions">
+                                                            <button
+                                                                className="adm-btn adm-btn-approve"
+                                                                onClick={() => handleReport(report.id, 'resolve')}
+                                                            >
+                                                                Mark as Resolved
+                                                            </button>
+                                                            <button
+                                                                className="adm-btn adm-btn-reject"
+                                                                onClick={() => handleReport(report.id, 'dismiss')}
+                                                            >
+                                                                Dismiss
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                ))}
-                            </div>
-                        )}
-                    </>
+                                )}
+                            </>
                 ) : (
                     <>
                         <p className="adm-section-label">Course requests</p>
@@ -214,20 +226,20 @@ const AdminPage = ({ currentUser, onLogout }) => {
                                         <span className={`adm-pill ${req.status === 'REJECTED' ? 'adm-pill-rejected' : 'adm-pill-new'}`}>
                                             {req.status === 'REJECTED' ? 'Rejected' : 'New'}
                                         </span>
+
                                         <div className="adm-actions">
-                                            {req.status === 'REJECTED' ? (
-                                                <button
-                                                    className="adm-btn adm-btn-restore"
-                                                    onClick={() => handleCourseRequest(req.id, 'restore')}
-                                                >
-                                                    Restore
-                                                </button>
-                                            ) : (
-                                                <>
-                                                    <button className="adm-btn adm-btn-approve" onClick={() => handleCourseRequest(req.id, 'approve')}>Approve</button>
-                                                    <button className="adm-btn adm-btn-reject" onClick={() => handleCourseRequest(req.id, 'reject')}>Reject</button>
-                                                </>
-                                            )}
+                                            <button
+                                                className="adm-btn adm-btn-approve"
+                                                onClick={() => handleCourseRequest(req.id, 'approve')}
+                                            >
+                                                Approve
+                                            </button>
+                                            <button
+                                                className="adm-btn adm-btn-reject"
+                                                onClick={() => handleCourseRequest(req.id, 'reject')}
+                                            >
+                                                Reject
+                                            </button>
                                         </div>
                                     </div>
                                 ))}

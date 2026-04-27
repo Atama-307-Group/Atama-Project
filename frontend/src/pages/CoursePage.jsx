@@ -275,6 +275,7 @@ const CoursePage = ({ userId }) => {
                 updateCourseLibraryItem(editingItem.id, editYear, editSemester, editDescription || null)
             ];
 
+
             const titleChanged = editTitle !== editingItem.libraryItem?.title;
             const canEditTitle = editingItem.libraryItem?.itemType !== "FLASHCARD";
             if (canEditTitle && titleChanged) {
@@ -282,6 +283,7 @@ const CoursePage = ({ userId }) => {
             }
 
             const [updated] = await Promise.all(promises);
+
 
             setItems(prev => prev.map(i => i.id === updated.id ? {
                 ...updated,
@@ -444,20 +446,21 @@ const CoursePage = ({ userId }) => {
                                                 >
                                                     ⭳
                                                 </button>
-                                            )}
+                                             )}
+                                            </div>
                                         </div>
+                                        {cli.description && (
+                                            <div className="cliDescription">
+                                                <Highlighted text={cli.description} query={query.trim()} />
+                                            </div>
+                                        )}
                                     </div>
-                                    {cli.description && (
-                                        <div className="cliDescription">
-                                            <Highlighted text={cli.description} query={query.trim()} />
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
 
             {/* Study Groups section */}
             <div className="studyGroupsSection">
