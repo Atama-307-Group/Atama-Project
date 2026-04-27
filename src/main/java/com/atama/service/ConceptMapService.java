@@ -63,7 +63,7 @@ public class ConceptMapService {
 
         ConceptMap saved = conceptMapRepository.save(conceptMap);
         
-        return toDto(saved);
+        return toDto(saved, userId);
     }
 
     public ConceptMapResponseDTO createManualMap(UUID setId, List<UUID> cardIds, String title, UUID userId) {
@@ -99,7 +99,7 @@ public class ConceptMapService {
 
         ConceptMap saved = conceptMapRepository.save(conceptMap);
         
-        return toDto(saved);
+        return toDto(saved, userId);
     }
     
     public ConceptMapResponseDTO addPngToMap(UUID mapId, String pngPath, UUID userId) {
@@ -112,7 +112,7 @@ public class ConceptMapService {
         }
         
         map.setPngPath(pngPath);
-        return toDto(conceptMapRepository.save(map));
+        return toDto(conceptMapRepository.save(map), userId);
     }
 
     public ConceptMapResponseDTO updateConceptMapGraph(UUID id, UUID userId, String newGraphData) {
@@ -124,30 +124,42 @@ public class ConceptMapService {
         }
         
         map.setGraphData(newGraphData);
-        return toDto(conceptMapRepository.save(map));
+        return toDto(conceptMapRepository.save(map), userId);
     }
 
     public ConceptMapResponseDTO getById(UUID id, UUID userId) {
         ConceptMap map = conceptMapRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Concept map not found"));
                 
-        // Ensure user owns this
-        if (!map.getLibrary().getUser().getId().equals(userId)) {
+        // Ensure user owns this or it is public
+        if (!map.getLibrary().getUser().getId().equals(userId) && !map.isPublic()) {
            throw new RuntimeException("Unauthorized"); 
         }
 
-        return toDto(map);
+        return toDto(map, userId);
+    }
+
+    public ConceptMapResponseDTO updatePrivacy(UUID id, boolean isPublic, UUID requesterId) {
+        ConceptMap map = conceptMapRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Concept map not found"));
+        
+        if (!map.getLibrary().getUser().getId().equals(requesterId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        
+        map.setPublic(isPublic);
+        return toDto(conceptMapRepository.save(map), requesterId);
     }
 
     public List<ConceptMapResponseDTO> getMyMaps(UUID userId) {
         com.atama.model.Library library = libraryRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Library not found"));
         return conceptMapRepository.findByLibraryId(library.getId()).stream()
-                .map(this::toDto)
+                .map(map -> toDto(map, userId))
                 .collect(Collectors.toList());
     }
 
-    private ConceptMapResponseDTO toDto(ConceptMap map) {
+    private ConceptMapResponseDTO toDto(ConceptMap map, UUID requesterId) {
         ConceptMapResponseDTO dto = new ConceptMapResponseDTO();
         dto.setId(map.getId());
         dto.setTitle(map.getTitle());
@@ -155,6 +167,10 @@ public class ConceptMapService {
         dto.setPngPath(map.getPngPath());
         dto.setSourceSetId(map.getSourceSetId());
         dto.setCreatedAt(map.getCreatedAt());
+        dto.setPublic(map.isPublic());
+        if (requesterId != null) {
+            dto.setOwner(map.getLibrary().getUser().getId().equals(requesterId));
+        }
         return dto;
     }
 }

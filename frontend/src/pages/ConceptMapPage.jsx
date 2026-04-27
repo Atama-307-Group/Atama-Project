@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { getConceptMap, uploadConceptMapPng, updateConceptMapGraph } from '../api';
+import { getConceptMap, uploadConceptMapPng, updateConceptMapGraph, updateConceptMapPrivacy } from '../api';
 import './ConceptMapPage.css';
 
 const ConceptMapPage = () => {
@@ -39,6 +39,9 @@ const ConceptMapPage = () => {
         getConceptMap(id)
             .then(data => {
                 setMapData(data);
+                if (!data.isOwner && isEditing) {
+                    setIsEditing(false);
+                }
                 try {
                     const parsed = typeof data.graphData === 'string' ? JSON.parse(data.graphData) : data.graphData;
                     initGraphData(parsed);
@@ -678,6 +681,15 @@ const ConceptMapPage = () => {
     const actualSelectedNode = selectedElement?.type === 'node' ? nodesRef.current.find(n => n.id === selectedElement.data.id) : null;
     const actualSelectedEdge = selectedElement?.type === 'edge' ? edgesRef.current.find(e => e.id === selectedElement.data.id) : null;
 
+    const handleTogglePrivacy = async () => {
+        try {
+            await updateConceptMapPrivacy(id, !mapData.isPublic);
+            setMapData({ ...mapData, isPublic: !mapData.isPublic });
+        } catch (e) {
+            alert('Failed to update privacy: ' + e.message);
+        }
+    };
+
     return (
         <div className="cmap-page-container">
             <header className="cmap-page-header">
@@ -692,9 +704,16 @@ const ConceptMapPage = () => {
                 <div style={{display:'flex', gap: 12}}>
                     {!isEditing && (
                         <>
-                            <button className="cmap-save-png" style={{background: '#4a6b57'}} onClick={() => setIsEditing(true)}>
-                                ✏️ Edit Map
-                            </button>
+                            {mapData.isOwner && (
+                                <>
+                                    <button className="cmap-save-png" style={{background: '#6b4a4a'}} onClick={handleTogglePrivacy}>
+                                        {mapData.isPublic ? '🔒 Make Private' : '🌍 Make Public'}
+                                    </button>
+                                    <button className="cmap-save-png" style={{background: '#4a6b57'}} onClick={() => setIsEditing(true)}>
+                                        ✏️ Edit Map
+                                    </button>
+                                </>
+                            )}
                             <button className="cmap-save-png" onClick={saveToLibrary} disabled={uploading}>
                                 {uploading ? 'Saving...' : '💾 Save as PDF'}
                             </button>

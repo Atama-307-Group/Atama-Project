@@ -854,6 +854,17 @@ export async function getMyConceptMaps() {
     return res.json();
 }
 
+export async function updateConceptMapPrivacy(id, isPublic) {
+    const res = await fetch(`${API_BASE}/api/concept-maps/${id}/privacy`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic }),
+    });
+    if (!res.ok) throw new Error("Failed to update concept map privacy");
+    return res.json();
+}
+
 /* Multiplayer Games ------------------------------------------- */
 
 export async function hostGame(flashcardSetId) {

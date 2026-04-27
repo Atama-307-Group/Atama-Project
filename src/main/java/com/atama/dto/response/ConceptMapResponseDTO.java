@@ -13,4 +13,6 @@ public class ConceptMapResponseDTO {
     private String pngPath;
     private UUID sourceSetId;
     private Instant createdAt;
+    private boolean isPublic;
+    private boolean isOwner;
 }

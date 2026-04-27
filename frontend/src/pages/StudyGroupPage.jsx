@@ -163,8 +163,19 @@ const StudyGroupPage = ({ userId }) => {
         if (pickerItems.length > 0) return;
         setPickerLoading(true);
         try {
-            const items = await getLibraryContents();
-            setPickerItems(Array.isArray(items) ? items.filter(i => i.isPublic) : []);
+            const data = await getLibraryContents();
+            let allItems = [];
+            if (data.looseItems && Array.isArray(data.looseItems)) {
+                allItems.push(...data.looseItems);
+            }
+            if (data.folders && Array.isArray(data.folders)) {
+                data.folders.forEach(folder => {
+                    if (folder.items && Array.isArray(folder.items)) {
+                        allItems.push(...folder.items);
+                    }
+                });
+            }
+            setPickerItems(allItems.filter(i => i.isPublic));
         } catch {
             setPickerItems([]);
         } finally {
