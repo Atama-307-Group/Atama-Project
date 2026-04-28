@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryContents, addLibraryItemToCourse, getGroupsByCourse, getUserGroups, joinPublicGroup, updateCourseLibraryItem, deleteCourseLibraryItem } from "../api.js";
+import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryContents,
+    addLibraryItemToCourse, getGroupsByCourse, getUserGroups, joinPublicGroup, updateCourseLibraryItem,
+    deleteCourseLibraryItem, updateCourseLibraryItemTitle } from "../api.js";
 import "./CoursePage.css";
 import Highlighted from "../components/Highlighted.jsx";
 import CourseToolbar from "../components/CourseToolbar";
@@ -150,7 +152,6 @@ const CoursePage = ({ userId }) => {
         );
     }, [libraryItems, librarySearch]);
 
-
     function toggleSet(setter, value) {
         setter(prev => {
             const next = new Set(prev);
@@ -271,6 +272,7 @@ const CoursePage = ({ userId }) => {
     }
 
     function handleOpenEdit(e, cli) {
+        console.log(cli);
         e.stopPropagation();
         setOpenMenuId(null);
         setEditingItem(cli);
@@ -292,7 +294,7 @@ const CoursePage = ({ userId }) => {
             const titleChanged = editTitle !== editingItem.libraryItem?.title;
             const canEditTitle = editingItem.libraryItem?.itemType !== "FLASHCARD";
             if (canEditTitle && titleChanged) {
-                promises.push(updateLibraryItem(editingItem.libraryItem.id, { title: editTitle }));
+                promises.push(updateCourseLibraryItemTitle(editingItem.libraryItem.id, { title: editTitle }));
             }
 
             const [updated] = await Promise.all(promises);
@@ -399,7 +401,7 @@ const CoursePage = ({ userId }) => {
                                     {isOwner && (
                                         <div className="ownerBadge" title="Added by you">
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+                                                <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" strokeWidth="2"/>
                                                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                                             </svg>
                                         </div>

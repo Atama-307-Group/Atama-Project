@@ -158,7 +158,8 @@ public class LibraryService {
                         i.isStarred(),
                         i.getItemType(),
                         i.isPublic(),
-                        null
+                        null,
+                        i.getOwner().getId()
                 ))
                 .toList();
 
