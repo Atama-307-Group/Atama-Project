@@ -46,7 +46,7 @@ const ChangePasswordPage = ({ currentUser }) => {
             setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
-            setTimeout(() => navigate('/profile'), 1000);
+            setTimeout(() => navigate('/settings'), 1000);
         } catch (err) {
             setStatus({ loading: false, error: err.message || 'Something went wrong.', success: '' });
         }
@@ -54,7 +54,7 @@ const ChangePasswordPage = ({ currentUser }) => {
 
     return (
         <div className="change-pw-container">
-            <button className="back-btn" onClick={() => navigate('/profile')}>&larr; Back</button>
+            <button className="back-btn" onClick={() => navigate('/settings')}>&larr; Back</button>
 
             <div className="change-pw-card">
                 <h2 className="change-pw-title">Change Password</h2>
