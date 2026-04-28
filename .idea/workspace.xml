@@ -5,119 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34ed46a6-52cf-40b0-ba37-098021c0c94c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/db-forest-config.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/2026-02-22T135829.500.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/2026-02-22T140058.200.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/2026-02-22T140700.200.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/http-client.cookies" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/httpRequests/http-requests-log.http" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/ConfirmModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/CourseToolbar.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/EnrollModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/FolderCard.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Highlighted.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Highlighted.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/LeaveAllCoursesModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/LibraryItemCard.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/MetadataModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/RecommendationBanner.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/ReportModal.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/ReportModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/constants.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useCourseItems.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useEscapeKey.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/hooks/useFilteredItems.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/PracticeTestOptionsPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/UserProfilePage.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/UserProfilePage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLeaveDateController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/PracticeTestController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/RecommendationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/ReportController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/game/QuestionDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/request/CreateReportDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/request/PracticeTestRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/UserProfileDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/UserSearchDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/CourseLeaveDate.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/RecentlyStudied.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/CourseLeaveDateRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/RecentlyStudiedRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateScheduler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/PracticeTestService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/RecommendationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/ReportService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/1650613e-9681-4de5-8a74-55944047ad7a_2. InterviewPlan_FG.docx.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/27d28d4f-cf4f-4a6e-a948-e0ea21c0fc85_DVC1-2 (Aquinas).pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/54223394-db8d-4908-a2e1-e7a839f83bfe_DVC1-2 (Aquinas).pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/57fc36cd-cdfa-49f3-937f-bf48f556cd91_AI Shadow Report (1).pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/7db099f7-13c6-4aaa-8580-3946411303a7_U-M GenAI Committee Report.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/8bb8a567-e598-4442-bd5f-6a04b715c5b6_congestion-422-26s-a.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/906e578a-1d28-49ea-ad64-814194ed3829_C-Span Paper.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/adb627c1-9d41-4da5-aa1f-0093998ea361_AI Shadow Report (1).pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/be352472-6bba-4741-a8c3-c2e889d25a88_SQs Aquinas (QDV and ST 1-2_61-62).pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/c1c19cc8-829d-4042-9d91-dc2d4ad119c0_Psychological Persuasion for Academic Practice.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/c2e1b6eb-c8f1-4fe7-9157-3a93e72c33c0_Ethnography_FieldNote_Reflection.docx.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uploads/d4357632-0a0a-43db-ad10-d41d42c81e78_8. Sprint 2 Retrospective.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_1.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_27_2026_2_34_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_27_2026_2_34_PM__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_4_27_2026_2_36_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_4_27_2026_2_36_PM__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/ConceptMapModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ConceptMapModal.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/DesktopNotification.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/DesktopNotification.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useCourseEnrollment.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useCourseEnrollment.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LandingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LandingPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/MatchPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MatchPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PickSetPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PickSetPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PracticeTestPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PracticeTestPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PreTestPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PreTestPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ProfilePage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/admin/AdminPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/AdminController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLibraryItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLibraryItemController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/FlashcardSetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/FlashcardSetController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryItemController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FlashcardSetResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FlashcardSetResponseDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/SearchResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/SearchResponseDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/mapper/FlashcardSetMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/mapper/FlashcardSetMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/FlashcardSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/FlashcardSet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/LibraryItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/LibraryItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/Report.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/Report.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/model/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/FlashcardRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/FlashcardRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryItemRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/LibraryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/ReportRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/ReportRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/AdminService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/AdminService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetReviewService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/FolderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/FolderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/GeminiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/GeminiService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryItemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryItemService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +30,7 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
-    "git-widget-placeholder": "Merging feature/study__groups",
+    "git-widget-placeholder": "flashcard__fixes",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -150,6 +47,13 @@
     <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
       <module name="Atama" />
       <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AtamaApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="Atama" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.atama.AtamaApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

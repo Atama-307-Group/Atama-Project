@@ -160,6 +160,26 @@ export async function updateFlashcard(setId, flashcardId, cardData) {
     return res.json();
 }
 
+export async function addFlashcard(setId, cardData) {
+    const res = await fetch(`/api/flashcard-sets/${setId}/flashcards`, {
+        method: 'POST',
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cardData),
+    });
+    if (!res.ok) throw new Error('Failed to add flashcard');
+    return res.json();
+}
+
+export async function deleteFlashcard(setId, flashcardId) {
+    const res = await fetch(`/api/flashcard-sets/${setId}/flashcards/${flashcardId}`, {
+        method: 'DELETE',
+        credentials: "include",
+    });
+    if (!res.ok) throw new Error('Failed to delete flashcard');
+    return res.json();
+}
+
 export async function generateSharedLink(flashcardSetId) {
     const res = await fetch('/api/shared-links', {
         method: 'POST',
