@@ -14,10 +14,24 @@ export default function useFilteredItems(items, query, sortBy, filters) {
         function compareBySort(a, b) {
             const titleA = a.libraryItem?.title ?? "";
             const titleB = b.libraryItem?.title ?? "";
+
+            const parseYear = (item) => {
+                const n = parseInt(item.year, 10);
+                return Number.isFinite(n) ? n : null;
+            };
+
             switch (sortBy) {
                 case "alpha-desc": return titleB.localeCompare(titleA);
-                case "created-asc": return safeTime(a.libraryItem?.createdAt) - safeTime(b.libraryItem?.createdAt);
-                case "created-desc": return safeTime(b.libraryItem?.createdAt) - safeTime(a.libraryItem?.createdAt);
+                case "created-desc": {
+                    const ya = parseYear(a) ?? -Infinity;
+                    const yb = parseYear(b) ?? -Infinity;
+                    return yb - ya;
+                }
+                case "created-asc": {
+                    const ya = parseYear(a) ?? Infinity;
+                    const yb = parseYear(b) ?? Infinity;
+                    return ya - yb;
+                }
                 case "accessed-desc": return safeTime(b.libraryItem?.lastAccessed) - safeTime(a.libraryItem?.lastAccessed);
                 case "alpha-asc":
                 default: return titleA.localeCompare(titleB);

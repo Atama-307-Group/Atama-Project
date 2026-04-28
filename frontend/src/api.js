@@ -429,7 +429,6 @@ export async function updateCourseLibraryItemTitle(id, { title }) {
     return res.json();
 }
 
-
 export async function deleteCourseLibraryItem(id) {
     const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
         method: "DELETE",

@@ -5,7 +5,7 @@ export const ITEM_TYPES = ["PDF", "FLASHCARD_SET", "PRACTICE_TEST"];
 export const SORT_LABELS = {
     "alpha-asc": "Alphabetical (A → Z)",
     "alpha-desc": "Alphabetical (Z → A)",
-    "created-desc": "Date added (Newest)",
-    "created-asc": "Date added (Oldest)",
+    "created-desc": "Year (Newest)",
+    "created-asc": "Year (Oldest)",
     "accessed-desc": "Last accessed by you"
 };

@@ -1,5 +1,7 @@
 package com.atama.controller;
 
+import com.atama.dto.response.CourseLibraryItemResponseDTO;
+import com.atama.dto.response.LibraryItemResponseDTO;
 import com.atama.model.Course;
 import com.atama.model.CourseLibraryItem;
 import com.atama.model.LibraryItem;
@@ -22,13 +24,29 @@ public class CourseLibraryItemController {
     private final CourseRepository courseRepository;
     private final LibraryItemRepository libraryItemRepository;
 
+    private CourseLibraryItemResponseDTO toDTO(CourseLibraryItem cli) {
+        LibraryItem li = cli.getLibraryItem();
+        LibraryItemResponseDTO liDTO = new LibraryItemResponseDTO();
+        liDTO.setId(li.getId());
+        liDTO.setTitle(li.getTitle());
+        liDTO.setItemType(li.getItemType());
+        liDTO.setOwnerId(li.getOwner() != null ? li.getOwner().getId() : null);
+
+        return new CourseLibraryItemResponseDTO(
+                cli.getId(), cli.getYear(), cli.getSemester(), cli.getDescription(), liDTO
+        );
+    }
+
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<CourseLibraryItem>> getItemsByCourse(@PathVariable UUID courseId) {
-        return ResponseEntity.ok(courseLibraryItemRepository.findByCourseId(courseId));
+    public ResponseEntity<List<CourseLibraryItemResponseDTO>> getItemsByCourse(@PathVariable UUID courseId) {
+        return ResponseEntity.ok(
+                courseLibraryItemRepository.findByCourseId(courseId)
+                        .stream().map(this::toDTO).toList()
+        );
     }
 
     @PostMapping
-    public ResponseEntity<CourseLibraryItem> addItem(@RequestBody AddItemRequest body) {
+    public ResponseEntity<CourseLibraryItemResponseDTO> addItem(@RequestBody AddItemRequest body) {
         Course course = courseRepository.findById(body.courseId())
                 .orElseThrow(() -> new RuntimeException("Course not found"));
         LibraryItem libraryItem = libraryItemRepository.findById(body.libraryItemId())
@@ -41,18 +59,19 @@ public class CourseLibraryItemController {
         item.setSemester(body.semester());
         item.setDescription(body.description());
 
-        return ResponseEntity.ok(courseLibraryItemRepository.save(item));
+        return ResponseEntity.ok(toDTO(courseLibraryItemRepository.save(item)));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CourseLibraryItem> updateItem(@PathVariable UUID id, @RequestBody UpdateItemRequest body) {
+    public ResponseEntity<CourseLibraryItemResponseDTO> updateItem(@PathVariable UUID id, @RequestBody UpdateItemRequest body) {
         CourseLibraryItem item = courseLibraryItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item not found"));
 
         item.setYear(body.year());
         item.setSemester(body.semester());
         item.setDescription(body.description());
-        return ResponseEntity.ok(courseLibraryItemRepository.save(item));
+
+        return ResponseEntity.ok(toDTO(courseLibraryItemRepository.save(item)));
     }
 
     @DeleteMapping("/{id}")

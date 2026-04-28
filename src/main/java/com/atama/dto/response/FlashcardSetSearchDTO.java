@@ -17,8 +17,8 @@ public class FlashcardSetSearchDTO extends LibraryItemResponseDTO {
     public FlashcardSetSearchDTO(UUID id, String title, Instant createdAt, Instant updatedAt,
                                  Instant lastAccessed, boolean starred,
                                  com.atama.model.LibraryItemType itemType, boolean isPublic,
-                                 UUID folderId, Double averageRating, List<ReviewTag> topTags) {
-        super(id, title, createdAt, updatedAt, lastAccessed, starred, itemType, isPublic, folderId);
+                                 UUID folderId, UUID ownerId, Double averageRating, List<ReviewTag> topTags) {
+        super(id, title, createdAt, updatedAt, lastAccessed, starred, itemType, isPublic, folderId, ownerId);
         this.averageRating = averageRating;
         this.topTags = topTags;
     }

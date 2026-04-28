@@ -19,7 +19,7 @@ public class CourseLeaveDateScheduler {
         this.userService = userService;
     }
 
-    @Scheduled(cron = "0 * * * * *")    // TODO 0 0 0 * * * for leaving at midnight
+    @Scheduled(cron = "0 0 0 * * *")    // TODO 0 0 0 * * * for leaving at midnight
     public void executeScheduledLeaves() {
         System.out.println("Cron job fired at: " + Instant.now());
 
