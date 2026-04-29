@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import BackButton from '../components/BackButton.jsx';
 
 const PreMatchPage = () => {
     const { state } = useLocation();
@@ -28,7 +29,7 @@ const PreMatchPage = () => {
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
-            <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginBottom: '1rem' }}>← Back</button>
+            <BackButton />
             <h2>Match Settings</h2>
             {setTitle && <p style={{ color: '#666', marginTop: 0 }}>{setTitle}</p>}
             <label>

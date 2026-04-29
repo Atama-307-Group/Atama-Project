@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ResetPasswordPage.css';
+import BackButton from '../components/BackButton.jsx';
 
 const ResetPasswordPage = () => {
     const navigate = useNavigate();
@@ -49,7 +50,7 @@ const ResetPasswordPage = () => {
 
     return (
         <div className="reset-pw-container">
-            <button className="back-btn" onClick={() => navigate('/forgot-password')}>&larr; Back</button>
+            <BackButton />
 
             <div className="reset-pw-card">
                 <h2 className="reset-pw-title">Reset Password</h2>

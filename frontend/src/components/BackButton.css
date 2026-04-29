@@ -3,10 +3,10 @@
     border: none;
     cursor: pointer;
     font-family: inherit;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 3rem;
+    font-weight: 1000;
     color: #1E352F;
-    padding: 4px 8px;
+    padding: 8px 10px;
     border-radius: 8px;
     flex-shrink: 0;
     align-self: center;

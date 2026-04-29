@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './StudyPage.css';
 import { startStudying, stopStudying, updateCardProgress, addSetStudyTime, getSetProgress, recordAccess } from "../api.js";
+import BackButton from '../components/BackButton.jsx';
 
 const KNOWLEDGE_OPTIONS = [
     { value: 'DONT_KNOW',     label: "Don't Know",    color: '#ef4444' },
@@ -208,6 +209,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
 
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
+            <BackButton />
             <h2>Learn</h2>
 
             <div style={{ position: 'relative', width: '400px', maxWidth: '90%', margin: '0 auto' }}>
