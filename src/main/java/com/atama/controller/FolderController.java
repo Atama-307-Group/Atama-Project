@@ -6,8 +6,8 @@ import com.atama.dto.request.SetFolderPrivacyRequest;
 import com.atama.dto.request.SetFolderStarredRequest;
 import com.atama.dto.response.FolderItemsResponse;
 import com.atama.dto.response.FolderResponse;
+import com.atama.dto.response.LibraryItemResponseDTO;
 import com.atama.model.Folder;
-import com.atama.model.LibraryItem;
 import com.atama.repository.FolderRepository;
 import com.atama.repository.LibraryItemRepository;
 import com.atama.service.FolderService;
@@ -33,8 +33,6 @@ public class FolderController {
     }
 
     private static FolderResponse toResponse(Folder f) {
-        List<LibraryItem> items = f.getItems() == null ? List.of() : f.getItems();
-
         return new FolderResponse(
                 f.getId(),
                 f.getName(),
@@ -42,7 +40,7 @@ public class FolderController {
                 f.isPublic(),
                 f.getCreatedAt(),
                 f.getLastAccessed(),
-                items,
+                List.of(),
                 f.getLibrary().getId()
         );
     }

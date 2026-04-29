@@ -12,6 +12,6 @@ public record FolderResponse(
         @JsonProperty("isPublic") boolean isPublic,
         Instant createdAt,
         Instant lastAccessed,
-        List<com.atama.model.LibraryItem> items,
+        List<LibraryItemResponseDTO> items,
         UUID libraryId
 ) {}

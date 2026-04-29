@@ -33,7 +33,20 @@ public class SearchService {
                         f.isPublic(),
                         f.getCreatedAt(),
                         f.getLastAccessed(),
-                        f.getItems(),
+                        f.getItems().stream()
+                                .map(i -> new LibraryItemResponseDTO(
+                                        i.getId(),
+                                        i.getTitle(),
+                                        i.getCreatedAt(),
+                                        i.getUpdatedAt(),
+                                        i.getLastAccessed(),
+                                        i.isStarred(),
+                                        i.getItemType(),
+                                        i.isPublic(),
+                                        f.getId(),
+                                        i.getOwner().getId()
+                                ))
+                                .toList(),
                         f.getLibrary().getId()
                 ))
                 .toList();

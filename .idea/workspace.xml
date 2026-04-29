@@ -5,22 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34ed46a6-52cf-40b0-ba37-098021c0c94c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/CourseLibraryItemResponseDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM_[Changes]1/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/constants.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useFilteredItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useFilteredItems.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLibraryItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/CourseLibraryItemController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/LibraryItemController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FlashcardSetSearchDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FlashcardSetSearchDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/LibraryItemResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/LibraryItemResponseDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/CourseLeaveDateScheduler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/FolderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/FolderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FolderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/dto/response/FolderResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/exception/GlobalExceptionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/LibraryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/SearchService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +38,7 @@
     "RequestMappingsPanelWidth1": "75",
     "Spring Boot.Atama Application.executor": "Run",
     "Spring Boot.AtamaApplication.executor": "Run",
-    "git-widget-placeholder": "bug/course__page",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -56,13 +46,6 @@
   }
 }]]></component>
   <component name="RunManager">
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="Atama" />
-      <option name="filePath" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Atama Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="Atama" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.atama.AtamaApplication" />
