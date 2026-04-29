@@ -83,7 +83,8 @@ public class SearchService {
                 .map(i -> new LibraryItemResponseDTO(
                         i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
                         i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
-                        i.getFolder() != null ? i.getFolder().getId() : null
+                        i.getFolder() != null ? i.getFolder().getId() : null,
+                        i.getOwner() != null ? i.getOwner().getId() : null
                 ))
                 .toList();
 
