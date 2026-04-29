@@ -1,0 +1,19 @@
+.back-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1E352F;
+    padding: 4px 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 1;
+    transition: background 0.15s;
+}
+
+.back-btn:hover {
+    background: rgba(51, 81, 69, 0.08);
+}

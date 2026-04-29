@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import BackButton from "../components/BackButton.jsx";
 import { getCourse, unenrollFromCourse, uploadPDFToCourse, getCourseItems, openPDF, downloadPDF, getLibraryContents, addLibraryItemToCourse, getGroupsByCourse, getUserGroups, joinPublicGroup, updateCourseLibraryItem, deleteCourseLibraryItem } from "../api.js";
 import "./CoursePage.css";
 import Highlighted from "../components/Highlighted.jsx";
@@ -327,7 +328,7 @@ const CoursePage = ({ userId }) => {
     return (
         <div className="coursePage">
             <div className="courseHeader">
-                <button className="backBtn" onClick={() => navigate(-1)}>← Back</button>
+                <BackButton />
                 <h1 className="courseTitle">
                     {course ? `${course.courseCode} — ${course.courseName}` : "Loading..."}
                 </h1>

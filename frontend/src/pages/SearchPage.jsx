@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchLibrary, openPDF } from "../api.js";
+import BackButton from "../components/BackButton.jsx";
 
 const SearchPage = () => {
     const [searchParams] = useSearchParams();
@@ -27,9 +28,7 @@ const SearchPage = () => {
 
     return (
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "32px 16px" }}>
-            <button onClick={() => navigate(-1)} style={{ marginBottom: 24, background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>
-                ← Back
-            </button>
+            <BackButton />
 
             <h2 style={{ marginBottom: 4 }}>Search results for "{q}"</h2>
             {!loading && <p style={{ color: "#888", marginBottom: 24, fontSize: 14 }}>{total} result{total !== 1 ? "s" : ""}</p>}

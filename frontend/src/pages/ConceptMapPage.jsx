@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getConceptMap, uploadConceptMapPng, updateConceptMapGraph, updateConceptMapPrivacy } from '../api';
 import './ConceptMapPage.css';
+import BackButton from '../components/BackButton.jsx';
 
 const ConceptMapPage = () => {
     const { id } = useParams();
@@ -694,7 +695,7 @@ const ConceptMapPage = () => {
         <div className="cmap-page-container">
             <header className="cmap-page-header">
                 <div style={{display:'flex', alignItems:'center', gap: 16}}>
-                    <button className="cmap-back-btn" onClick={() => navigate(-1)}>← Back</button>
+                    <BackButton />
                     <div className="cmap-header-info">
                         <h1>{mapData.title || "AI Concept Map"}</h1>
                         <p>{isEditing ? "✏️ Edit Mode Active" : `Generated from ${mapData.sourceSetId ? 'flashcard set' : 'library material'}`}</p>

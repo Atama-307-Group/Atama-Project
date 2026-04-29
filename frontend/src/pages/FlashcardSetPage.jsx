@@ -19,6 +19,7 @@ import {
 } from "../api.js";
 import FlashcardCard from "../components/FlashcardCard.jsx";
 import FlashcardInput from "../components/FlashcardInput.jsx";
+import BackButton from "../components/BackButton.jsx";
 import ConceptMapModal from "../components/ConceptMapModal.jsx";
 import "./FlashcardSetPage.css";
 import ReportModal from '../components/ReportModal';
@@ -308,7 +309,7 @@ const FlashcardSetPage = ({ currentUser }) => {
     return (
         <div className="set-page">
             <div className="set-page-top-bar">
-                <button className="set-page-back" type="button" onClick={() => navigate("/")}>← Back</button>
+                <BackButton />
                 {!isOwner && setData && (
                     <button className="set-page-report-btn" onClick={() => setShowReport(true)} title="Report this set">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

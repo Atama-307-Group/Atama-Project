@@ -5,24 +5,45 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34ed46a6-52cf-40b0-ba37-098021c0c94c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_1.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_27_2026_2_34_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_27_2026_2_34_PM__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_4_27_2026_2_36_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_4_27_2026_2_36_PM__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM_[Changes]1/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_4_21_2026_12_48_PM__Changes_1.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ConceptMapPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ConceptMapPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/CoursePage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FlashcardSetPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/controller/FlashcardSetController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/controller/FlashcardSetController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/atama/service/FlashcardSetService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FoldersPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PickSetPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PickSetPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PreLearnPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PreLearnPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SearchPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyGoal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyGoal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyGroupPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/UniversityPage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="3Czuwv1aJrseYcLUAEPjGNPkcHI" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
@@ -30,27 +51,19 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "flashcard__fixes",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="Atama" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="Atama" />
-      <option name="filePath" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="AtamaApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="Atama" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.atama.AtamaApplication" />
@@ -59,7 +72,19 @@
       </method>
     </configuration>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="34ed46a6-52cf-40b0-ba37-098021c0c94c" name="Changes" comment="" />
+      <created>1777400969816</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1777400969816</updated>
+      <workItem from="1777400972269" duration="5620000" />
+    </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
