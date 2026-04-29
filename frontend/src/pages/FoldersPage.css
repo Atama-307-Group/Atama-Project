@@ -34,39 +34,29 @@ body {
   border: 1px solid rgba(51, 81, 69, 0.14);
   border-radius: 18px;
   padding: 14px 16px;
-  display: flex !important;
+  display: flex;
+  min-height: 100px;
   align-items: center;
-  position: relative !important;
+  position: relative;
   box-shadow: 0 4px 20px rgba(30, 53, 47, 0.10);
-  width: 100%;
 }
 
 .libraryTitle {
   font-weight: 950;
-  font-size: 32px !important;
+  font-size: 32px;
   letter-spacing: 0.2px;
   margin: 0;
   color: #1E352F;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-.backBtn {
-  font: inherit;
-  font-weight: 700;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: #1E352F;
-  padding: 4px 8px;
-  border-radius: 8px;
+.libraryHeader .back-btn {
   flex-shrink: 0;
-}
-
-.backBtn:hover {
-  background: rgba(51, 81, 69, 0.08);
+  padding: 10px 12px;
 }
 
 /* ── Toolbar ── */

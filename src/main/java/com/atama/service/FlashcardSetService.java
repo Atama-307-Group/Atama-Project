@@ -68,8 +68,14 @@ public class FlashcardSetService {
     public FlashcardSetResponseDTO addFlashcard(UUID flashcardSetId, FlashcardRequestDTO flashcardDTO) {
         FlashcardSet set = flashcardSetRepository.findById(flashcardSetId)
                 .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", flashcardSetId));
-        // map DTO to entity via flashcardMapper, not raw entity from request
         set.addFlashcard(flashcardMapper.toEntity(flashcardDTO));
+        return mapper.toResponseDTO(flashcardSetRepository.save(set));
+    }
+
+    public FlashcardSetResponseDTO deleteFlashcard(UUID setId, UUID flashcardId) {
+        FlashcardSet set = flashcardSetRepository.findById(setId)
+                .orElseThrow(() -> new ResourceNotFoundException("FlashcardSet", "id", setId));
+        set.getFlashcards().removeIf(f -> f.getId().equals(flashcardId));
         return mapper.toResponseDTO(flashcardSetRepository.save(set));
     }
 

@@ -9,7 +9,7 @@ const CARD_TYPES = [
   { value: 'STEPS', label: 'Steps' },
 ];
 
-const FlashcardInput = ({ index, card, onChange, onRemove, canRemove }) => {
+const FlashcardInput = ({ index, card, onChange, onRemove, canRemove, showRemove = true }) => {
   const updateField = (field, value) => {
     onChange(index, { ...card, [field]: value });
   };
@@ -138,14 +138,16 @@ const FlashcardInput = ({ index, card, onChange, onRemove, canRemove }) => {
             <option key={t.value} value={t.value}>{t.label}</option>
           ))}
         </select>
-        <button
-          className="flashcard-input-remove"
-          onClick={() => onRemove(index)}
-          disabled={!canRemove} // idk about this
-          title="Remove card"
-        >
-          ✕
-        </button>
+        {showRemove && (
+          <button
+            className="flashcard-input-remove"
+            onClick={() => onRemove(index)}
+            disabled={!canRemove}
+            title="Remove card"
+          >
+            ✕
+          </button>
+        )}
       </div>
       <div className="flashcard-input-fields">
         {renderFields()}

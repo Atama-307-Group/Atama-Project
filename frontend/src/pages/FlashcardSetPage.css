@@ -282,9 +282,11 @@
     border-color: #2b5c3f;
 }
 .set-page-cards {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     box-sizing: border-box;
-    gap: 14px;
+    gap: 20px;
 }
 
 .set-page-loading,
@@ -394,8 +396,15 @@
 
 .set-page-meta-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.download-container {
+    position: relative;
+    display: inline-flex;
 }
 
 .set-page-meta-edit {
@@ -486,6 +495,7 @@
     gap: 0.75rem;
     margin: 1rem 0 1.25rem;
     flex-wrap: wrap;
+    justify-content: center;
 }
 .set-page-study-btn {
     padding: 0.55rem 1.2rem;
@@ -626,7 +636,7 @@
 }
 
 /* Study buttons */
-.set-page-study-actions { display: flex; gap: 0.75rem; margin: 1rem 0 1.25rem; flex-wrap: wrap; }
+.set-page-study-actions { display: flex; gap: 0.75rem; margin: 1rem 0 1.25rem; flex-wrap: wrap; justify-content: center; }
 .set-page-study-btn { padding: 0.55rem 1.2rem; border: none; border-radius: 8px; background: #2b5c3f; color: white; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s; }
 .set-page-study-btn:hover { background: #1e4530; transform: translateY(-1px); }
 .set-page-study-btn--stats { background: #4f6ef7; }
@@ -690,3 +700,54 @@
 
 .review-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
 .review-delete-btn { color: #b91c1c !important; border-color: #fca5a5 !important; margin-right: auto; }
+
+.set-page-add-card-btn {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px 0;
+    border: 2px dashed #c3d4cc;
+    border-radius: 12px;
+    background: transparent;
+    color: #2b5c3f;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.set-page-add-card-btn:hover {
+    border-color: #2b5c3f;
+    background: rgba(43, 92, 63, 0.05);
+}
+
+.set-page-add-card-error {
+    color: #b91c1c;
+    font-size: 0.85rem;
+    margin: 4px 0 0;
+}
+
+.set-page-card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.set-page-delete-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid #fca5a5;
+    background: transparent;
+    color: #b91c1c;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.set-page-delete-btn:hover {
+    background-color: #fde8e8;
+    border-color: #f87171;
+}

@@ -18,6 +18,7 @@ import {
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
+import BackButton from "../components/BackButton.jsx";
 import { FolderCard } from "../components/FolderCard.jsx";
 import { LibraryItemCard } from "../components/LibraryItemCard.jsx";
 import { ConfirmModal } from "../components/ConfirmModal.jsx";
@@ -479,9 +480,7 @@ const FoldersPage = ({ userId }) => {
     return (
         <div className="foldersPage">
             <header className="libraryHeader">
-                <button className="backBtn" onClick={() => navigate('/')} title="Back to Home">
-                    ←
-                </button>
+                <BackButton />
                 <div className="libraryTitle">Your Library</div>
             </header>
 

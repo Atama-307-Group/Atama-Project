@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getLibraryContents, getFlashcardSetById } from '../api.js';
 import './PickSetPage.css';
+import BackButton from '../components/BackButton.jsx';
 
 const MODE_LABELS = {
     learn: 'Learn',
@@ -94,9 +95,7 @@ const PickSetPage = () => {
 
     return (
         <div className="pick-set-page">
-            <button className="pick-set-back" onClick={() => navigate('/')}>
-                ← Back
-            </button>
+            <BackButton />
 
             <div className="pick-set-header">
                 <h1>{isTestMode ? 'Select Study Materials' : 'Choose a Set'}</h1>

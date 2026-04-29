@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { getGoal, updateGoal, getStreak } from "../api.js"; // adjust path as needed
 import { useNavigate } from "react-router-dom";
 import "./studyGoal.css";
+import BackButton from "../components/BackButton.jsx";
 
 const DAYS = [
     { key: "M", label: "M" },
@@ -225,23 +226,9 @@ const GoalsPage = ({ userId }) => {
     return (
         <div className="goalPage">
 
-            <button
-                type="button"
-                className="backBtn"
-                onClick={() => navigate('/')}
-                style={{
-                    alignSelf: 'flex-start',
-                    marginBottom: '8px',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '1.5rem',
-                    color: '#2f3e3b',
-                    padding: '4px 8px',
-                }}
-            >
-                ← Back
-            </button>
+            <div style={{ alignSelf: 'flex-start' }}>
+                <BackButton />
+            </div>
 
             <h1>Study Schedule and Goal</h1>
 

@@ -81,6 +81,13 @@ public class FlashcardSetController {
                         request.getUniversity(), request.getCourse()));
     }
 
+    @DeleteMapping("/{id}/flashcards/{flashcardId}")
+    public ResponseEntity<FlashcardSetResponseDTO> deleteFlashcard(
+            @PathVariable UUID id,
+            @PathVariable UUID flashcardId) {
+        return ResponseEntity.ok(flashcardSetService.deleteFlashcard(id, flashcardId));
+    }
+
     @PatchMapping("/{id}/flashcards/{flashcardId}")
     public ResponseEntity<FlashcardResponseDTO> updateFlashcard(
             @PathVariable UUID id,

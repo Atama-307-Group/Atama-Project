@@ -5,6 +5,8 @@ import {
     getFlashcardSetById,
     updateFlashcardSetMeta,
     updateFlashcard,
+    addFlashcard,
+    deleteFlashcard,
     getSetProgress,
     getSetStats,
     saveSet,
@@ -17,6 +19,7 @@ import {
 } from "../api.js";
 import FlashcardCard from "../components/FlashcardCard.jsx";
 import FlashcardInput from "../components/FlashcardInput.jsx";
+import BackButton from "../components/BackButton.jsx";
 import ConceptMapModal from "../components/ConceptMapModal.jsx";
 import "./FlashcardSetPage.css";
 import ReportModal from '../components/ReportModal';
@@ -77,6 +80,9 @@ const FlashcardSetPage = ({ currentUser }) => {
     const [editingId, setEditingId] = useState(null);
     const [editDraft, setEditDraft] = useState(null);
     const [editingMeta, setEditingMeta] = useState(false);
+    const [showAddCard, setShowAddCard] = useState(false);
+    const [newCardDraft, setNewCardDraft] = useState({ type: 'NORMAL', term: '', definition: '' });
+    const [addCardError, setAddCardError] = useState('');
     const [metaDraft, setMetaDraft] = useState({ title: '', description: '', university: '', course: '' });
     const [shareStatus, setShareStatus] = useState(null);
     const [shareUrl, setShareUrl] = useState('');
@@ -195,6 +201,35 @@ const FlashcardSetPage = ({ currentUser }) => {
         setEditingId(null); setEditDraft(null);
     };
 
+    const deleteCard = async (cardId) => {
+        if (!window.confirm('Delete this card?')) return;
+        try {
+            const updated = await deleteFlashcard(id, cardId);
+            setSetData(prev => ({ ...updated, isOwner: prev.isOwner, isSaved: prev.isSaved }));
+        } catch (e) {
+            alert(e.message || 'Failed to delete card.');
+        }
+    };
+
+    const openAddCard = () => {
+        setNewCardDraft({ type: 'NORMAL', term: '', definition: '' });
+        setAddCardError('');
+        setShowAddCard(true);
+    };
+
+    const cancelAddCard = () => { setShowAddCard(false); setAddCardError(''); };
+
+    const handleAddCard = async () => {
+        setAddCardError('');
+        try {
+            const updated = await addFlashcard(id, newCardDraft);
+            setSetData(prev => ({ ...updated, isOwner: prev.isOwner, isSaved: prev.isSaved }));
+            setShowAddCard(false);
+        } catch (e) {
+            setAddCardError(e.message || 'Failed to add card.');
+        }
+    };
+
     const startEditingMeta = () => {
         setMetaDraft({ title: setData.title, description: setData.description ?? '', university: setData.university ?? '', course: setData.course ?? '' });
         setEditingMeta(true);
@@ -274,7 +309,7 @@ const FlashcardSetPage = ({ currentUser }) => {
     return (
         <div className="set-page">
             <div className="set-page-top-bar">
-                <button className="set-page-back" type="button" onClick={() => navigate("/")}>← Back</button>
+                <BackButton />
                 {!isOwner && setData && (
                     <button className="set-page-report-btn" onClick={() => setShowReport(true)} title="Report this set">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -340,7 +375,7 @@ const FlashcardSetPage = ({ currentUser }) => {
                         <button className="set-page-study-btn set-page-study-btn--stats" onClick={() => setShowStats(true)}>📊 View Statistics</button>
                     </div>
 
-                    <div>
+                    <div className="set-page-meta-actions">
                         {setData.isOwner && (
                             <button className="set-page-edit-btn" onClick={startEditingMeta}>Edit title & description</button>
                         )}
@@ -350,7 +385,7 @@ const FlashcardSetPage = ({ currentUser }) => {
                             </button>
                         )}
                         <button className="set-page-edit-btn" onClick={handleShare}>Share Set</button>
-                        <div className="download-container" style={{ position: 'relative', display: 'inline-block' }}>
+                        <div className="download-container">
                             <button className="set-page-edit-btn" onClick={() => setShowDownloadOptions(!showDownloadOptions)}>Download</button>
                             {showDownloadOptions && (
                                 <div className="download-dropdown">
@@ -358,12 +393,12 @@ const FlashcardSetPage = ({ currentUser }) => {
                                     <button onClick={() => { downloadSet('txt'); setShowDownloadOptions(false); }}>TXT file</button>
                                 </div>
                             )}
-                            {setData.isOwner && (
-                                <button className="set-page-edit-btn" onClick={handlePrivacyToggle}>
-                                    {setData.isPublic ? '🔒 Make Private' : '🔓 Make Public'}
-                                </button>
-                            )}
                         </div>
+                        {setData.isOwner && (
+                            <button className="set-page-edit-btn" onClick={handlePrivacyToggle}>
+                                {setData.isPublic ? '🔒 Make Private' : '🔓 Make Public'}
+                            </button>
+                        )}
                         {!isOwner && (
                             <button className="set-page-edit-btn" onClick={openReviewModal}>
                                 {myReview ? 'Edit Review' : 'Review'}
@@ -391,7 +426,7 @@ const FlashcardSetPage = ({ currentUser }) => {
                         const level = progressMap[card.id] ?? 'DONT_KNOW';
                         return isEditing ? (
                             <div key={cardKey} className="set-page-editing-card">
-                                <FlashcardInput index={index} card={editDraft} onChange={(i, updated) => setEditDraft(updated)} onRemove={() => {}} canRemove={false} />
+                                <FlashcardInput index={index} card={editDraft} onChange={(i, updated) => setEditDraft(updated)} onRemove={() => {}} canRemove={false} showRemove={false} />
                                 <div className="set-page-edit-actions">
                                     <button className="set-page-cancel-btn" onClick={cancelEditing}>Cancel</button>
                                     <button className="set-page-save-btn" onClick={() => saveCard(index)}>Save</button>
@@ -401,13 +436,38 @@ const FlashcardSetPage = ({ currentUser }) => {
                             <div key={cardKey} className="set-page-card-wrap">
                                 <FlashcardCard index={index} card={card} knowledgeLevel={level} />
                                 {setData.isOwner && (
-                                    <button className="set-page-edit-btn" onClick={() => startEditing(card, index)}>Edit</button>
+                                    <div className="set-page-card-actions">
+                                        <button className="set-page-edit-btn" onClick={() => startEditing(card, index)}>Edit</button>
+                                        <button className="set-page-delete-btn" onClick={() => deleteCard(card.id)}>Delete</button>
+                                    </div>
                                 )}
                             </div>
                         );
                     })}
                 </div>
             ) : <p>No cards in this set.</p>}
+
+            {setData.isOwner && (
+                showAddCard ? (
+                    <div className="set-page-editing-card">
+                        <FlashcardInput
+                            index={setData.flashcards?.length ?? 0}
+                            card={newCardDraft}
+                            onChange={(i, updated) => setNewCardDraft(updated)}
+                            onRemove={() => {}}
+                            canRemove={false}
+                            showRemove={false}
+                        />
+                        {addCardError && <p className="set-page-add-card-error">{addCardError}</p>}
+                        <div className="set-page-edit-actions">
+                            <button className="set-page-cancel-btn" onClick={cancelAddCard}>Cancel</button>
+                            <button className="set-page-save-btn" onClick={handleAddCard}>Add Card</button>
+                        </div>
+                    </div>
+                ) : (
+                    <button className="set-page-add-card-btn" onClick={openAddCard}>+ Add Card</button>
+                )
+            )}
 
             {/* Stats modal */}
             {showStats && (

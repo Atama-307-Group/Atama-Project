@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UniversityPage.css";
+import BackButton from "../components/BackButton.jsx";
 import EnrollModal from "../components/EnrollModal.jsx"
 import LeaveAllCoursesModal from "../components/LeaveAllCoursesModal.jsx"
 import { useCourseEnrollment } from "../hooks/useCourseEnrollment.js";
@@ -90,61 +91,62 @@ const UniversityPage = ({ userId }) => {
     return (
         <div className="universityPage">
             <div className="universityHeader">
-                <button className="backBtn" onClick={() => navigate('/')}>← Back</button>
+                <BackButton />
                 <h1 className="universityTitle">{university ? university.name : "Loading..."}</h1>
-                {enrolledIds.size > 0 && (
-                    <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
-                        Leave All Your Courses
-                    </button>
-                )}
+                <div className="universityHeaderRight">
+                    {enrolledIds.size > 0 && (
+                        <button className="leaveAllBtn" onClick={() => setShowLeaveAllModal(true)}>
+                            Leave All Your Courses
+                        </button>
+                    )}
+                </div>
             </div>
-
-            <div className="viewToggle">
-                <button
-                    className={`toggleBtn ${view === "all" ? "toggleBtn--active" : ""}`}
-                    onClick={() => handleSetView("all")}
-                >
-                    All Courses
-                </button>
-                <button
-                    className={`toggleBtn ${view === "enrolled" ? "toggleBtn--active" : ""}`}
-                    onClick={() => handleSetView("enrolled")}
-                >
-                    Your Enrolled Courses
-                </button>
-
-                {view === "enrolled" && (
-                    <button className="enrollFromScheduleBtn" onClick={() => setShowScheduleModal(true)}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                        Enroll from Schedule
-                    </button>
-                )}
-
-
-
-                <div className="searchGroup">
+            <div className="pageContent">
+                <div className="viewToggle">
                     <button
-                        className="requestCourseBtn"
-                        onClick={() => setShowRequestModal(true)}
-                        aria-label="Request a course"
-                        title="Request a course to be added"
+                        className={`toggleBtn ${view === "all" ? "toggleBtn--active" : ""}`}
+                        onClick={() => handleSetView("all")}
                     >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
+                        All Courses
                     </button>
-                    <button className="searchTriggerBtn" onClick={openSearch} aria-label="Search courses">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="11" cy="11" r="8" />
-                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        <span className="searchTriggerLabel">Search courses</span>
-                        <kbd className="searchKbd">⌘K</kbd>
+                    <button
+                        className={`toggleBtn ${view === "enrolled" ? "toggleBtn--active" : ""}`}
+                        onClick={() => handleSetView("enrolled")}
+                    >
+                        Your Enrolled Courses
                     </button>
+
+                    {view === "enrolled" && (
+                        <button className="enrollFromScheduleBtn" onClick={() => setShowScheduleModal(true)}>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Enroll from Schedule
+                        </button>
+                    )}
+
+                    <div className="searchGroup">
+                        <button
+                            className="requestCourseBtn"
+                            onClick={() => setShowRequestModal(true)}
+                            aria-label="Request a course"
+                            title="Request a course to be added"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                        </button>
+                        <button className="searchTriggerBtn" onClick={openSearch} aria-label="Search courses">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <span className="searchTriggerLabel">Search courses</span>
+                            <kbd className="searchKbd">⌘K</kbd>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -322,11 +324,11 @@ const UniversityPage = ({ userId }) => {
             {/* Leave all courses modal */}
             {showLeaveAllModal && (
                 <LeaveAllCoursesModal
-                        leavingAll={leavingAll}
-                        scheduledLeaveDate={scheduledLeaveDate}
-                        onConfirm={handleLeaveAll}
-                        onCancel={() => setShowLeaveAllModal(false)}
-                    />
+                    leavingAll={leavingAll}
+                    scheduledLeaveDate={scheduledLeaveDate}
+                    onConfirm={handleLeaveAll}
+                    onCancel={() => setShowLeaveAllModal(false)}
+                />
             )}
 
             {/* Request course modal */}

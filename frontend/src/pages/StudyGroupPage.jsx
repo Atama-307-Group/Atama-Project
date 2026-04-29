@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import BackButton from "../components/BackButton.jsx";
 import { Client } from "@stomp/stompjs";
 import { getGroup, getGroupMembers, getUniversity, getGroupLeaderboard, getGroupMessages, nudgeMember, leaveGroup, getLibraryContents, openPDF } from "../api.js";
 import "./StudyGroupPage.css";
@@ -247,7 +248,7 @@ const StudyGroupPage = ({ userId }) => {
     return (
         <div className="sgPage">
             <header className="sgHeader">
-                <button className="sgBackBtn" onClick={() => navigate(-1)}>←</button>
+                <BackButton />
                 <div className="sgHeaderInfo">
                     <h1 className="sgGroupName">{group.name}</h1>
                     <span className="sgHeaderMeta">
