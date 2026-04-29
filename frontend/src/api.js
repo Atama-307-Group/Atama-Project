@@ -449,7 +449,6 @@ export async function updateCourseLibraryItemTitle(id, { title }) {
     return res.json();
 }
 
-
 export async function deleteCourseLibraryItem(id) {
     const res = await fetch(`${API_BASE}/course-library-items/${id}`, {
         method: "DELETE",
@@ -549,6 +548,9 @@ export async function uploadFlashcardSet(file, title, description, university, c
         body: formData,
     });
     if (!res.ok) {
+        if (res.status === 503) {
+            throw new Error("Oops, sorry! Looks like Gemini is experiencing high loads right now. Try again a bit later");
+        }
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || "Failed to upload set");
     }
@@ -814,6 +816,9 @@ export async function generateConceptMap(setId, selectedCardIds, title) {
         body: JSON.stringify({ setId, selectedCardIds, title }),
     });
     if (!res.ok) {
+        if (res.status === 503) {
+            throw new Error("Oops, sorry! Looks like Gemini is experiencing high loads right now. Try again a bit later");
+        }
         const text = await res.text().catch(() => "");
         throw new Error(text || "Failed to generate concept map");
     }
@@ -956,6 +961,9 @@ export const generatePracticeTest = async (payload) => {
         body: JSON.stringify(payload),
     });
     if (!response.ok) {
+        if (response.status === 503) {
+            throw new Error("Oops, sorry! Looks like Gemini is experiencing high loads right now. Try again a bit later");
+        }
         const err = await response.text();
         throw new Error(err || 'Failed to generate practice test');
     }

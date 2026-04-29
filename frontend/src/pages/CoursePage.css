@@ -760,6 +760,10 @@ button.leaveConfirmBtn:disabled {
 .itemCard--mine {
     border-color: rgba(124, 111, 205, 0.45);
 }
+.itemCard--mine,
+.itemCard--mine:hover {
+    border-color: rgba(124, 111, 205, 0.6);
+}
 
 .ownerBadge {
     position: absolute;

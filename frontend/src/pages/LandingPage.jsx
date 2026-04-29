@@ -254,9 +254,6 @@ const LandingPage = ({ currentUser, onLogout, recentSets = [], recommendationsEn
                   </div>
                 </div>
                 <div className="dropdown-divider" />
-                <button className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/profile'); }}>
-                  Profile Settings
-                </button>
                 <button className="dropdown-item" onClick={() => { setDropdownOpen(false); navigate('/settings'); }}>
                   Settings
                 </button>

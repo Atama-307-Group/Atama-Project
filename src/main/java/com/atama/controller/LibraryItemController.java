@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -42,7 +41,8 @@ public class LibraryItemController {
                 i.isStarred(),
                 i.getItemType(),
                 i.isPublic(),
-                i.getFolder() != null ? i.getFolder().getId() : null
+                i.getFolder() != null ? i.getFolder().getId() : null,
+                i.getOwner() != null ? i.getOwner().getId() : null
         );
     }
 
@@ -174,5 +174,17 @@ public class LibraryItemController {
     public ResponseEntity<Void> deleteLibraryItem(@PathVariable UUID id) {
         libraryItemService.deleteLibraryItem(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<LibraryItemResponseDTO> updateItem(
+            @PathVariable UUID id,
+            @RequestBody Map<String, String> body) {
+        LibraryItem item = libraryItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+        if (body.containsKey("title")) {
+            item.setTitle(body.get("title"));
+        }
+        return ResponseEntity.ok(toResponse(libraryItemRepository.save(item)));
     }
 }

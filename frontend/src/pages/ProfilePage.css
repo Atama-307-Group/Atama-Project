@@ -2,28 +2,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
-    width: 100vw;
-    background-color: #fdfbf7;
+    width: 100%;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     position: relative;
-    min-height: 100vh;
-    padding: 24px 16px;
     box-sizing: border-box;
 }
 
 .profile-card {
-    background-color: #ffffff;
-    padding: 48px 40px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    background-color: transparent;
+    padding: 0;
     width: 100%;
-    max-width: 420px;
+    max-width: 800px;
     text-align: center;
-    animation: slideUp 0.5s ease-out;
-    max-height: calc(100vh - 48px);  /* respects viewport with padding */
-        overflow-y: auto;
+    animation: fadeIn 0.3s ease-out;
+    margin: 0;
 }
 
 /* Large avatar */
@@ -389,22 +381,6 @@
 }
 
 /* Back button */
-.profile-page .back-btn {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: #2b5c3f;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.profile-page .back-btn:hover {
-    color: #1a3c27;
-    background: transparent;
-}
 
 .delete-options {
     display: flex;

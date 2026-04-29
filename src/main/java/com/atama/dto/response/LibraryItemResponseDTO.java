@@ -24,4 +24,5 @@ public class LibraryItemResponseDTO {
     @JsonProperty("isPublic")
     private boolean isPublic = true;
     private UUID folderId; // just the ID to avoid deep nesting
+    private UUID ownerId;
 }
