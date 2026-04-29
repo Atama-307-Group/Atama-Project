@@ -15,6 +15,7 @@ import {
     getSavedSets,
     getUserGroups,
     deleteFlashcardSet,
+    renameLibraryItem,
 } from "../api.js";
 import {useNavigate} from "react-router-dom";
 import "./FoldersPage.css";
@@ -385,6 +386,7 @@ const FoldersPage = ({ userId }) => {
     // ── Rename folder ─────────────────────────────────────────────────────────
 
     function openRenameModal(folder) { setOpenMenuId(null); setRenameId(folder.id); setRenameName(folder.name ?? ""); }
+    function closeRenameModal() { setRenameId(null); setRenameName(""); }
 
 
     // ── Drag & Drop Logic ───────────────────────────────────────────────────
@@ -510,16 +512,17 @@ const FoldersPage = ({ userId }) => {
                 </button>
                 <input ref={fileInputRef} type="file" accept=".pdf" style={{display: "none"}} onChange={onUploadPDF} />
 
-                <button 
-                    className="toolbarActionBtn" 
-                    onClick={() => setShowModal(true)} 
-                    disabled={selectedFolderId !== null}
-                >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                    </svg>
-                    New Folder
-                </button>
+                {selectedFolderId === null && (
+                    <button 
+                        className="toolbarActionBtn" 
+                        onClick={() => setShowModal(true)} 
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                        </svg>
+                        New Folder
+                    </button>
+                )}
 
                 <button
                     className={`toolbarActionBtn ${organizeMode ? "primary" : ""}`}
@@ -692,8 +695,50 @@ const FoldersPage = ({ userId }) => {
                     ) : (
                         /* Folder contents view */
                         <div className="folderContents">
-                            <button type="button" className="toolbarActionBtn" onClick={() => setSelectedFolderId(null)} style={{marginBottom: 16}}>
-                                ← Back to main library
+                            <button 
+                                type="button" 
+                                className={`toolbarActionBtn ${organizeMode && selectedItemIds.size > 0 ? "primary" : ""}`} 
+                                onClick={async () => {
+                                    if (organizeMode && selectedItemIds.size > 0) {
+                                        try {
+                                            await Promise.all([...selectedItemIds].map(id => removeItemFromFolder(id)));
+                                            setItems(prev => prev.filter(i => !selectedItemIds.has(i.id)));
+                                            setSelectedItemIds(new Set());
+                                            await loadLibrary();
+                                        } catch (err) {
+                                            setError("Failed to move items: " + err.message);
+                                        }
+                                    } else {
+                                        setSelectedFolderId(null);
+                                    }
+                                }} 
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={async (e) => {
+                                    if (!organizeMode) return;
+                                    e.preventDefault();
+                                    e.currentTarget.classList.remove("folderDropTargetActive");
+
+                                    const itemsToMove = selectedItemIds.size > 0 
+                                        ? Array.from(selectedItemIds) 
+                                        : [e.dataTransfer.getData("text/plain")];
+
+                                    if (itemsToMove.length === 0) return;
+
+                                    try {
+                                        await Promise.all(itemsToMove.map(id => removeItemFromFolder(id)));
+                                        setSelectedItemIds(new Set());
+                                        if (selectedFolderId) {
+                                            setItems(prev => prev.filter(i => !itemsToMove.includes(i.id)));
+                                        }
+                                        await loadLibrary();
+                                    } catch (err) {
+                                        setError("Failed to move items to main library: " + err.message);
+                                    }
+                                }}
+                                style={{marginBottom: 16}}
+                            >
+                                ← {organizeMode && selectedItemIds.size > 0 ? "Move selected to main library" : "Back to main library"}
                             </button>
 
                             {itemsLoading ? (
