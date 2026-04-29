@@ -77,4 +77,17 @@ public class Goal {
             studyStartTime = null;
         }
     }
+
+    public int getEffectiveCurrentStreak() {
+        if (currentStreak == 0) return 0;
+        if (lastStudyDate == null) return 0;
+
+        LocalDate today = LocalDate.now();
+        // Streak is still alive if they studied today or yesterday
+        if (lastStudyDate.equals(today) || lastStudyDate.equals(today.minusDays(1))) {
+            return currentStreak;
+        }
+        // Missed a day — streak is broken
+        return 0;
+    }
 }

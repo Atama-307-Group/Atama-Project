@@ -32,7 +32,7 @@ public class StreakReminderService {
             }
 
             // Skip users with no streak to protect
-            if (goal.getCurrentStreak() == 0) {
+            if (goal.getEffectiveCurrentStreak() == 0) {
                 continue;
             }
 
@@ -46,7 +46,7 @@ public class StreakReminderService {
                 message.setSubject("Atama – Don't break your streak! 🔥");
                 message.setText(
                         "Hi " + user.getUsername() + ",\n\n" +
-                                "You're on a " + goal.getCurrentStreak() + "-day streak — don't lose it!\n\n" +
+                                "You're on a " + goal.getEffectiveCurrentStreak() + "-day streak — don't lose it!\n\n" +
                                 "You haven't studied yet today. Head over to Atama before midnight to keep your streak alive.\n\n"
                                 +
                                 "— Atama Team");
