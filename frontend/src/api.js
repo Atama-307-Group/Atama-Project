@@ -808,12 +808,12 @@ export async function getRecommendation(userId) {
 
 /* Concept Maps ------------------------------------------- */
 
-export async function generateConceptMap(setId, selectedCardIds, title) {
+export async function generateConceptMap(setId, selectedCardIds, title, isPublic = true) {
     const res = await fetch(`${API_BASE}/api/concept-maps/generate`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ setId, selectedCardIds, title }),
+        body: JSON.stringify({ setId, selectedCardIds, title, isPublic }),
     });
     if (!res.ok) {
         if (res.status === 503) {
@@ -825,12 +825,12 @@ export async function generateConceptMap(setId, selectedCardIds, title) {
     return res.json();
 }
 
-export async function createManualConceptMap(setId, selectedCardIds, title) {
+export async function createManualConceptMap(setId, selectedCardIds, title, isPublic = true) {
     const res = await fetch(`${API_BASE}/api/concept-maps`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ setId, selectedCardIds, title }),
+        body: JSON.stringify({ setId, selectedCardIds, title, isPublic }),
     });
     if (!res.ok) {
         const text = await res.text().catch(() => "");

@@ -23,7 +23,7 @@ const SearchPage = () => {
     }, [q]);
 
     const total = results
-        ? results.folders.length + results.flashcardSets.length + results.pdfs.length + (results.users?.length ?? 0)
+        ? results.folders.length + results.flashcardSets.length + results.pdfs.length + (results.conceptMaps?.length ?? 0) + (results.users?.length ?? 0)
         : 0;
 
     return (
@@ -94,6 +94,19 @@ const SearchPage = () => {
                                      onClick={() => openPDF(item.id)}
                                      style={{ cursor: "pointer" }}>
                                     <p className="recent-title">📄 {item.title}</p>
+                                </div>
+                            ))}
+                        </section>
+                    )}
+
+                    {results.conceptMaps?.length > 0 && (
+                        <section style={{ marginBottom: 32 }}>
+                            <h3 style={{ marginBottom: 12 }}>Concept Maps</h3>
+                            {results.conceptMaps.map(item => (
+                                <div key={item.id} className="recent-item"
+                                     onClick={() => navigate(`/concept-maps/${item.id}`)}
+                                     style={{ cursor: "pointer" }}>
+                                    <p className="recent-title">🧠 {item.title}</p>
                                 </div>
                             ))}
                         </section>
