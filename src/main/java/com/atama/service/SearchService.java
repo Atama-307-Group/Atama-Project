@@ -62,6 +62,16 @@ public class SearchService {
                 ))
                 .toList();
 
+        List<LibraryItemResponseDTO> conceptMaps = libraryItemRepository
+                .searchByType(q, LibraryItemType.CONCEPT_MAP, userId)
+                .stream()
+                .map(i -> new LibraryItemResponseDTO(
+                        i.getId(), i.getTitle(), i.getCreatedAt(), i.getUpdatedAt(),
+                        i.getLastAccessed(), i.isStarred(), i.getItemType(), i.isPublic(),
+                        i.getFolder() != null ? i.getFolder().getId() : null
+                ))
+                .toList();
+
         List<UserSearchDTO> users = userRepository
                 .searchByUsername(q)
                 .stream()
@@ -69,6 +79,6 @@ public class SearchService {
                 .map(u -> new UserSearchDTO(u.getId(), u.getUsername(), u.getProfilePictureUrl()))
                 .toList();
 
-        return new SearchResponseDTO(folders, flashcardSets, pdfs, users);
+        return new SearchResponseDTO(folders, flashcardSets, pdfs, conceptMaps, users);
     }
 }

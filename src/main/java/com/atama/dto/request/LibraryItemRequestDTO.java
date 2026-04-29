@@ -9,5 +9,6 @@ import java.util.UUID;
 public class LibraryItemRequestDTO {
     private String title;
     private UUID folderID;
+    @com.fasterxml.jackson.annotation.JsonProperty("isPublic")
     private boolean isPublic = true;
 }

@@ -33,7 +33,7 @@ public class ConceptMapService {
     private final LibraryItemService libraryItemService;
     private final LibraryRepository libraryRepository;
 
-    public ConceptMapResponseDTO generateAndSave(UUID setId, List<UUID> cardIds, String title, UUID userId) {
+    public ConceptMapResponseDTO generateAndSave(UUID setId, List<UUID> cardIds, String title, boolean isPublic, UUID userId) {
         FlashcardSet set = flashcardSetRepository.findById(setId)
                 .orElseThrow(() -> new RuntimeException("Flashcard set not found"));
 
@@ -58,15 +58,17 @@ public class ConceptMapService {
 
         LibraryItemRequestDTO mockDto = new LibraryItemRequestDTO();
         mockDto.setTitle(title != null && !title.isBlank() ? title : set.getTitle() + " - Concept Map");
+        mockDto.setPublic(isPublic);
         
         libraryItemService.initializeLibraryItem(conceptMap, mockDto, userId);
+        conceptMap.setPublic(isPublic);
 
         ConceptMap saved = conceptMapRepository.save(conceptMap);
         
         return toDto(saved, userId);
     }
 
-    public ConceptMapResponseDTO createManualMap(UUID setId, List<UUID> cardIds, String title, UUID userId) {
+    public ConceptMapResponseDTO createManualMap(UUID setId, List<UUID> cardIds, String title, boolean isPublic, UUID userId) {
         FlashcardSet set = flashcardSetRepository.findById(setId)
                 .orElseThrow(() -> new RuntimeException("Flashcard set not found"));
 
@@ -94,8 +96,10 @@ public class ConceptMapService {
 
         LibraryItemRequestDTO mockDto = new LibraryItemRequestDTO();
         mockDto.setTitle(title != null && !title.isBlank() ? title : set.getTitle() + " - Concept Map");
+        mockDto.setPublic(isPublic);
         
         libraryItemService.initializeLibraryItem(conceptMap, mockDto, userId);
+        conceptMap.setPublic(isPublic);
 
         ConceptMap saved = conceptMapRepository.save(conceptMap);
         

@@ -31,8 +31,9 @@ public class ConceptMapController {
         List<String> cardIdStrings = (List<String>) request.get("selectedCardIds");
         List<UUID> cardIds = cardIdStrings.stream().map(UUID::fromString).toList();
         String title = (String) request.get("title");
+        Boolean isPublic = request.get("isPublic") != null ? (Boolean) request.get("isPublic") : true;
 
-        ConceptMapResponseDTO dto = conceptMapService.generateAndSave(setId, cardIds, title, getAuthenticatedUserId());
+        ConceptMapResponseDTO dto = conceptMapService.generateAndSave(setId, cardIds, title, isPublic, getAuthenticatedUserId());
         return ResponseEntity.ok(dto);
     }
 
@@ -42,8 +43,9 @@ public class ConceptMapController {
         List<String> cardIdStrings = (List<String>) request.get("selectedCardIds");
         List<UUID> cardIds = cardIdStrings.stream().map(UUID::fromString).toList();
         String title = (String) request.get("title");
+        Boolean isPublic = request.get("isPublic") != null ? (Boolean) request.get("isPublic") : true;
 
-        ConceptMapResponseDTO dto = conceptMapService.createManualMap(setId, cardIds, title, getAuthenticatedUserId());
+        ConceptMapResponseDTO dto = conceptMapService.createManualMap(setId, cardIds, title, isPublic, getAuthenticatedUserId());
         return ResponseEntity.ok(dto);
     }
     
