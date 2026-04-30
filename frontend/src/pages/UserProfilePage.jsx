@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./UserProfilePage.css";
+import BackButton from '../components/BackButton.jsx';
 import ReportModal from '../components/ReportModal';
 
 const UserProfilePage = () => {
@@ -30,14 +31,14 @@ const UserProfilePage = () => {
 
     if (error) return (
         <div className="user-profile-page">
-            <button className="user-profile-back" onClick={() => navigate(-1)}>← Back</button>
+            <BackButton onClick={() => navigate(-1)} />
             <p className="user-profile-error">{error}</p>
         </div>
     );
 
     return (
         <div className="user-profile-page">
-            <button className="user-profile-back" onClick={() => navigate(-1)}>← Back</button>
+            <BackButton onClick={() => navigate(-1)} />
 
             {/* Profile card */}
             <div className="user-profile-card">

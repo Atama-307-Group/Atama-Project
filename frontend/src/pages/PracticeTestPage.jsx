@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { startStudying, stopStudying, addSetStudyTime, recordAccess } from "../api.js";
+import BackButton from '../components/BackButton.jsx';
 
 const getEditDistance = (a, b) => {
   if (!a || !b) return (a || b || '').length;
@@ -464,7 +465,9 @@ console.log(currentQ);
   return (
     <div style={{ maxWidth: '600px', margin: '50px auto', textAlign: 'center', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', alignSelf: 'flex-start' }}>← Back</button>
+          <div style={{ alignSelf: 'flex-start' }}>
+              <BackButton onClick={() => navigate(-1)} />
+          </div>
           <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>⏱ {formatTime(elapsedTime)}</div>
       </div>
       

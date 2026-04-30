@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginUser } from '../api.js';
+import BackButton from '../components/BackButton.jsx';
 import './LoginPage.css';
 
 const LoginPage = ({ onLoginSuccess }) => {
@@ -34,7 +35,7 @@ const LoginPage = ({ onLoginSuccess }) => {
 
     return (
         <div className="login-container">
-            <button className="back-btn" onClick={() => navigate('/')}>&larr; Back</button>
+            <BackButton onClick={() => navigate('/')} />
 
             <div className="login-card">
                 <h2 className="login-title">Welcome Back</h2>

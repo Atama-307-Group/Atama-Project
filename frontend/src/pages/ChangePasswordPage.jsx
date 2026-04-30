@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../components/BackButton.jsx';
 import './ChangePasswordPage.css';
 
 const ChangePasswordPage = ({ currentUser }) => {
@@ -54,7 +55,7 @@ const ChangePasswordPage = ({ currentUser }) => {
 
     return (
         <div className="change-pw-container">
-            <button className="back-btn" onClick={() => navigate('/settings')}>&larr; Back</button>
+            <BackButton onClick={() => navigate('/settings')} />
 
             <div className="change-pw-card">
                 <h2 className="change-pw-title">Change Password</h2>

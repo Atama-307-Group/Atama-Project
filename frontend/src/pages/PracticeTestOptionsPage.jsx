@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AiDisabledModal from '../components/AiDisabledModal.jsx';
+import BackButton from '../components/BackButton.jsx';
 
 const PracticeTestOptionsPage = () => {
     const navigate = useNavigate();
@@ -106,7 +107,9 @@ const PracticeTestOptionsPage = () => {
 
     return (
         <div style={{ maxWidth: '800px', margin: '50px auto', fontFamily: 'sans-serif', padding: '20px' }}>
-            <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginBottom: '1rem' }}>← Back to Home</button>
+            <div style={{ marginBottom: '1rem' }}>
+                <BackButton onClick={() => navigate('/')} />
+            </div>
             <h2 style={{ textAlign: 'center', marginBottom: '40px' }}>Practice Test Generation Options</h2>
 
             {error && (

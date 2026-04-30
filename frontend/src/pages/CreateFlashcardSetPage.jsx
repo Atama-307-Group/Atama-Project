@@ -4,6 +4,7 @@ import FlashcardInput from '../components/FlashcardInput.jsx';
 import TextImportModal from '../components/TextImportModal.jsx';
 import AiDisabledModal from '../components/AiDisabledModal.jsx';
 import { createFlashcardSet, uploadFlashcardSet, recordAccess } from '../api.js';
+import BackButton from '../components/BackButton.jsx';
 import './CreateFlashcardSetPage.css';
 
 const newNormalCard = () => ({ type: 'NORMAL', term: '', definition: '' });
@@ -139,7 +140,7 @@ const CreateFlashcardSetPage = ({ aiDisabled }) => {
   return (
     <div className="create-set-page">
       <div className="create-set-top">
-        <button className="set-page-back" onClick={() => navigate('/')}>&larr; Back</button>
+        <BackButton onClick={() => navigate('/')} />
       </div>
       <h1>Create a New Flashcard Set</h1>
       {/* TODO: add fields for university and class */}
