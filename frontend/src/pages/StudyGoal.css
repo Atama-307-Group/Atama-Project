@@ -2,20 +2,20 @@
 
 .goalPage {
     min-height: 100vh;
-    padding: 0 10px 40px 20px;
-    background: linear-gradient(180deg, #e8f7f2 0%, #f4fbf9 100%);
+    padding: 24px;
+    background-color: #fdfbf7;
     display: flex;
     flex-direction: column;
     align-items: center;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    /*height: 100vh;*/
 }
 
 .goalPage h1 {
     margin-bottom: 24px;
     font-size: 2rem;
-    font-weight: 700;
-    color: #1f2d2a;
+    font-weight: 950;
+    color: #1E352F;
+    letter-spacing: 0.2px;
 }
 
 /* ===== Card ===== */
@@ -23,15 +23,13 @@
 .card {
     width: 100%;
     max-width: 550px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(6px);
+    background: #ffffff;
     padding: 28px;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 22px rgba(30, 53, 47, 0.08);
+    border: 1px solid rgba(51, 81, 69, 0.16);
     align-self: center;
     display: block;
-
     height: auto;
     overflow: visible;
 }
@@ -42,23 +40,24 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2f3e3b;
+    color: #335145;
 }
 
 .card input {
     width: 100%;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid #d4e3df;
+    border: 1px solid rgba(51, 81, 69, 0.22);
     margin-bottom: 20px;
     font-size: 1rem;
     transition: all 0.2s ease;
+    color: #1E352F;
 }
 
 .card input:focus {
     outline: none;
-    border-color: #79c7b7;
-    box-shadow: 0 0 0 3px rgba(121, 199, 183, 0.25);
+    border-color: #77BFA3;
+    box-shadow: 0 0 0 3px rgba(119, 191, 163, 0.25);
 }
 
 /* ===== Progress ===== */
@@ -68,20 +67,20 @@
     justify-content: space-between;
     font-weight: 600;
     margin-bottom: 8px;
-    color: #33423f;
+    color: #335145;
 }
 
 .bar {
     height: 14px;
     border-radius: 999px;
-    background: #e2efeb;
+    background: rgba(51, 81, 69, 0.10);
     overflow: hidden;
     margin-bottom: 20px;
 }
 
 .fill {
     height: 100%;
-    background: linear-gradient(90deg, #79c7b7, #4eb89f);
+    background: linear-gradient(90deg, #77BFA3, #3a9e7e);
     transition: width 0.3s ease;
     border-radius: 999px;
 }
@@ -99,27 +98,29 @@
     padding: 12px;
     border-radius: 10px;
     border: none;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .actions button:first-child {
-    background: #4eb89f;
-    color: white;
+    background: #77BFA3;
+    color: #1E352F;
 }
 
 .actions button:first-child:hover {
-    background: #3da98f;
+    background: #6ab59a;
 }
 
 .actions button:last-child {
-    background: #eef3f2;
-    color: #33423f;
+    background: transparent;
+    border: 1px solid rgba(51, 81, 69, 0.35);
+    color: #335145;
 }
 
 .actions button:last-child:hover {
-    background: #e1e8e6;
+    background: rgba(51, 81, 69, 0.06);
+    border-color: rgba(51, 81, 69, 0.55);
 }
 
 /* ===== Sections ===== */
@@ -129,8 +130,8 @@
 }
 
 .sectionTitle {
-    font-weight: 700;
-    color: #2f3e3b;
+    font-weight: 800;
+    color: #1E352F;
     margin-bottom: 10px;
     width: 100%;
     display: block;
@@ -140,15 +141,16 @@
     margin-top: 10px;
     font-size: 0.95rem;
     opacity: 0.8;
+    color: #335145;
 }
 
 .summary {
     margin-top: 10px;
-    color: #33423f;
+    color: #335145;
 }
 
 .summaryWarn {
-    color: #8a2f2f;
+    color: #c0392b;
     font-weight: 600;
 }
 
@@ -163,16 +165,18 @@
 .dayBtn {
     padding: 10px 0;
     border-radius: 12px;
-    border: 1px solid #d4e3df;
-    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(51, 81, 69, 0.22);
+    background: transparent;
     font-weight: 700;
+    color: #335145;
     cursor: pointer;
     transition: transform 0.05s ease, background 0.2s ease, border-color 0.2s ease;
     user-select: none;
 }
 
 .dayBtn:hover {
-    background: rgba(255, 255, 255, 1);
+    background: rgba(119, 191, 163, 0.12);
+    border-color: rgba(119, 191, 163, 0.5);
 }
 
 .dayBtn:active {
@@ -180,8 +184,9 @@
 }
 
 .dayBtn.active {
-    background: rgba(78, 184, 159, 0.15);
-    border-color: rgba(78, 184, 159, 0.65);
+    background: rgba(119, 191, 163, 0.20);
+    border-color: rgba(119, 191, 163, 0.75);
+    color: #1E352F;
 }
 
 /* ===== Field Row ===== */
@@ -194,7 +199,7 @@
 
 .fieldLabel {
     font-weight: 700;
-    color: #2f3e3b;
+    color: #1E352F;
     text-align: left;
 }
 
@@ -203,15 +208,16 @@
     max-width: 220px;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid #d4e3df;
+    border: 1px solid rgba(51, 81, 69, 0.22);
     font-size: 1rem;
-    background: rgba(255, 255, 255, 0.85);
+    background: #ffffff;
+    color: #1E352F;
 }
 
 .goalSelect:focus {
     outline: none;
-    border-color: #79c7b7;
-    box-shadow: 0 0 0 3px rgba(121, 199, 183, 0.25);
+    border-color: #77BFA3;
+    box-shadow: 0 0 0 3px rgba(119, 191, 163, 0.25);
 }
 
 /* Disable look for day buttons/select when not editing */
@@ -237,15 +243,20 @@
 .goalBtnSecondary {
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
     font-weight: 800;
     cursor: pointer;
+    font-family: inherit;
 }
 
 .goalBtnPrimary {
-    background: #4eb89f;
-    color: white;
-    border: none;
+    background: #77BFA3;
+    color: #1E352F;
+    border: 1px solid #77BFA3;
+}
+
+.goalBtnPrimary:hover:not(:disabled) {
+    background: #6ab59a;
+    border-color: #6ab59a;
 }
 
 .goalBtnPrimary:disabled {
@@ -254,7 +265,14 @@
 }
 
 .goalBtnSecondary {
-    background: rgba(255, 255, 255, 0.65);
+    background: transparent;
+    border: 1px solid rgba(51, 81, 69, 0.35);
+    color: #335145;
+}
+
+.goalBtnSecondary:hover {
+    background: rgba(51, 81, 69, 0.06);
+    border-color: rgba(51, 81, 69, 0.55);
 }
 
 .stack {
@@ -268,7 +286,7 @@
 /* Optional: slightly different title style inside cards */
 .sectionTitleSmall {
     font-weight: 700;
-    color: #2f3e3b;
+    color: #335145;
     margin-bottom: 10px;
     opacity: 0.9;
 }
@@ -276,31 +294,32 @@
 .backBtn {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     align-self: flex-start;
-    margin-top: 24px;
+    margin-top: 0;
     margin-bottom: 8px;
     background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(51, 81, 69, 0.22);
     border-radius: 10px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 700;
-    color: #2f3e3b;
+    color: #335145;
     padding: 8px 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px rgba(30, 53, 47, 0.06);
     transition: all 0.2s ease;
 }
 
 .backBtn:hover {
-    background: #4eb89f;
-    color: white;
-    border-color: transparent;
+    background: #77BFA3;
+    color: #1E352F;
+    border-color: #77BFA3;
 }
 
 .goalMetMessage {
     margin-top: 8px;
     padding: 8px 12px;
-    background-color: #e6f4ea;
-    color: #2d6a4f;
+    background: rgba(119, 191, 163, 0.18);
+    color: #1E6B4A;
+    border: 1px solid rgba(119, 191, 163, 0.5);
     border-radius: 8px;
     font-weight: 600;
     text-align: center;
@@ -308,7 +327,7 @@
 
 /* Optional: turn the bar green when complete */
 .fill--complete {
-    background-color: #40c074;
+    background: #77BFA3;
 }
 
 /* ===== Notification Toggle Rows ===== */
@@ -322,7 +341,7 @@
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    color: #2f3e3b;
+    color: #335145;
     cursor: pointer;
     user-select: none;
 }
@@ -352,7 +371,7 @@
 .toggleSlider {
     position: absolute;
     inset: 0;
-    background: #ccd9d5;
+    background: rgba(51, 81, 69, 0.18);
     border-radius: 999px;
     cursor: pointer;
     transition: background 0.25s ease;
@@ -372,7 +391,7 @@
 }
 
 .toggleSwitch input:checked+.toggleSlider {
-    background: #4eb89f;
+    background: #77BFA3;
 }
 
 .toggleSwitch input:checked+.toggleSlider::before {
@@ -400,20 +419,21 @@
     padding: 6px;
     text-align: center;
     font-size: 0.9rem;
-    background: #f2f2f2;
+    background: rgba(51, 81, 69, 0.07);
+    color: #335145;
     box-sizing: border-box;
 }
 
 .calendarDay.studied {
-    background: #6ecf8d;
-    color: white;
+    background: #77BFA3;
+    color: #1E352F;
     font-weight: bold;
 }
 
 .calendarHeader {
     text-align: center;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.1rem;
     margin-bottom: 8px;
-    color: #2f3e3b;
+    color: #1E352F;
 }
