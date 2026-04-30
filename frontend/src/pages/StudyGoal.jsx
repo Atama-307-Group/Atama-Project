@@ -52,6 +52,7 @@ const GoalsPage = ({ userId }) => {
     const [streak, setStreak] = useState(0);
     const [studyDates, setStudyDates] = useState([]);
     const [bestStreak, setBestStreak] = useState(0);
+    const [viewDate, setViewDate] = useState(new Date());
 
     // Track when a save is in flight so polls don't overwrite fresh local state
     const pendingSaveRef = useRef(false);
@@ -78,9 +79,8 @@ const GoalsPage = ({ userId }) => {
     }, [progress, effectiveMinutes]);
 
     const calendarDays = useMemo(() => {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
+        const year = viewDate.getFullYear();
+        const month = viewDate.getMonth();
 
         const lastDay = new Date(year, month + 1, 0);
 
@@ -97,15 +97,35 @@ const GoalsPage = ({ userId }) => {
         }
 
         return days;
-    }, [studyDates]);
+    }, [studyDates, viewDate]);
 
     const monthLabel = useMemo(() => {
-        const today = new Date();
-        return today.toLocaleString("default", {
+        return viewDate.toLocaleString("default", {
             month: "long",
             year: "numeric"
         });
-    }, []);
+    }, [viewDate]);
+
+    const oldestDate = useMemo(() => {
+        if (!studyDates || studyDates.length === 0) return new Date();
+        const sorted = [...studyDates].sort();
+        const [y, m, d] = sorted[0].split('-');
+        return new Date(y, m - 1, d);
+    }, [studyDates]);
+
+    const canGoBack = viewDate.getFullYear() > oldestDate.getFullYear() || 
+                      (viewDate.getFullYear() === oldestDate.getFullYear() && viewDate.getMonth() > oldestDate.getMonth());
+
+    const canGoForward = viewDate.getFullYear() < new Date().getFullYear() ||
+                         (viewDate.getFullYear() === new Date().getFullYear() && viewDate.getMonth() < new Date().getMonth());
+
+    const goBack = () => {
+        if (canGoBack) setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    };
+
+    const goForward = () => {
+        if (canGoForward) setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    };
 
     const goalMet = percent >= 100;
 
@@ -478,7 +498,23 @@ const GoalsPage = ({ userId }) => {
                     </div>
 
                     <div className="calendarHeader">
-                        {monthLabel}
+                        <button 
+                            className="monthNavBtn" 
+                            onClick={goBack} 
+                            disabled={!canGoBack}
+                            title="Previous Month"
+                        >
+                            &lt;
+                        </button>
+                        <span>{monthLabel}</span>
+                        <button 
+                            className="monthNavBtn" 
+                            onClick={goForward} 
+                            disabled={!canGoForward}
+                            title="Next Month"
+                        >
+                            &gt;
+                        </button>
                     </div>
 
                     <div className="calendar">
