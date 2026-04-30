@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getCourse, getGroupsByCourse, getUserGroups, createGroup, joinPublicGroup } from "../api.js";
+import BackButton from "../components/BackButton.jsx";
 import "./StudyGroupsListPage.css";
 
 const StudyGroupsListPage = ({ userId }) => {
@@ -119,7 +120,7 @@ const StudyGroupsListPage = ({ userId }) => {
     return (
         <div className="sglPage">
             <header className="sglHeader">
-                <button className="sglBackBtn" onClick={() => navigate(`/course/${courseId}`)}>← Back</button>
+                <BackButton onClick={() => navigate(`/course/${courseId}`)} />
                 <div className="sglHeaderInfo">
                     <h1 className="sglTitle">Study Groups</h1>
                     <span className="sglSubtitle">
