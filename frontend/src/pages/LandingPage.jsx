@@ -165,7 +165,8 @@ function CollabGameModal({ onClose, navigate }) {
 
 /* ── Main Page ─────────────────────────────────────────────────── */
 const LandingPage = ({ currentUser, onLogout, recentSets = [], recommendationsEnabled = true }) => {
-  const navigate = useNavigate();
+  const navigate =
+  useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');

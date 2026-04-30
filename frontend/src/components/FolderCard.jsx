@@ -23,8 +23,7 @@ export function FolderCard({ folder: f, organizeMode, hasSelection, openMenuId, 
                         {f.starred ? "★" : "☆"}
                     </button>
 
-                    <div className="menuWrap" ref={openMenuId === f.id ? menuRef : null}>
-                        <button
+                        <div className="menuWrap" style={{ position: "relative" }} ref={openMenuId === f.id ? menuRef : null}>                        <button
                             type="button"
                             className="iconBtn menuTrigger"
                             onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === f.id ? null : f.id); }}
@@ -36,7 +35,7 @@ export function FolderCard({ folder: f, organizeMode, hasSelection, openMenuId, 
                         </button>
 
                         {openMenuId === f.id && (
-                            <div className="dropdownMenu" role="menu">
+                            <div className="dropdownMenu" role="menu" style={{ left: 'auto', right: 0 }}>
                                 <button role="menuitem" className="menuItem"
                                     onClick={(e) => { e.stopPropagation(); onRenameModal(f); }}>
                                     ✏ Rename
