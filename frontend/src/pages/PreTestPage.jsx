@@ -190,7 +190,7 @@ const PreTestPage = () => {
                 </button>
             </div>
 
-            {loading && (
+            {loading && !forceManual && !aiDisabled && (
                 <div style={{ marginTop: '25px', textAlign: 'center', transition: 'all 0.3s ease' }}>
                     <p style={{ marginBottom: '10px', color: '#55916f', fontWeight: 'bold' }}>{loadingMessage}</p>
                     <div style={{ width: '100%', backgroundColor: '#eee', borderRadius: '10px', height: '14px', overflow: 'hidden', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)' }}>

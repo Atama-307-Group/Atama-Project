@@ -253,6 +253,7 @@ const FlashcardSetPage = ({ currentUser }) => {
         let stateObj = { flashcards: setData.flashcards, setTitle: setData.title, setId: id };
         if (mode === 'test') {
             stateObj.selectedItems = [{ id, title: setData.title, itemType: 'FLASHCARD_SET' }];
+            stateObj.forceManual = true;
         }
         navigate(destinations[mode], { state: stateObj });
     };
