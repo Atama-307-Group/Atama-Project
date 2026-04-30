@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="34ed46a6-52cf-40b0-ba37-098021c0c94c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/BackButton.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/BackButton.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PreMatchPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PreMatchPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PreTestPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PreTestPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ResetPasswordPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ResetPasswordPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SettingsPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SignupPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SignupPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StudyPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StudyPage.jsx" afterDir="false" />
-    </list>
+    <list default="true" id="34ed46a6-52cf-40b0-ba37-098021c0c94c" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,7 +31,7 @@
     "RequestMappingsPanelWidth1": "75",
     "Spring Boot.Atama Application.executor": "Run",
     "Spring Boot.AtamaApplication.executor": "Run",
-    "git-widget-placeholder": "pawani__fixes",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

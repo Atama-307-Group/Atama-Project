@@ -2,8 +2,8 @@
 
 .countdownPage {
     min-height: 100vh;
-    padding: 0 20px 40px;
-    background: linear-gradient(180deg, #e8f7f2 0%, #f4fbf9 100%);
+    padding: 24px;
+    background-color: #fdfbf7;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -13,33 +13,9 @@
 .countdownPage h1 {
     margin-bottom: 20px;
     font-size: 2rem;
-    font-weight: 700;
-    color: #1f2d2a;
-}
-
-/* ===== Back Button ===== */
-
-.cdBackBtn {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    align-self: flex-start;
-    margin-top: 24px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #2f3e3b;
-    padding: 8px 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    transition: all 0.2s ease;
-}
-
-.cdBackBtn:hover {
-    background: #4eb89f;
-    color: white;
-    border-color: transparent;
+    font-weight: 950;
+    color: #1E352F;
+    letter-spacing: 0.2px;
 }
 
 /* ===== Add Button ===== */
@@ -47,9 +23,9 @@
 .cdAddBtn {
     padding: 14px 28px;
     border-radius: 14px;
-    border: 2px dashed #4eb89f;
-    background: rgba(78, 184, 159, 0.06);
-    color: #2f6b5e;
+    border: 2px dashed rgba(119, 191, 163, 0.7);
+    background: rgba(119, 191, 163, 0.06);
+    color: #335145;
     font-size: 1.05rem;
     font-weight: 700;
     cursor: pointer;
@@ -58,8 +34,9 @@
 }
 
 .cdAddBtn:hover {
-    background: rgba(78, 184, 159, 0.15);
-    border-color: #3da98f;
+    background: rgba(119, 191, 163, 0.18);
+    border-color: #77BFA3;
+    color: #1E352F;
 }
 
 /* ===== Form ===== */
@@ -67,12 +44,11 @@
 .cdForm {
     width: 100%;
     max-width: 520px;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(6px);
+    background: #ffffff;
     padding: 28px;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 22px rgba(30, 53, 47, 0.08);
+    border: 1px solid rgba(51, 81, 69, 0.16);
     margin-bottom: 28px;
     animation: cdSlideDown 0.25s ease;
 }
@@ -97,7 +73,7 @@
     display: block;
     margin-bottom: 6px;
     font-weight: 700;
-    color: #2f3e3b;
+    color: #335145;
     font-size: 0.95rem;
 }
 
@@ -106,9 +82,10 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid #d4e3df;
+    border: 1px solid rgba(51, 81, 69, 0.22);
     font-size: 1rem;
-    background: rgba(255, 255, 255, 0.85);
+    background: #ffffff;
+    color: #1E352F;
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -116,8 +93,8 @@
 .cdFormField input:focus,
 .cdFormField select:focus {
     outline: none;
-    border-color: #79c7b7;
-    box-shadow: 0 0 0 3px rgba(121, 199, 183, 0.25);
+    border-color: #77BFA3;
+    box-shadow: 0 0 0 3px rgba(119, 191, 163, 0.25);
 }
 
 .cdFormActions {
@@ -137,16 +114,18 @@
     cursor: pointer;
     font-size: 0.95rem;
     transition: all 0.2s ease;
+    font-family: inherit;
 }
 
 .cdBtnPrimary {
-    background: #4eb89f;
-    color: white;
-    border: none;
+    background: #77BFA3;
+    color: #1E352F;
+    border: 1px solid #77BFA3;
 }
 
 .cdBtnPrimary:hover:not(:disabled) {
-    background: #3da98f;
+    background: #6ab59a;
+    border-color: #6ab59a;
 }
 
 .cdBtnPrimary:disabled {
@@ -155,13 +134,14 @@
 }
 
 .cdBtnSecondary {
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    color: #33423f;
+    background: transparent;
+    border: 1px solid rgba(51, 81, 69, 0.35);
+    color: #335145;
 }
 
 .cdBtnSecondary:hover {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(51, 81, 69, 0.06);
+    border-color: rgba(51, 81, 69, 0.55);
 }
 
 /* ===== Empty State ===== */
@@ -169,7 +149,7 @@
 .cdEmpty {
     margin-top: 28px;
     font-size: 1.05rem;
-    color: #6b8a82;
+    color: #7a9e90;
     text-align: center;
 }
 
@@ -186,19 +166,19 @@
 /* ===== Individual Countdown Card ===== */
 
 .cdCard {
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(6px);
+    background: #ffffff;
     padding: 22px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border-radius: 18px;
+    box-shadow: 0 8px 22px rgba(30, 53, 47, 0.08);
+    border: 1px solid rgba(51, 81, 69, 0.16);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     animation: cdFadeIn 0.3s ease;
 }
 
 .cdCard:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(119, 191, 163, 0.7);
+    box-shadow: 0 14px 28px rgba(30, 53, 47, 0.12);
 }
 
 .cdCardUrgent {
@@ -226,8 +206,8 @@
 
 .cdCardReason {
     font-size: 1.15rem;
-    font-weight: 700;
-    color: #1f2d2a;
+    font-weight: 800;
+    color: #1E352F;
     flex: 1;
     word-break: break-word;
 }
@@ -236,7 +216,7 @@
     background: none;
     border: none;
     font-size: 1.1rem;
-    color: #9aa;
+    color: rgba(51, 81, 69, 0.35);
     cursor: pointer;
     padding: 2px 6px;
     border-radius: 6px;
@@ -245,20 +225,20 @@
 }
 
 .cdCardDelete:hover {
-    background: rgba(220, 80, 60, 0.1);
+    background: rgba(192, 57, 43, 0.08);
     color: #c0392b;
 }
 
 .cdCardDate {
     font-size: 0.9rem;
-    color: #6b8a82;
+    color: #7a9e90;
     margin-bottom: 14px;
 }
 
 .cdCardTimer {
     font-size: 1.6rem;
     font-weight: 800;
-    color: #2f6b5e;
+    color: #335145;
     letter-spacing: 0.02em;
     font-variant-numeric: tabular-nums;
 }
@@ -266,9 +246,9 @@
 .cdCardReminder {
     margin-top: 12px;
     font-size: 0.85rem;
-    color: #7a9590;
+    color: #335145;
     padding: 4px 10px;
-    background: rgba(78, 184, 159, 0.08);
+    background: rgba(119, 191, 163, 0.12);
     border-radius: 8px;
     display: inline-block;
 }
@@ -291,7 +271,7 @@
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    color: #2f3e3b;
+    color: #335145;
     cursor: pointer;
     user-select: none;
     font-size: 0.95rem;
@@ -301,7 +281,7 @@
     font-size: 1.1rem;
 }
 
-/* Toggle switch (reusable) */
+/* Toggle switch */
 
 .cdToggleSwitch {
     position: relative;
@@ -322,7 +302,7 @@
 .cdToggleSlider {
     position: absolute;
     inset: 0;
-    background: #ccd9d5;
+    background: rgba(51, 81, 69, 0.18);
     border-radius: 999px;
     cursor: pointer;
     transition: background 0.25s ease;
@@ -342,7 +322,7 @@
 }
 
 .cdToggleSwitch input:checked+.cdToggleSlider {
-    background: #4eb89f;
+    background: #77BFA3;
 }
 
 .cdToggleSwitch input:checked+.cdToggleSlider::before {
