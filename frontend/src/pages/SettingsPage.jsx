@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ProfilePage from './ProfilePage.jsx';
 import { updateAiDisabled, updateRecommendationsEnabled, updateDarkMode } from '../api.js';
 import './SettingsPage.css';
+import BackButton from '../components/BackButton.jsx';
 
 const AppPreferencesTab = ({ currentUser, aiDisabled, recommendationsEnabled, onAiDisabledChange, onRecsEnabledChange, darkMode, onDarkModeChange }) => {
     const [saving, setSaving] = useState(false);
@@ -146,9 +147,7 @@ const SettingsPage = ({ currentUser, aiDisabled, recommendationsEnabled, onAiDis
             <div className="settings-container">
                 <div className="settings-sidebar">
                     <div className="settings-sidebar-header">
-                        <button className="settings-back-arrow" onClick={() => navigate('/')}>
-                            &larr;
-                        </button>
+                        <BackButton />
                         <h1 className="settings-title">Settings</h1>
                     </div>
                     <ul className="settings-menu">

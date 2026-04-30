@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { generatePracticeTest, getFlashcardSetById } from '../api.js';
+import BackButton from '../components/BackButton.jsx';
 
 const PreTestPage = () => {
     const { state } = useLocation();
@@ -156,7 +157,7 @@ const PreTestPage = () => {
 
     return (
         <div style={{ maxWidth: '600px', margin: '50px auto', fontFamily: 'sans-serif', padding: '20px' }}>
-            <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', marginBottom: '1rem' }}>← Back</button>
+            <BackButton />
             <h2 style={{ textAlign: 'center' }}>Practice Test Settings</h2>
             
             {aiDisabled && (
