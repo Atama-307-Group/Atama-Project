@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser, sendVerificationCode, registerVerifiedUser } from '../api.js';
 import './SignupPage.css';
+import BackButton from '../components/BackButton.jsx';
 
 const SignupPage = () => {
     const navigate = useNavigate();
@@ -96,7 +97,7 @@ const SignupPage = () => {
 
     return (
         <div className="signup-container">
-            <button className="back-btn" onClick={() => navigate('/')}>&larr; Back</button>
+            <BackButton />
 
             <div className="signup-card">
                 <h2 className="signup-title">Create Account</h2>

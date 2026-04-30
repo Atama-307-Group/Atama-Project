@@ -31,24 +31,6 @@
     margin-bottom: 32px;
 }
 
-.settings-back-arrow {
-    background: none;
-    border: none;
-    font-size: 24px;
-    line-height: 1;
-    color: #2b5c3f;
-    cursor: pointer;
-    padding: 0;
-    transition: color 0.2s ease, transform 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.settings-back-arrow:hover {
-    color: #1a3c27;
-    transform: translateX(-4px);
-}
 
 .settings-title {
     font-size: 28px;

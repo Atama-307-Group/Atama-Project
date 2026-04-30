@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import {
     getCountdowns,
     createCountdown,
@@ -7,6 +6,7 @@ import {
     deleteExpiredCountdowns,
 } from "../api.js";
 import "./CountdownPage.css";
+import BackButton from "../components/BackButton.jsx";
 
 /* ──────────── helpers ──────────── */
 
@@ -56,7 +56,6 @@ const REMINDER_OPTIONS = [
 /* ──────────── Component ──────────── */
 
 const CountdownPage = ({ userId }) => {
-    const navigate = useNavigate();
     const [countdowns, setCountdowns] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [tick, setTick] = useState(0); // drives re-renders every second
@@ -151,13 +150,7 @@ const CountdownPage = ({ userId }) => {
 
     return (
         <div className="countdownPage">
-            <button
-                type="button"
-                className="cdBackBtn"
-                onClick={() => navigate("/")}
-            >
-                ← Back
-            </button>
+            <BackButton />
 
             <h1>Exam Countdowns</h1>
 
