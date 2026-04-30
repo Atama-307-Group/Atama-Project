@@ -83,6 +83,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
     box-shadow: 0 2px 12px rgba(30, 53, 47, 0.07);
 }
 
@@ -99,6 +101,7 @@
     padding: 4px 10px;
     border-radius: 8px;
     font-weight: 800;
+    word-break: break-word;
 }
 
 .join-code-huge {
@@ -116,6 +119,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     padding: 20px 40px;
     gap: 12px;
 }
