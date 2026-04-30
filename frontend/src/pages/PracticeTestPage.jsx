@@ -45,16 +45,17 @@ function buildQuestion(card, promptType, allCards) {
       };
 
     case 'DRAG_DROP':
-      return {
-        type: 'ZONES',
-        cardType: 'DRAG_DROP',
-        prompt: card.prompt,
-        imageUrl: card.imageUrl || null,
-        zones: (card.dropZones || []).map(z => ({
-          label: z.label,
-          correctAnswer: z.correctAnswer ?? z.correct_answer ?? '', // handle both casings
-        })),
-      };
+        return {
+            type: 'ZONES',
+            cardType: 'DRAG_DROP',
+            prompt: card.prompt,
+            imageUrl: card.imageUrl || null,
+            zones: (card.dropZones || []).map((z, i) => ({
+                x: z.x,
+                y: z.y,
+                correctAnswer: z.correctLabel || (card.draggableLabels || [])[i] || '',
+            })),
+        };
 
     default: {
       // Regular card — MCQ
@@ -134,61 +135,115 @@ function StepsQuestion({ question, userInputs, setUserInputs, showFeedback }) {
 /* ── Zones (DragDrop) question renderer ─────────────────────────── */
 
 function ZonesQuestion({ question, userInputs, setUserInputs, showFeedback }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-      {question.imageUrl && (
-        <img
-          src={question.imageUrl}
-          alt="diagram"
-          style={{ maxWidth: '100%', maxHeight: '160px', objectFit: 'contain', borderRadius: '8px', marginBottom: '8px' }}
-        />
-      )}
-      <p style={{ color: '#666', fontSize: '13px', margin: '0 0 4px' }}>
-        Fill in each zone's correct answer:
-      </p>
-      {question.zones.map((zone, idx) => {
-        const userVal = userInputs[idx] || '';
-        const isCorrect = showFeedback && userVal.trim().toLowerCase() === zone.correctAnswer.trim().toLowerCase();
-        const isWrong = showFeedback && !isCorrect;
-        return (
-          <div key={idx} style={{ width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{
-                fontSize: '12px', fontWeight: '600', color: '#555',
-                minWidth: '80px', textAlign: 'right', flexShrink: 0,
-              }}>
-                {zone.label}:
-              </span>
-              <input
-                type="text"
-                placeholder={`Answer for "${zone.label}"…`}
-                value={userVal}
-                disabled={showFeedback}
-                onChange={e => {
-                  const next = [...userInputs];
-                  next[idx] = e.target.value;
-                  setUserInputs(next);
-                }}
-                style={{
-                  flex: 1, padding: '10px 12px', borderRadius: '6px',
-                  border: showFeedback
-                    ? (isCorrect ? '2px solid #22c55e' : '2px solid #ef4444')
-                    : '1px solid #ccc',
-                  outline: 'none', fontSize: '14px',
-                }}
-              />
-            </div>
-            {isWrong && (
-              <p style={{ color: '#ef4444', fontSize: '13px', margin: '4px 0 0 96px', textAlign: 'left' }}>
-                ✗ Expected: <strong>{zone.correctAnswer}</strong>
-              </p>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+     // Fallback: if no image, render as numbered text inputs
+     if (!question.imageUrl) {
+         return (
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+                 <p style={{ color: '#666', fontSize: '13px', margin: '0 0 4px' }}>Label each zone:</p>
+                 {question.zones.map((zone, idx) => {
+                     const userVal = userInputs[idx] || '';
+                     const isCorrect = showFeedback && userVal.trim().toLowerCase() === zone.correctAnswer.trim().toLowerCase();
+                     const isWrong = showFeedback && !isCorrect;
+                     return (
+                         <div key={idx} style={{ width: '100%' }}>
+                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                 <span style={{
+                                     minWidth: '24px', height: '24px', borderRadius: '50%',
+                                     background: showFeedback ? (isCorrect ? '#22c55e' : '#ef4444') : '#6366f1',
+                                     color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                     fontSize: '12px', fontWeight: '700', flexShrink: 0,
+                                 }}>{idx + 1}</span>
+                                 <input
+                                     type="text"
+                                     placeholder={`Zone ${idx + 1}…`}
+                                     value={userVal}
+                                     disabled={showFeedback}
+                                     onChange={e => {
+                                         const next = [...userInputs];
+                                         next[idx] = e.target.value;
+                                         setUserInputs(next);
+                                     }}
+                                     style={{
+                                         flex: 1, padding: '10px 12px', borderRadius: '6px',
+                                         border: showFeedback
+                                             ? `2px solid ${isCorrect ? '#22c55e' : '#ef4444'}`
+                                             : '2px solid #6366f1',
+                                         outline: 'none', fontSize: '14px',
+                                     }}
+                                 />
+                             </div>
+                             {isWrong && (
+                                 <p style={{ color: '#ef4444', fontSize: '13px', margin: '4px 0 0 32px', textAlign: 'left' }}>
+                                     ✗ Expected: <strong>{zone.correctAnswer}</strong>
+                                 </p>
+                             )}
+                         </div>
+                     );
+                 })}
+             </div>
+         );
+     }
+
+     // Normal image overlay path — unchanged
+     return (
+         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+             <div style={{ position: 'relative', display: 'inline-block', width: '100%', maxWidth: '480px' }}>
+                 <img
+                     src={question.imageUrl}
+                     alt="diagram"
+                     style={{ width: '100%', display: 'block', borderRadius: '8px' }}
+                 />
+                 {question.zones.map((zone, idx) => {
+                     const userVal = userInputs[idx] || '';
+                     const isCorrect = showFeedback && userVal.trim().toLowerCase() === zone.correctAnswer.trim().toLowerCase();
+                     const isWrong = showFeedback && !isCorrect;
+                     return (
+                         <div key={idx} style={{
+                             position: 'absolute', left: `${zone.x}%`, top: `${zone.y}%`,
+                             transform: 'translate(-50%, -50%)',
+                             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+                         }}>
+                             <div style={{
+                                 width: '18px', height: '18px', borderRadius: '50%',
+                                 background: showFeedback ? (isCorrect ? '#22c55e' : '#ef4444') : '#6366f1',
+                                 color: 'white', fontSize: '10px', fontWeight: '700',
+                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                 boxShadow: '0 1px 4px rgba(0,0,0,0.4)', flexShrink: 0,
+                             }}>{idx + 1}</div>
+                             <input
+                                 type="text"
+                                 value={userVal}
+                                 disabled={showFeedback}
+                                 onChange={e => {
+                                     const next = [...userInputs];
+                                     next[idx] = e.target.value;
+                                     setUserInputs(next);
+                                 }}
+                                 style={{
+                                     width: '80px', padding: '3px 5px', fontSize: '11px',
+                                     borderRadius: '4px', textAlign: 'center',
+                                     border: showFeedback ? `2px solid ${isCorrect ? '#22c55e' : '#ef4444'}` : '2px solid #6366f1',
+                                     outline: 'none',
+                                     background: showFeedback ? (isCorrect ? '#f0fdf4' : '#fef2f2') : 'white',
+                                     boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+                                 }}
+                                 placeholder={`${idx + 1}…`}
+                             />
+                             {isWrong && (
+                                 <div style={{
+                                     background: '#fef2f2', border: '1px solid #ef4444',
+                                     borderRadius: '4px', padding: '2px 5px', fontSize: '10px',
+                                     color: '#ef4444', whiteSpace: 'nowrap',
+                                     boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                                 }}>✗ {zone.correctAnswer}</div>
+                             )}
+                         </div>
+                     );
+                 })}
+             </div>
+         </div>
+     );
+ }
 
 /* ── Main Component ──────────────────────────────────────────────── */
 
@@ -251,11 +306,17 @@ const PracticeTestPage = ({ userId }) => {
   }, [setId]);
 
   useEffect(() => {
-    if (initialQuestions && initialQuestions.length > 0) return;
-    if (!cards || cards.length === 0) return;
-    const shuffled = [...cards].filter(card => card.type !== 'DRAG_DROP').sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, numQuestions);
-    setQuestions(selected.map(card => buildQuestion(card, promptType, cards)));
+      if (!cards || cards.length === 0) return;
+      // initialQuestions === null means "build from cards" was requested explicitly
+      // initialQuestions === [] or all-null means API returned nothing useful
+      const validInitial = (initialQuestions || []).filter(q => q?.type != null);
+      if (validInitial.length > 0) {
+          setQuestions(validInitial);
+          return;
+      }
+      const shuffled = [...cards].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, numQuestions || cards.length);
+      setQuestions(selected.map(card => buildQuestion(card, promptType, cards)));
   }, [cards, promptType, numQuestions, initialQuestions]);
 
   if (!questions || questions.length === 0) {
@@ -273,116 +334,87 @@ const PracticeTestPage = ({ userId }) => {
     if (currentQ.type === 'MCQ') return !selectedAnswer;
     if (currentQ.type === 'FITB') return currentQ.correctAnswers.some((_, i) => !userInputs[i]?.trim());
     if (currentQ.type === 'STEPS') return currentQ.steps.some((_, i) => !userInputs[i]?.trim());
-    if (currentQ.type === 'ZONES') return currentQ.zones.some((_, i) => !userInputs[i]?.trim());    return false;
+    if (currentQ.type === 'ZONES') return currentQ.zones.some((_, i) => !userInputs[i]?.trim());
+    return false;
   })();
 
   /* ── Submit handler ── */
   const handleSubmit = () => {
-    if (currentQ.type === 'MCQ' || currentQ.type === 'TRUE_FALSE') {
-      if (selectedAnswer === currentQ.correctAnswer) setTotalScore(s => s + 1);
-      setShowFeedback(true);
-    } else if (currentQ.type === 'SHORT_ANSWER') {
-      // One blank, check against ANY correct answer
-      const userInput = userInputs[0]?.trim().toLowerCase() || "";
-      let isCorrect = false;
-      let matchedFuzzy = null;
-
-      for (const ans of currentQ.correctAnswers) {
-        if (userInput === ans.toLowerCase()) {
-          isCorrect = true;
-          break;
-        }
+      if (currentQ.type === 'MCQ' || currentQ.type === 'TRUE_FALSE') {
+          if (selectedAnswer === currentQ.correctAnswer) setTotalScore(s => s + 1);
+          setShowFeedback(true);
+          return;
       }
 
-      if (!isCorrect) {
-        for (const ans of currentQ.correctAnswers) {
-          const distance = getEditDistance(userInput, ans.toLowerCase());
-          if (distance > 0 && distance <= 2 && !dismissedIndices.includes(0)) {
-            matchedFuzzy = ans;
-            break;
+      if (currentQ.type === 'SHORT_ANSWER') {
+          const userInput = userInputs[0]?.trim().toLowerCase() || '';
+          let isCorrect = false;
+          let matchedFuzzy = null;
+          for (const ans of currentQ.correctAnswers) {
+              if (userInput === ans.toLowerCase()) { isCorrect = true; break; }
           }
-        }
+          if (!isCorrect) {
+              for (const ans of currentQ.correctAnswers) {
+                  const distance = getEditDistance(userInput, ans.toLowerCase());
+                  if (distance > 0 && distance <= 2 && !dismissedIndices.includes(0)) {
+                      matchedFuzzy = ans; break;
+                  }
+              }
+          }
+          if (matchedFuzzy) {
+              setFuzzyMatches([{ index: 0, expected: matchedFuzzy, userTyped: userInputs[0] }]);
+              return;
+          }
+          if (isCorrect) setTotalScore(s => s + 1);
+          setShowFeedback(true);
+          setFuzzyMatches([]);
+          setDismissedIndices([]);
+          return;
       }
 
-      if (matchedFuzzy) {
-        setFuzzyMatches([{ index: 0, expected: matchedFuzzy, userTyped: userInputs[0] }]);
-        return;
+      if (currentQ.type === 'STEPS') {
+          let correct = 0;
+          currentQ.steps.forEach((step, i) => {
+              if (userInputs[i]?.trim().toLowerCase() === step.trim().toLowerCase()) correct++;
+          });
+          setTotalScore(s => s + correct / currentQ.steps.length);
+          setShowFeedback(true);
+          return;
       }
 
-      if (isCorrect) setTotalScore(s => s + 1);
-      setShowFeedback(true);
-      setFuzzyMatches([]);
-      setDismissedIndices([]);
-    } else {
-      // FITB: Multiple blanks
-      const newFuzzyMatches = [];
-      let allCorrect = true;
-      let correctCount = 0;
-
-      currentQ.correctAnswers.forEach((ans, i) => {
-        const userInput = userInputs[i]?.trim().toLowerCase() || "";
-        const isMatch = userInput === ans.toLowerCase();
-        
-        if (!isMatch) {
-            allCorrect = false;
-            const distance = getEditDistance(userInput, ans.toLowerCase());
-            if (distance > 0 && distance <= 2 && !dismissedIndices.includes(i)) {
-              newFuzzyMatches.push({ index: i, expected: ans, userTyped: userInputs[i] });
-            }
-        } else {
-            correctCount++;
-        }
-      });
-      
-      if (newFuzzyMatches.length > 0) { 
-          setFuzzyMatches(newFuzzyMatches); 
-          return; 
+      if (currentQ.type === 'ZONES') {
+          let correct = 0;
+          currentQ.zones.forEach((zone, i) => {
+              if (userInputs[i]?.trim().toLowerCase() === zone.correctAnswer.trim().toLowerCase()) correct++;
+          });
+          setTotalScore(s => s + correct / currentQ.zones.length);
+          setShowFeedback(true);
+          return;
       }
 
-      setTotalScore(s => s + (correctCount / currentQ.correctAnswers.length));
-      return;
-    }
-
-    if (currentQ.type === 'FITB') {
-      // Fuzzy matching for FITB
-      const newFuzzy = [];
-      currentQ.correctAnswers.forEach((ans, i) => {
-        const input = userInputs[i]?.trim().toLowerCase() || '';
-        const dist = getEditDistance(input, ans.toLowerCase());
-        if (dist > 0 && dist <= 2 && !dismissedIndices.includes(i)) newFuzzy.push(i);
-      });
-      if (newFuzzy.length > 0) { setFuzzyIndices(newFuzzy); return; }
-
-      let correct = 0;
-      currentQ.correctAnswers.forEach((ans, i) => {
-        if (userInputs[i]?.trim().toLowerCase() === ans.toLowerCase()) correct++;
-      });
-      setTotalScore(s => s + correct / currentQ.correctAnswers.length);
-      setShowFeedback(true);
-      setFuzzyMatches([]);
-      setDismissedIndices([]);
-      return;
-    }
-
-    if (currentQ.type === 'STEPS') {
-      let correct = 0;
-      currentQ.steps.forEach((step, i) => {
-        if (userInputs[i]?.trim().toLowerCase() === step.trim().toLowerCase()) correct++;
-      });
-      setTotalScore(s => s + correct / currentQ.steps.length);
-      setShowFeedback(true);
-      return;
-    }
-
-    if (currentQ.type === 'ZONES') {
-      let correct = 0;
-      currentQ.zones.forEach((zone, i) => {
-        if (userInputs[i]?.trim().toLowerCase() === zone.correctAnswer.trim().toLowerCase()) correct++;
-      });
-      setTotalScore(s => s + correct / currentQ.zones.length);
-      setShowFeedback(true);
-      return;
-    }
+      if (currentQ.type === 'FITB') {
+          const newFuzzyMatches = [];
+          let correctCount = 0;
+          currentQ.correctAnswers.forEach((ans, i) => {
+              const userInput = userInputs[i]?.trim().toLowerCase() || '';
+              if (userInput === ans.toLowerCase()) {
+                  correctCount++;
+              } else {
+                  const distance = getEditDistance(userInput, ans.toLowerCase());
+                  if (distance > 0 && distance <= 2 && !dismissedIndices.includes(i)) {
+                      newFuzzyMatches.push({ index: i, expected: ans, userTyped: userInputs[i] });
+                  }
+              }
+          });
+          if (newFuzzyMatches.length > 0) {
+              setFuzzyMatches(newFuzzyMatches);
+              return;
+          }
+          setTotalScore(s => s + correctCount / currentQ.correctAnswers.length);
+          setShowFeedback(true);
+          setFuzzyMatches([]);
+          setDismissedIndices([]);
+      }
   };
 
   const resolveFuzzy = (idx, accept, expectedVal) => {
@@ -426,6 +458,8 @@ const PracticeTestPage = ({ userId }) => {
     STEPS:      { label: 'Steps',             color: '#0ea5e9' },
     DRAG_DROP:  { label: 'Diagram',           color: '#f59e0b' },
   }[currentQ.cardType];
+
+console.log(currentQ);
 
   return (
     <div style={{ maxWidth: '600px', margin: '50px auto', textAlign: 'center', fontFamily: 'sans-serif' }}>

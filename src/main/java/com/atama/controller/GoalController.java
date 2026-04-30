@@ -5,6 +5,9 @@ import com.atama.service.GoalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -56,12 +59,16 @@ public class GoalController {
             return ResponseEntity.notFound().build();
         }
 
-        // Convert study dates to strings if your Goal model stores a list of dates
-        java.util.List<String> studyDates = goal.getStudyDates() != null
-                ? goal.getStudyDates().stream().map(java.time.LocalDate::toString).toList()
-                : java.util.Collections.emptyList();
+        List<String> studyDates = goal.getStudyDates() != null
+                ? goal.getStudyDates().stream().map(LocalDate::toString).toList()
+                : Collections.emptyList();
 
-        return ResponseEntity.ok(new StreakResponse(goal.getCurrentStreak(), goal.getBestStreak(), studyDates));
+        // Use effective streak — resets lazily if user missed a day
+        return ResponseEntity.ok(new StreakResponse(
+                goal.getEffectiveCurrentStreak(),
+                goal.getBestStreak(),
+                studyDates
+        ));
     }
 
     public record StreakResponse(int currentStreak, int bestStreak, java.util.List<String> studyDates) {

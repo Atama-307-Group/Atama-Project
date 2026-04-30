@@ -13,6 +13,8 @@ public class ConceptMapResponseDTO {
     private String pngPath;
     private UUID sourceSetId;
     private Instant createdAt;
+    @com.fasterxml.jackson.annotation.JsonProperty("isPublic")
     private boolean isPublic;
+    @com.fasterxml.jackson.annotation.JsonProperty("isOwner")
     private boolean isOwner;
 }

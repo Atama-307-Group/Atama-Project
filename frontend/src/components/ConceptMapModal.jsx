@@ -9,6 +9,7 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards, aiDisabled }) => 
     const [librarySets, setLibrarySets] = useState([]);
     const [selectedCards, setSelectedCards] = useState(new Set());
     const [title, setTitle] = useState('');
+    const [isPublic, setIsPublic] = useState(true);
     const [expandedSets, setExpandedSets] = useState(new Set([sourceSetId]));
     const [setDetailsCache, setSetDetailsCache] = useState({});
     
@@ -121,7 +122,7 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards, aiDisabled }) => 
             try {
                 setIsGenerating(true);
                 const cardIds = Array.from(selectedCards);
-                const dto = await createManualConceptMap(sourceSetId, cardIds, title);
+                const dto = await createManualConceptMap(sourceSetId, cardIds, title, isPublic);
                 setIsGenerating(false);
                 window.location.href = `/concept-maps/${dto.id}?edit=true`;
             } catch (e) {
@@ -144,7 +145,7 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards, aiDisabled }) => 
 
         try {
             const cardIds = Array.from(selectedCards);
-            const dto = await generateConceptMap(sourceSetId, cardIds, title);
+            const dto = await generateConceptMap(sourceSetId, cardIds, title, isPublic);
             clearInterval(interval);
             setIsGenerating(false);
             
@@ -202,6 +203,17 @@ const ConceptMapModal = ({ onClose, sourceSetId, defaultCards, aiDisabled }) => 
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
+                        
+                        <div className="cmap-privacy-toggle" style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-color)' }}>
+                            <input 
+                                type="checkbox" 
+                                id="cmap-public-toggle"
+                                checked={isPublic}
+                                onChange={(e) => setIsPublic(e.target.checked)}
+                                style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--accent-color)' }}
+                            />
+                            <label htmlFor="cmap-public-toggle" style={{ cursor: 'pointer' }}>Make Concept Map Public</label>
+                        </div>
                         
                         {error && <div className="cmap-error">{error}</div>}
 

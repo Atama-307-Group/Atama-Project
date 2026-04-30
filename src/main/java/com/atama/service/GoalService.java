@@ -97,7 +97,6 @@ public class GoalService {
     }
 
     private void updateStreak(Goal goal) {
-
         LocalDate today = LocalDate.now();
         LocalDate lastStudyDate = goal.getLastStudyDate();
 
@@ -108,6 +107,7 @@ public class GoalService {
         } else if (lastStudyDate.equals(today.minusDays(1))) {
             goal.setCurrentStreak(goal.getCurrentStreak() + 1);
         } else {
+            // Missed one or more days — reset before incrementing
             goal.setCurrentStreak(1);
         }
 

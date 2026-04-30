@@ -18,8 +18,13 @@ function getCardFront(card, studyMode) {
             return { text: card.textWithBlanks, isRich: false };
         case 'STEPS':
             return { text: card.title, isRich: false };
-        case 'DRAG_DROP':
-            return { text: card.prompt, imageUrl: card.imageUrl, isRich: false };
+        case 'DRAG_DROP': {
+            const zones = (card.dropZones || []).map((z, i) => ({
+                ...z,
+                correctLabel: z.correctLabel || (card.draggableLabels || [])[i] || '',
+            }));
+            return { imageUrl: card.imageUrl, dropZones: zones, isRich: true, isDragDropFront: true };
+        }
         default:
             return { text: studyMode === 'term' ? card.term : card.definition, isRich: false };
     }
@@ -31,14 +36,72 @@ function getCardBack(card, studyMode) {
             return { text: card.correctAnswers?.join(', '), isRich: false };
         case 'STEPS':
             return { steps: card.steps, isRich: true };
-        case 'DRAG_DROP':
-            return { draggableLabels: card.draggableLabels, isRich: true };
+        case 'DRAG_DROP': {
+            const zones = (card.dropZones || []).map((z, i) => ({
+                ...z,
+                correctLabel: z.correctLabel || (card.draggableLabels || [])[i] || '',
+            }));
+            return { imageUrl: card.imageUrl, dropZones: zones, isRich: true, isDragDropBack: true };
+        }
         default:
             return { text: studyMode === 'term' ? card.definition : card.term, isRich: false };
     }
 }
 
 function CardFrontContent({ front }) {
+    if (front.isDragDropFront) {
+        return (
+            <div style={{ width: '100%' }}>
+                {front.imageUrl && (
+                    <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                        <img
+                            src={front.imageUrl}
+                            alt="diagram"
+                            style={{ width: '100%', maxHeight: '120px', objectFit: 'contain', display: 'block' }}
+                        />
+                        {front.dropZones.map((zone, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    position: 'absolute',
+                                    left: `${zone.x}%`,
+                                    top: `${zone.y}%`,
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '20px',
+                                    height: '20px',
+                                    borderRadius: '50%',
+                                    background: '#6366f1',
+                                    color: 'white',
+                                    fontSize: '11px',
+                                    fontWeight: '700',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+                                    pointerEvents: 'none',
+                                }}
+                            >
+                                {i + 1}
+                            </div>
+                        ))}
+                    </div>
+                )}
+                <div style={{ marginTop: '8px', textAlign: 'left', fontSize: '12px', color: '#444' }}>
+                    {front.dropZones.map((_, i) => (
+                        <div key={i} style={{ marginBottom: '2px' }}>
+                            <span style={{ fontWeight: '600', marginRight: '4px' }}>{i + 1}.</span>
+                            <span style={{
+                                display: 'inline-block',
+                                width: '80px',
+                                borderBottom: '1.5px solid #999',
+                                verticalAlign: 'bottom',
+                            }} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
     return (
         <div style={{ textAlign: 'center' }}>
             {front.imageUrl && (
@@ -54,6 +117,54 @@ function CardFrontContent({ front }) {
 }
 
 function CardBackContent({ back }) {
+    if (back.isDragDropBack) {
+        return (
+            <div style={{ width: '100%' }}>
+                {back.imageUrl && (
+                    <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                        <img
+                            src={back.imageUrl}
+                            alt="diagram"
+                            style={{ width: '100%', maxHeight: '120px', objectFit: 'contain', display: 'block' }}
+                        />
+                        {back.dropZones.map((zone, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    position: 'absolute',
+                                    left: `${zone.x}%`,
+                                    top: `${zone.y}%`,
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '20px',
+                                    height: '20px',
+                                    borderRadius: '50%',
+                                    background: '#22c55e',
+                                    color: 'white',
+                                    fontSize: '11px',
+                                    fontWeight: '700',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+                                    pointerEvents: 'none',
+                                }}
+                            >
+                                {i + 1}
+                            </div>
+                        ))}
+                    </div>
+                )}
+                <div style={{ marginTop: '8px', textAlign: 'left', fontSize: '12px', color: '#444' }}>
+                    {back.dropZones.map((zone, i) => (
+                        <div key={i} style={{ marginBottom: '2px' }}>
+                            <span style={{ fontWeight: '600', marginRight: '4px' }}>{i + 1}.</span>
+                            <span>{zone.correctLabel}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
     if (back.steps) {
         return (
             <ol style={{ textAlign: 'left', paddingLeft: '20px', margin: 0, fontSize: '13px' }}>
@@ -207,6 +318,7 @@ const StudyPage = ({ onToggleFavorite, userId }) => {
     const currentKnowledge = knowledgeMap[currentCard.id] ?? 'DONT_KNOW';
     const currentKnowledgeOption = KNOWLEDGE_OPTIONS.find(o => o.value === currentKnowledge);
 
+    console.log(currentCard);
     return (
         <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center' }}>
             <BackButton />

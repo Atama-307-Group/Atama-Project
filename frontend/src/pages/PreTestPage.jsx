@@ -90,7 +90,7 @@ const PreTestPage = () => {
         try {
             setLoading(true);
             setError('');
-            
+
             const flashcardSetIds = selectedItems
                 .filter(i => { const t = i.itemType || i.item_type; return t === 'FLASHCARD_SET' || t === 'flashcard_set'; })
                 .map(i => i.id);
@@ -98,13 +98,40 @@ const PreTestPage = () => {
                 .filter(i => { const t = i.itemType || i.item_type; return t !== 'FLASHCARD_SET' && t !== 'flashcard_set'; })
                 .map(i => i.id);
 
-            const useAi = !forceManual && !aiDisabled;
+            const useAi = !forceManual && !aiDisabled && documentIds.length > 0;
 
+            // ── Flashcard-only path: build questions client-side, no AI ──
+            if (!useAi || documentIds.length === 0) {
+                const promises = flashcardSetIds.map(id => getFlashcardSetById(id));
+                const sets = await Promise.all(promises);
+                const allCards = sets.flatMap(s => s.flashcards || []);
+
+                if (allCards.length === 0) {
+                    setError('No cards found in the selected sets.');
+                    return;
+                }
+
+                const shuffled = [...allCards].sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, numQuestions);
+
+                navigate('/practice_test', {
+                    state: {
+                        questions: null, // signal to PracticeTestPage to build from cards
+                        cards: allCards,
+                        promptType: 'term',
+                        numQuestions: selected.length,
+                        setId: flashcardSetIds[0] ?? null,
+                    }
+                });
+                return;
+            }
+
+            // ── AI path: only when documents are involved ──
             const payload = {
                 flashcardSetIds,
                 documentIds,
                 formattedText: '',
-                useAi,
+                useAi: true,
                 questionTypes: types,
                 numQuestions
             };
@@ -116,8 +143,9 @@ const PreTestPage = () => {
             }
 
             navigate('/practice_test', {
-                state: { questions, setId: flashcardSetIds.length > 0 ? flashcardSetIds[0] : null }
+                state: { questions, setId: flashcardSetIds[0] ?? null }
             });
+
         } catch (err) {
             setError(err.message || 'Error generating test');
         } finally {
