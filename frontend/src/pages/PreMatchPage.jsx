@@ -33,7 +33,7 @@ const PreMatchPage = () => {
 
                 <div className="presettings-header">
                     <div>
-                        <h2 className="presettings-title">Learn Settings</h2>
+                        <h2 className="presettings-title">Match Settings</h2>
                         {setTitle && <p className="presettings-subtitle">{setTitle}</p>}
                     </div>
                 </div>
