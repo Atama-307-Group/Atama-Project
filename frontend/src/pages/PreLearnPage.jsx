@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BackButton from '../components/BackButton.jsx';
+import './PreSettingsPage.css';
 
 const PreLearnPage = () => {
     const { state } = useLocation();
@@ -13,58 +14,73 @@ const PreLearnPage = () => {
 
     if (flashcards.length === 0) {
         return (
-            <div style={{ textAlign: 'center', marginTop: '100px' }}>
-                <p>No flashcards found. Please go back and select a set.</p>
-                <button onClick={() => navigate('/')}>Return Home</button>
+            <div className="presettings-shell">
+                <div className="presettings-card">
+                    <p className="presettings-empty">No flashcards found. Please go back and select a set.</p>
+                    <button className="presettings-start-btn" onClick={() => navigate('/')}>Return Home</button>
+                </div>
             </div>
         );
     }
 
     const handleStart = () => {
-        let cardsToStudy = favoritesOnly
+        const cardsToStudy = favoritesOnly
             ? flashcards.filter((card) => card.favorite)
             : flashcards;
-
-        navigate('/study', {
-            state: { frontChoice, cards: cardsToStudy, setId: state?.setId }
-        });
+        navigate('/study', { state: { frontChoice, cards: cardsToStudy, setId: state?.setId } });
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}>
-            <div style={{ maxWidth: '500px', width: '100%', fontFamily: 'sans-serif', textAlign: 'center' }}>
-                <BackButton />
-                <h2>Learn Settings</h2>
-                {setTitle && <p style={{ color: '#666', marginTop: 0 }}>{setTitle}</p>}
-                <h3>Front of Card:</h3>
-                <div>
-                    <label>
-                        <input type="radio" value="term" checked={frontChoice === 'term'}
-                               onChange={() => setFrontChoice('term')} /> Term
-                    </label>
-                    <br />
-                    <label>
-                        <input type="radio" value="definition" checked={frontChoice === 'definition'}
-                               onChange={() => setFrontChoice('definition')} /> Definition
+        <div className="presettings-shell">
+            <div className="presettings-card">
+                <div className="presettings-back"><BackButton /></div>
+
+                <div className="presettings-header">
+                    <div>
+                        <h2 className="presettings-title">Learn Settings</h2>
+                        {setTitle && <p className="presettings-subtitle">{setTitle}</p>}
+                    </div>
+                </div>
+
+                <div className="presettings-divider" />
+
+                <div className="presettings-section">
+                    <p className="presettings-section-label">Front of Card</p>
+                    <div className="presettings-radio-group">
+                        {['term', 'definition'].map((val) => (
+                            <label key={val} className={`presettings-radio-option ${frontChoice === val ? 'presettings-radio-option--active' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="frontChoice"
+                                    value={val}
+                                    checked={frontChoice === val}
+                                    onChange={() => setFrontChoice(val)}
+                                    className="presettings-radio-input"
+                                />
+                                <span className="presettings-radio-dot" />
+                                {val.charAt(0).toUpperCase() + val.slice(1)}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="presettings-section">
+                    <p className="presettings-section-label">Options</p>
+                    <label className={`presettings-checkbox-option ${favoritesOnly ? 'presettings-checkbox-option--active' : ''}`}>
+                        <input
+                            type="checkbox"
+                            checked={favoritesOnly}
+                            onChange={() => setFavoritesOnly(!favoritesOnly)}
+                            className="presettings-checkbox-input"
+                        />
+                        <span className="presettings-checkbox-box">{favoritesOnly && '✓'}</span>
+                        Favorited cards only
                     </label>
                 </div>
-                <h3>Other Options:</h3>
-                <div style={{ marginTop: '20px' }}>
-                    <label>
-                        <input type="checkbox" checked={favoritesOnly}
-                               onChange={() => setFavoritesOnly(!favoritesOnly)} /> Favorited cards only
-                    </label>
-                </div>
-                <div style={{ marginTop: '30px' }}>
-                    <button onClick={handleStart} style={{ padding: '10px 20px', fontSize: '16px', borderRadius: '5px' }}>
-                        Start Learning
-                    </button>
-                </div>
+
+                <button className="presettings-start-btn" onClick={handleStart}>
+                    Start Learning
+                </button>
             </div>
         </div>
     );
